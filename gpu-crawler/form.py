@@ -61,7 +61,7 @@ class Form:
                 'page start': StringVar(),
                 'page stop': StringVar(),
                 'budget': StringVar(),
-                'search': IntVar()
+                'spent': StringVar(),
                 },
             'search by': {
                 'sku id': {
@@ -83,12 +83,14 @@ class Form:
                 'status': StringVar()
                 }
             }
-        self.bestbuy_search_selection()
+        self.bestbuy['settings']['spent'].set('0')
+        self.bestbuy['settings']['search'] = \
+            self.bestbuy_search_selection
         self.amd['filled out']['status'].set('incomplete')
         self.amazon['filled out']['status'].set('incomplete')
         self.bestbuy['filled out']['status'].set('incomplete')
 
-    def bestbuy_search_selection(self) -> None:
+    def bestbuy_search_selection(self) -> int:
         sku_id = (self.bestbuy['search by']
                   ['sku id']['checked'].get())
         prices = (self.bestbuy['search by']
@@ -114,5 +116,4 @@ class Form:
             selection *= \
                 bool(self.bestbuy['search by']
                      ['price per sku id']['prices'].get())
-        self.bestbuy['settings']['search'].set(selection)
-        return None
+        return selection

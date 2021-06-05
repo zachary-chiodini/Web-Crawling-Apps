@@ -5,14 +5,18 @@ from PIL import ImageTk, Image
 from bestbuycrawler import BestBuyCrawler
 from typing import Callable, Dict, List
 
+COOL_ROBOT_EMOJI = 'gpu-crawler//icon//cool_robot_emoji.ico'
+COOL_GLASSES_EMOJI = 'gpu-crawler//icon//cool_glasses.png'
+
 
 class App:
 
     def __init__(self, main_window: tk.Tk):
         self.started = False
         self.terminated = True
-        self.bestbuycrawler = BestBuyCrawler()
+        self.threads = []
         self.form = Form()
+        self.bestbuycrawler = BestBuyCrawler(self.form.bestbuy, self.log)
         self.amd_window = tk.Toplevel()
         self.amd_window.destroy()
         self.bestbuy_window = tk.Toplevel()
@@ -331,7 +335,7 @@ class App:
     def ok_or_cancel_buttons(
             self, frame: tk.Frame, window: tk.Toplevel, form_type: Dict,
             row: int, colspan: int, padx: int, pady: int
-    ) -> None:
+            ) -> None:
         def form_trace_callback(*args) -> None:
             self.button_state(form_type, cool_glasses)
             return None
@@ -346,7 +350,7 @@ class App:
                 self.on_exit(win, form, can, *args)
             )
         )
-        image = ImageTk.PhotoImage(Image.open('cool_glasses.png'))
+        image = ImageTk.PhotoImage(Image.open(COOL_GLASSES_EMOJI))
         cool_glasses.image = image
         cool_glasses.configure(image=image)
         cool_glasses.grid(row=row, column=1,
@@ -443,7 +447,7 @@ class App:
         self.amd_window = tk.Toplevel(self.main_window)
         self.amd_window.geometry('450x300')
         self.amd_window.title('AMD Login Form')
-        self.amd_window.iconbitmap('cool_robot_emoji.ico')
+        self.amd_window.iconbitmap(COOL_ROBOT_EMOJI)
         frame = tk.Frame(self.amd_window)
         frame.pack(expand='True')
         self.address_form(
@@ -638,7 +642,7 @@ class App:
         self.bestbuy_window = tk.Toplevel(self.main_window)
         self.bestbuy_window.geometry('570x425')
         self.bestbuy_window.title('Best Buy Login Form')
-        self.bestbuy_window.iconbitmap('cool_robot_emoji.ico')
+        self.bestbuy_window.iconbitmap(COOL_ROBOT_EMOJI)
         frame = tk.Frame(self.bestbuy_window)
         frame.pack(expand=True)
         self.login_form(frame, self.form.bestbuy, 'login', 0, 0, 10, 10)
@@ -714,20 +718,37 @@ class App:
                 and self.form.bestbuy['select']['checked'].get()
         )
         selection = (
-                any_selected * (
-                'You have selected to crawl ' + \
-                self.form.amd['select']['checked'].get() * 'AMD' + \
-                amd_and_amazon_not_bestbuy * ' and ' + \
-                all_selected * ', ' + \
-                self.form.amazon['select']['checked'].get() * 'Amazon' + \
-                amd_or_amazon_and_bestbuy * ' and ' + \
-                self.form.bestbuy['select']['checked'].get() * 'Best Buy' + \
-                '.'
-        ) + \
-                (not any_selected) * \
-                'Please select which website(s) to crawl.'
-        )
+            any_selected * (
+                'You have selected to crawl '
+                + self.form.amd['select']['checked'].get() * 'AMD'
+                + amd_and_amazon_not_bestbuy * ' and '
+                + all_selected * ', '
+                + self.form.amazon['select']['checked'].get() * 'Amazon'
+                + amd_or_amazon_and_bestbuy * ' and '
+                + self.form.bestbuy['select']['checked'].get() * 'Best Buy'
+                + '.'
+                )
+            + (not any_selected)
+            * 'Please select which website(s) to crawl.'
+            )
         self.log(selection)
+        return None
+
+    def start_bestbuy_crawler(self) -> None:
+        try:
+            self.bestbuycrawler.setup_crawler()
+            self.bestbuycrawler.login_crawler()
+            while self.started:
+                page_start = int(self.form.bestbuy['settings']['page start'])
+                page_stop = int(self.form.bestbuy['settings']['page stop'])
+                for page in range(page_start, page_stop + 1):
+                    if self.terminated:
+                        break
+                    html = self.bestbuycrawler.search_gpus(page)
+                    self.bestbuycrawler.scrape_page(html)
+        except Exception as e:
+            self.log(str(e))
+            self.stop(exception=True)
         return None
 
     def start(self) -> None:
@@ -740,22 +761,25 @@ class App:
         self.bestbuy_btn.configure(state='disable')
         self.log('GPU Crawler has started.')
         if self.form.bestbuy['filled out']['status'] == 'complete':
-            pass
-            '''
-            separate_thread = Thread(target=start_crawler)
+            separate_thread = Thread(target=self.start_bestbuy_crawler)
+            self.threads.append(separate_thread)
             separate_thread.start()
-            '''
         return None
 
-    def stop(self) -> None:
+    def stop(self, exception=False) -> None:
         self.started = False
         self.terminated = True
         self.stop_btn.configure(state='disable')
+        if not exception:
+            self.log('Waiting for threads to close ...')
+            for separate_thread in self.threads:
+                separate_thread.join()
+            self.log('GPU Crawler has terminated.')
+        self.bestbuycrawler.close()
         self.strt_btn.configure(state='normal')
         self.amd_btn.configure(state='normal')
         self.amazon_btn.configure(state='normal')
         self.bestbuy_btn.configure(state='normal')
-        self.log('GPU Crawler has terminated.')
         return None
 
 
@@ -763,6 +787,6 @@ if __name__ == '__main__':
     main = tk.Tk()
     main.geometry('550x300')
     main.title('GPU Crawler')
-    main.iconbitmap('cool_robot_emoji.ico')
+    main.iconbitmap(COOL_ROBOT_EMOJI)
     App(main)
     main.mainloop()
