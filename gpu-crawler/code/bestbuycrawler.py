@@ -71,7 +71,7 @@ class BestBuyCrawler:
 
     def close(self) -> None:
         if self._browser:
-            self._browser.close()
+            self._browser.quit()
         if self._session:
             self._session.close()
         self._browser = None
@@ -156,6 +156,11 @@ class BestBuyCrawler:
     def _fill_in_credit_card_security_code(self) -> None:
         try :
             # Sometimes the CVV is not needed.
+            WebDriverWait(self._browser, 10).until(
+            expected_conditions.element_to_be_clickable(
+                    (By.XPATH, '//input[@id="credit-card-cvv"]')
+                    )
+                )
             self._browser.find_element_by_xpath(
                 '//input[@id="credit-card-cvv"]'
                 ).send_keys(self._form['credit card']['security code'].get())
@@ -164,6 +169,11 @@ class BestBuyCrawler:
         return None
 
     def _place_order(self) -> None:
+        WebDriverWait(self._browser, 10).until(
+            expected_conditions.element_to_be_clickable(
+                (By.XPATH, '//button[@class="btn btn-lg btn-block btn-primary button__fast-track"]')
+                )
+            )
         self._browser.find_element_by_xpath(
             '//button[@class="btn btn-lg btn-block btn-primary button__fast-track"]'
             ).click()
@@ -174,7 +184,7 @@ class BestBuyCrawler:
         return None
 
     def _take_screenshot(self, sku_id: str) -> None:
-        file_name = 'SKU{}ORDER{}'\
+        file_name = 'SKU{}ORDER{}.png'\
             .format(sku_id, self._screenshot)
         self._browser.get_screenshot_as_file(file_name)
         self._log('Screenshot {} taken ...'.format(file_name))
