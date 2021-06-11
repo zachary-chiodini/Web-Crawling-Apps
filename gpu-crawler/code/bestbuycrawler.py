@@ -4,11 +4,15 @@ import requests
 from re import search
 from bs4 import BeautifulSoup
 from selenium.webdriver import Firefox, FirefoxProfile
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions
+from selenium.common.exceptions import TimeoutException
 from typing import Dict
 
-DRIVER_PATH = 'gpu-crawler//driver'
+DRIVER_PATH = 'driver'
 
 
 class BestBuyCrawler:
@@ -33,31 +37,34 @@ class BestBuyCrawler:
         return None
 
     def search_gpus(self, page: int) -> str:
+        self._log('Crawling page {} ...'.format(page))
         response = self._session.get(
             url='https://www.bestbuy.com/site/searchpage.jsp',
-            parms={'st': 'gpus', 'cp': page}
+            params={'st': 'gpus', 'cp': page}
             )
         return response.text
 
     def scrape_page(self, html: str) -> None:
-        if self._form['search by']['sku id']['checked']:
-            sku_list = self._form['search by']['sku id']['ids']
+        if self._form['search by']['sku id']['checked'].get():
+            sku_list = self._form['search by']['sku id']['ids'].get().split(',')
             self._log('Searching by SKU IDs: {}'
                       .format(','.join(sku_list)))
             self._search_by_sku_id(html, sku_list)
-        if self._form['search by']['price range']['checked']:
+        if self._form['search by']['price range']['checked'].get():
             mini = float(
-                self._form['search by']['price range']['min'])
+                self._form['search by']['price range']['min'].get())
             maxi = float(
-                self._form['search by']['price range']['max'])
+                self._form['search by']['price range']['max'].get())
             self._log('Searching by price range ${}-${}'
                       .format(mini, maxi))
             self._search_by_price_range(html, mini, maxi)
-        if self._form['search by']['price per sku id']['checked']:
+        if self._form['search by']['price per sku id']['checked'].get():
             sku_list = self._form['search by']\
-                ['price per sku id']['ids']
+                ['price per sku id']['ids'].get().split(',')
             price_list = self._form['search by']\
-                ['price per sku id']['prices']
+                ['price per sku id']['prices'].get().split(',')
+            self._log('Searching by price pr SKU ID: {}'
+                      .format(list(zip(sku_list, price_list))))
             self._search_by_price_per_sku_id(
                 html, sku_list, price_list)
         return None
@@ -105,13 +112,21 @@ class BestBuyCrawler:
             'https://www.bestbuy.com/identity/global/signin')
         self._browser.find_element_by_xpath(
             '//input[ @type="email" ]'
-            ).send_keys(self._form['login']['username'])
+            ).send_keys(self._form['login']['username'].get())
         self._browser.find_element_by_xpath(
             '//input[ @type="password" ]'
-            ).send_keys(self._form['login']['password'])
+            ).send_keys(self._form['login']['password'].get())
         self._browser.find_element_by_xpath(
             '//input[ @type="password" ]'
             ).send_keys(Keys.RETURN)
+        try:
+            WebDriverWait(self._browser, 10).until(
+                lambda driver:
+                driver.current_url == 'https://www.bestbuy.com/'
+                )
+        except TimeoutException:
+            raise Exception('Could not login. Check the '
+                            'username and/or password.')
         return None
 
     def _add_to_cart(self, sku_id: str) -> None:
@@ -119,24 +134,43 @@ class BestBuyCrawler:
             url='https://api.bestbuy.com/click/-/{}/cart'
                 .format(sku_id)
             )
+        WebDriverWait(self._browser, 10).until(
+            lambda driver:
+            driver.current_url == 'https://www.bestbuy.com/cart?cmp=RMX'
+            )
         return None
 
     def _fast_checkout(self) -> None:
         self._browser.get(
             url='https://www.bestbuy.com/checkout/r/fast-track'
             )
+        if self._browser.current_url == 'https://www.bestbuy.com/cart':
+            self._browser.find_element_by_xpath(
+                '//button[text()="Checkout"]').click()
+            WebDriverWait(self._browser, 10).until(
+                lambda driver:
+                driver.current_url == 'https://www.bestbuy.com/checkout/r/fast-track'
+                )
         return None
 
     def _fill_in_credit_card_security_code(self) -> None:
-        self._browser.find_element_by_xpath(
-            '//input[ @id="credit-card-cvv" ]'
-            ).send_keys(self._form['credit card']['security code'])
+        try :
+            # Sometimes the CVV is not needed.
+            self._browser.find_element_by_xpath(
+                '//input[@id="credit-card-cvv"]'
+                ).send_keys(self._form['credit card']['security code'].get())
+        except Exception as e:
+            self._log(str(e))
         return None
 
     def _place_order(self) -> None:
         self._browser.find_element_by_xpath(
-            '//button[ @class="btn btn-lg btn-block btn-primary button__fast-track" ]'
+            '//button[@class="btn btn-lg btn-block btn-primary button__fast-track"]'
             ).click()
+        WebDriverWait(self._browser, 10).until(
+            lambda driver:
+            driver.current_url == 'https://www.bestbuy.com/checkout/r/thank-you'
+            )
         return None
 
     def _take_screenshot(self, sku_id: str) -> None:
@@ -148,9 +182,9 @@ class BestBuyCrawler:
         return None
 
     def _within_budget(self, sku_id: str, price: float) -> bool:
-        total = float(self._form['settings']['spent']) \
+        total = float(self._form['settings']['spent'].get()) \
                 + price
-        if float(self._form['settings']['budget']) <= total:
+        if total <= float(self._form['settings']['budget'].get()):
             self._log('SKU ID {} is within your budget'
                       .format(sku_id))
             self._log('SKU ID {} is queued to order.'
@@ -197,11 +231,12 @@ class BestBuyCrawler:
         return None
 
     def _update_money_spent(self, price: float) -> None:
-        self._form['settings']['spent'] = \
-            float(self._form['settings']['spent']) \
-            + price
-        self._log('Spent ${}.'.format(
-            self._form['settings']['spent']))
+        self._form['settings']['spent'].set(
+            str(float(self._form['settings']['spent'].get())
+                + price)
+            )
+        self._log('Spent ${} and ${} in total.'.format(
+            price, self._form['settings']['spent'].get()))
         return None
 
     @staticmethod
@@ -232,7 +267,7 @@ class BestBuyCrawler:
 
     def _search_by_sku_id(self, html: str, sku_list) -> None:
         for add_to_cart_button in BeautifulSoup(html, 'lxml')\
-                .find('button', {'data-sku-id': sku_list}):
+                .findAll('button', {'data-sku-id': sku_list}):
             sku_id = self._get_sku_id(
                 add_to_cart_button, '(?<=data-sku-id=")[0-9]+')
             add_to_cart_status = add_to_cart_button.get_text()
@@ -264,11 +299,11 @@ class BestBuyCrawler:
     def _search_by_price_per_sku_id(
             self, html: str, sku_list, price_list) -> None:
         for add_to_cart_button in BeautifulSoup(html, 'lxml') \
-                .find('button', {'data-sku-id': sku_list}):
+                .findAll('button', {'data-sku-id': sku_list}):
             sku_id = self._get_sku_id(
                 add_to_cart_button, '(?<=data-sku-id=")[0-9]+')
             price_index = price_list[sku_list.index(sku_id)]
-            right_price = price_list[price_index]
+            right_price = float(price_list[price_index])
             add_to_cart_status = add_to_cart_button.get_text()
             if self._gpu_is_available(sku_id, add_to_cart_status):
                 price = self._get_price(sku_id, html)
