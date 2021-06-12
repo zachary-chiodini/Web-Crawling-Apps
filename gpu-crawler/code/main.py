@@ -415,15 +415,16 @@ class App:
     def model_selection(self, frame: tk.Frame, row, col, padx, pady) -> None:
         def set_display_default_text_on_click(
                 check_var, str_var, default_text, widget, secure
-        ) -> None:
+                ) -> None:
             def display_default_text_on_click(*args) -> None:
                 if check_var.get():
+                    frame.focus_set()
                     widget.config(state='normal')
                     self.display_default_text(str_var, default_text,
                                               widget, secure)
                 else:
                     widget.config(textvariable='')
-                    widget.delete(0, 'end')
+                    widget.delete(0, tk.END)
                     widget.insert(0, '')
                     widget.config(state='disable')
                 return None
