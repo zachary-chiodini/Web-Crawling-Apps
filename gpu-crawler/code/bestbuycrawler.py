@@ -296,7 +296,7 @@ class BestBuyCrawler:
                 sku_id = self._get_sku_id(
                     price_div, '(?<=data-skuid=")[0-9]+')
                 price = self._get_price(sku_id, html)
-                if self._within_price_range(price, mini, maxi):
+                if self._within_price_range(sku_id, price, mini, maxi):
                     add_to_cart_status = \
                         self._get_add_to_cart_status(html, sku_id)
                     if self._gpu_is_available(
