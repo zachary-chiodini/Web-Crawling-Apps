@@ -312,7 +312,7 @@ class BestBuyCrawler:
                 .findAll('button', {'data-sku-id': sku_list}):
             sku_id = self._get_sku_id(
                 add_to_cart_button, '(?<=data-sku-id=")[0-9]+')
-            price_index = price_list[sku_list.index(sku_id)]
+            price_index = sku_list.index(sku_id)
             right_price = float(price_list[price_index])
             add_to_cart_status = add_to_cart_button.get_text()
             if self._gpu_is_available(sku_id, add_to_cart_status):
