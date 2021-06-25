@@ -123,7 +123,7 @@ class App:
         tk.Label(frame, text='City')\
             .grid(row=5, column=col, sticky='w',
                   padx=padx, pady=pady)
-        tk.Entry(frame,textvariable=form_type[key]['city'])\
+        tk.Entry(frame, textvariable=form_type[key]['city'])\
             .grid(row=6, column=col, sticky='w',
                   padx=padx, pady=pady)
         tk.Label(frame, text='State')\
@@ -218,7 +218,7 @@ class App:
             form_type['credit card']['month'], 2)
         tk.Entry(frame, textvariable=form_type['credit card']['month'],
                  width=2)\
-            .grid(row=8, column=col, sticky='w',padx=(padx, 0), pady=pady)
+            .grid(row=8, column=col, sticky='w', padx=(padx, 0), pady=pady)
         self.set_character_limit(
             form_type['credit card']['day'], 2)
         tk.Entry(frame, textvariable=form_type['credit card']['day'],
@@ -228,7 +228,7 @@ class App:
             form_type['credit card']['year'], 4)
         tk.Entry(frame, textvariable=form_type['credit card']['year'],
                  width=4)\
-            .grid(row=8, column=col + 4, sticky='w',pady=pady)
+            .grid(row=8, column=col + 4, sticky='w', pady=pady)
         tk.Label(frame, text='Security Code')\
             .grid(row=9, column=col, columnspan=5, sticky='w',
                   padx=padx, pady=pady)
@@ -560,7 +560,7 @@ class App:
             .grid(row=row, column=col, columnspan=2, sticky='w',
                   padx=padx, pady=pady)
         tk.Label(frame, text='$')\
-            .grid(row=row + 1, column=col,padx=(padx, 0), pady=pady)
+            .grid(row=row + 1, column=col, padx=(padx, 0), pady=pady)
         bgt_var = form_type['settings']['budget']
         bgt_wdgt = tk.Entry(frame, width=8)
         bgt_wdgt.grid(row=row + 1, column=col + 1,
@@ -685,7 +685,7 @@ class App:
             self.bestbuycrawler.close()
             self.log(str(e))
             self.terminated = True
-            self.stop(exception=True)
+            self.stop()
             return None
         self.bestbuycrawler.close()
         self.terminated = True
@@ -705,7 +705,7 @@ class App:
             self.threads.start()
         return None
 
-    def stop(self, exception=False) -> None:
+    def stop(self) -> None:
         self.started = False
         self.stop_btn.configure(state='disable')
         self.strt_btn.configure(state='normal')
