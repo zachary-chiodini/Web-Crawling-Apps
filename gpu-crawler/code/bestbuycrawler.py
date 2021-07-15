@@ -12,7 +12,7 @@ from selenium.webdriver.support import expected_conditions
 from selenium.common.exceptions import TimeoutException
 from typing import Dict
 
-DRIVER_PATH = 'driver'
+DRIVER_PATH = 'gpu-crawler//code//driver'
 
 
 class BestBuyCrawler:
@@ -157,10 +157,10 @@ class BestBuyCrawler:
         try :
             # Sometimes the CVV is not needed.
             WebDriverWait(self._browser, 10).until(
-            expected_conditions.element_to_be_clickable(
-                    (By.XPATH, '//input[@id="credit-card-cvv"]')
+                expected_conditions.element_to_be_clickable(
+                        (By.XPATH, '//input[@id="credit-card-cvv"]')
+                        )
                     )
-                )
             self._browser.find_element_by_xpath(
                 '//input[@id="credit-card-cvv"]'
                 ).send_keys(self._form['credit card']['security code'].get())

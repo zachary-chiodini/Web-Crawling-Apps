@@ -5,8 +5,8 @@ from PIL import ImageTk, Image
 from bestbuycrawler import BestBuyCrawler
 from typing import Callable, Dict
 
-COOL_ROBOT_EMOJI = 'icon//cool_robot_emoji.ico'
-COOL_GLASSES_EMOJI = 'icon//cool_glasses.png'
+COOL_ROBOT_EMOJI = 'gpu-crawler//code//icon//cool_robot_emoji.ico'
+COOL_GLASSES_EMOJI = 'gpu-crawler//code//icon//cool_glasses.png'
 
 
 class App:
