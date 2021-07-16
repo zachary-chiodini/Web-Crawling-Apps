@@ -85,7 +85,8 @@ class CraigsCrawler:
                     str(BeautifulSoup(response.text, 'lxml').select('a:contains("cars+trucks")'))
                     ).group()
                 encoded_query = query.replace(' ', '%20')
-                search_url = '{}{}?query={}'.format(url, cars_and_trucks_path, encoded_query)
+                search_url = '{}/{}?query={}'.format(
+                    url.strip('/'), cars_and_trucks_path.strip('/'), encoded_query)
                 response = self._craigs_validate_get(search_url)
                 for result in BeautifulSoup(response.text, 'lxml') \
                         .findAll('div', {'class': 'result-info'}):
