@@ -63,7 +63,7 @@ class CraigsCrawler:
                     if self._state_and_cities_dict:
                         region_text = region.get_text().lower()
                         if region_text in self._state_and_cities_dict[state]:
-                            url = search('".+"', str(region)).group().strip('"')
+                            url = search('(?<=").+(?=")', str(region)).group().strip('"')
                             united_states[state][region_text] = url
                         else:
                             continue
