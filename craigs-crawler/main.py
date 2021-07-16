@@ -1,4 +1,4 @@
-import json
+from pprint import pprint
 
 from craigs_crawler import CraigsCrawler
 
@@ -10,4 +10,4 @@ results = craigs_crawler.search_cars_and_trucks(
     enforce_substrings=['Volvo', 'S80', 'V8']
     )
 craigs_crawler.close()
-print(json.loads(results, indent=4, default=str))
+pprint(results, width=4)
