@@ -17,7 +17,7 @@ results = craigs_crawler.search_cars_and_trucks(
 craigs_crawler.close()
 print(results)
 ```
-The data in the result is in json format and contains the state, region, 
+The data in the results is in json format and contains the state, region, 
 result header, price, date, URL and image for each result.
 
 To refine the search, the optional parameter "enforce_substrings" can be used.
