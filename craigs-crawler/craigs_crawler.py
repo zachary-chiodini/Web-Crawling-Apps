@@ -1,29 +1,48 @@
+from io import BytesIO
+from os import path
+from PIL import Image
 from re import search
 from typing import Dict, Optional, Set
 
 from bs4 import BeautifulSoup
-from requests import Session, Response
+from requests import Response, Session
+from requests.exceptions import HTTPError
+
+
+class CraigsException(HTTPError):
+    def __init__(self, response: Response) -> None:
+        super().__init__('Get response to URL {url} failed with code {code}'
+                         .format(url=response.url, code=response.status_code))
+        self.code = response.status_code
+        self.headers = response.headers
 
 
 class CraigsCrawler:
-
     def __init__(
             self,
             state_set: Set[str] = set(),
             state_and_regions_dict: Dict[str, Set[str]] = {}
             ) -> None:
-        self.state_set = {text.lower().strip() for text in state_set}
-        self.state_and_cities_dict = {
+        self.united_states = {}
+        self.search_results = {}
+        self.session = Session()
+        self._state_set = {text.lower().strip() for text in state_set}
+        self._state_and_cities_dict = {
             state.lower().strip():
                 [region.lower().strip() for region
                  in state_and_regions_dict[state]]
             for state in state_and_regions_dict
             }
-        self.united_states = {}
-        self.session = Session()
 
-    def _scrape_states_and_regions(self) -> Response:
-        response = self.session.get('https://www.craigslist.org/about/sites#US')
+    def _craigs_validate_get(self, url: str) -> Response:
+        response = self.session.get(url)
+        if response.status_code != 200:
+            raise CraigsException(response)
+        return response
+
+    def _scrape_states_and_regions(self) -> None:
+        response = self._craigs_validate_get(
+            'https://www.craigslist.org/about/sites#US')
         soup = BeautifulSoup(response.text, 'lxml')
         united_states = {}
         for i in range(1, 5):
@@ -34,23 +53,70 @@ class CraigsCrawler:
                     BeautifulSoup(united_states_box, 'lxml').findAll('ul')
                     ):
                 state = state.get_text().lower()
-                if self.state_set or self.state_and_cities_dict:
-                    if state in self.state_set or state in self.state_and_cities_dict:
+                if self._state_set or self._state_and_cities_dict:
+                    if state in self._state_set or state in self._state_and_cities_dict:
                         united_states[state] = {}
                     else:
                         continue
                 else:
                     united_states[state] = {}
                 for region in BeautifulSoup(str(list_), 'lxml').findAll('a'):
-                    if self.state_and_cities_dict:
+                    if self._state_and_cities_dict:
                         region_text = region.get_text().lower()
-                        if region_text in self.state_and_cities_dict[state]:
+                        if region_text in self._state_and_cities_dict[state]:
                             url = search('".+"', str(region)).group().strip('"')
                             united_states[state][region_text] = url
                         else:
                             continue
                     else:
-                        url = search('".+"', str(region)).group().strip('"')
+                        url = search('(?<=").+(?=")', str(region)).group()
                         united_states[state][region.get_text().lower()] = url
         self.united_states = united_states
-        return response
+        return None
+
+    def search_cars_and_trucks(self, query: str = '') -> Dict:
+        result_headers = set()  # Used to prevent duplicates
+        self.search_results = {}
+        self._scrape_states_and_regions()
+        for state in self.united_states:
+            self.search_results[state] = {}
+            for region, url in self.united_states[state].items():
+                self.search_results[state][region] = {}
+                encoded_query = query.replace(' ', '%20')
+                search_path = 'd/cars-trucks/search/cta?query={}'
+                search_url = path.join(url, search_path.format(encoded_query))
+                response = self._craigs_validate_get(search_url)
+                for result in BeautifulSoup(response.text, 'lxml') \
+                        .findAll('div', {'class': 'result-info'}):
+                    result_heading = BeautifulSoup(str(result), 'lxml') \
+                        .find('h3', {'class': 'result-heading'})
+                    heading = result_heading.get_text()
+                    result_url = search('(?<=href=").+?(?=")', str(result_heading)).group()
+                    result_date = search(
+                        '(?<=datetime=").+?(?=")',
+                        str(BeautifulSoup(str(result), 'lxml').find('time'))
+                        ).group()
+                    result_price = BeautifulSoup(str(result), 'lxml') \
+                        .find('span', {'class': 'result-price'}).get_text()
+                    response = self._craigs_validate_get(result_url)
+                    image_url = search(
+                        '(?<=content=").+?(?=")',
+                        str(BeautifulSoup(response.text, 'lxml')
+                            .find('meta', {'property': 'og:image'}))
+                        ).group()
+                    response = self._craigs_validate_get(image_url)
+                    result_image = Image.open(BytesIO(response.content))
+                    result = {
+                        'price': result_price,
+                        'date': result_date,
+                        'url': result_url,
+                        'image': result_image
+                        }
+                    if heading not in result_headers:
+                        self.search_results[state][region][heading] = result
+                        result_headers.add(heading)
+        return self.search_results
+
+    def close(self) -> None:
+        self.session.close()
+        return

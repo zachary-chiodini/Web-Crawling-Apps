@@ -1,6 +1,5 @@
 from craigs_crawler import CraigsCrawler
 
-craigs_crawler = CraigsCrawler()
-craigs_crawler._scrape_states_and_regions()
-print(craigs_crawler.united_states)
-craigs_crawler.session.close()
+craigs_crawler = CraigsCrawler(state_set={'north carolina'})
+results = craigs_crawler.search_cars_and_trucks('Volvo S80 V8')
+print(results)
