@@ -77,7 +77,7 @@ class CraigsCrawler:
     def search_cars_and_trucks(
             self, query: str, enforce_substring: str = ''
             ) -> Dict:
-        result_headers = set()  # Used to prevent duplicates
+        prev_results = set()  # Used to prevent duplicates
         self.search_results = {}
         self._scrape_states_and_regions()
         if 'territories' in self.united_states:
@@ -88,7 +88,9 @@ class CraigsCrawler:
                         for state in self.united_states)
         with tqdm(total=num_loops) as progress_bar:
             for state in self.united_states:
+                self.search_results[state] = {}
                 for region, url in self.united_states[state].items():
+                    self.search_results[state][region] = {}
                     response = self._craigs_validate_get(url)
                     cars_and_trucks_path = search(
                             '(?<=href=").+?(?=")',
@@ -104,6 +106,9 @@ class CraigsCrawler:
                         result_heading = BeautifulSoup(str(result), 'lxml') \
                             .find('h3', {'class': 'result-heading'})
                         heading = result_heading.get_text()
+                        if enforce_substring:
+                            if enforce_substring.lower() not in heading.lower():
+                                continue
                         result_url = search('(?<=href=").+?(?=")', str(result_heading)).group()
                         result_date = search(
                             '(?<=datetime=").+?(?=")',
@@ -125,17 +130,15 @@ class CraigsCrawler:
                             'url': result_url,
                             'image': result_image
                             }
-                        if enforce_substring:
-                            if enforce_substring.lower() not in heading.lower():
-                                continue
-                        if heading not in result_headers:
-                            if state not in self.search_results:
-                                self.search_results[state] = {}
-                            if region not in self.search_results[state]:
-                                self.search_results[state][region] = {}
-                            self.search_results[state][region][heading] = result
-                            result_headers.add(heading)
+                        if str(result) in prev_results:
+                            continue
+                        self.search_results[state][region][heading] = result
+                        prev_results.add(str(result))
+                    if not self.search_results[state][region]:
+                        del self.search_results[state][region]
                     progress_bar.update(1)
+                if not self.search_results[state]:
+                    del self.search_results[state]
         return self.search_results
 
     def close(self) -> None:
