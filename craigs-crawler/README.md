@@ -1,5 +1,5 @@
 # Craigs-Crawler
-This is used to search craigslist statewide or nationwide.
+This package is used to search craigslist statewide or nationwide.
 The default is a nationwide search. 
 Currently, the CraigsCrawler class can only search for cars and trucks.
 The nationwide search may take up to 20 or so minutes. 
