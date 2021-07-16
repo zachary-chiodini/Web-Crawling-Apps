@@ -77,11 +77,12 @@ class CraigsCrawler:
         result_headers = set()  # Used to prevent duplicates
         self.search_results = {}
         self._scrape_states_and_regions()
+        if 'territories' in self.united_states:
+            if 'puerto rico' in self.united_states['territories']:
+                # Puerto Rico craigslist is not in English.
+                del self.united_states['territories']['puerto rico']
         for state in self.united_states:
             for region, url in self.united_states[state].items():
-                if region == 'puerto rico':
-                    # Puerto Rico craigslist is not in English
-                    continue
                 response = self._craigs_validate_get(url)
                 cars_and_trucks_path = search(
                         '(?<=href=").+?(?=")',
