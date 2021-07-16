@@ -71,7 +71,7 @@ from pprint import pprint
 from craigs_crawler import CraigsCrawler
 
 craigs_crawler = CraigsCrawler(
-    state_and_regions_dict={'Texas': 'El Paso', 'California': 'Los Angeles'}
+    state_and_regions_dict={'Texas': {'El Paso', 'Houston'}, 'California': 'Los Angeles'}
     )
 results = craigs_crawler.search_cars_and_trucks(
     query='Volvo S80 V8',
@@ -88,7 +88,7 @@ from craigs_crawler import CraigsCrawler
 
 craigs_crawler = CraigsCrawler(
     state_set={'North Carolina', 'South Carolina', 'Virginia'},
-    state_and_regions_dict={'Texas': 'El Paso', 'California': 'Los Angeles'}
+    state_and_regions_dict={'Texas': {'El Paso', 'Houston'}, 'California': 'Los Angeles'}
     )
 results = craigs_crawler.search_cars_and_trucks(
     query='Volvo S80 V8',
