@@ -1,7 +1,3 @@
-from re import search
-
-from bs4 import BeautifulSoup
-
 from craigs_crawler import CraigsCrawler
 
 craigs_crawler = CraigsCrawler()  # Nationwide search takes some time.
