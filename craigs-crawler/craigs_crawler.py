@@ -77,7 +77,7 @@ class CraigsCrawler:
             self, query: str,
             enforce_substrings: Optional[List[str]] = None
             ) -> Dict:
-        prev_results = set()  # Used to prevent duplicates
+        prev_result_urls = set()  # Used to prevent duplicates
         search_results = {}
         self._scrape_states_and_regions()
         if 'territories' in self.united_states:
@@ -115,6 +115,8 @@ class CraigsCrawler:
                             if substring_not_found:
                                 continue
                         result_url = search('(?<=href=").+?(?=")', str(result_heading)).group()
+                        if result_url in prev_result_urls:
+                            continue
                         result_date = search(
                             '(?<=datetime=").+?(?=")',
                             str(BeautifulSoup(str(result), 'lxml').find('time'))
@@ -129,16 +131,13 @@ class CraigsCrawler:
                             ).group()
                         response = self._craigs_validate_get(image_url)
                         result_image = Image.open(BytesIO(response.content))
-                        result = {
+                        search_results[state][region][heading] = {
                             'price': result_price,
                             'date': result_date,
                             'url': result_url,
                             'image': result_image
                             }
-                        if str(result) in prev_results:
-                            continue
-                        search_results[state][region][heading] = result
-                        prev_results.add(str(result))
+                        prev_result_urls.add(result_url)
                     if not search_results[state][region]:
                         del search_results[state][region]
                     progress_bar.update(1)
