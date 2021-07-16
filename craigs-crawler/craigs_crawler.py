@@ -79,14 +79,19 @@ class CraigsCrawler:
         self._scrape_states_and_regions()
         for state in self.united_states:
             for region, url in self.united_states[state].items():
+                if region == 'puerto rico':
+                    # Puerto Rico craigslist is not in English
+                    continue
                 response = self._craigs_validate_get(url)
                 cars_and_trucks_path = search(
-                    '(?<=href=").+?(?=")',
-                    str(BeautifulSoup(response.text, 'lxml').select('a:contains("cars+trucks")'))
-                    ).group()
+                        '(?<=href=").+?(?=")',
+                        str(BeautifulSoup(response.text, 'lxml').select('a:contains("cars+trucks")'))
+                        ).group()
+                cars_and_trucks_path = cars_and_trucks_path.group()
+                domain = search('.+(.org)', url).group()
                 encoded_query = query.replace(' ', '%20')
                 search_url = '{}/{}?query={}'.format(
-                    url.strip('/'), cars_and_trucks_path.strip('/'), encoded_query)
+                    domain, cars_and_trucks_path.strip('/'), encoded_query)
                 response = self._craigs_validate_get(search_url)
                 for result in BeautifulSoup(response.text, 'lxml') \
                         .findAll('div', {'class': 'result-info'}):
