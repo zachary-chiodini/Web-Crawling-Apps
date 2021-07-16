@@ -1,6 +1,7 @@
 from io import BytesIO
 from PIL import Image
 from re import search
+from tqdm import tqdm
 from typing import Dict, Optional, Set
 
 from bs4 import BeautifulSoup
@@ -81,51 +82,55 @@ class CraigsCrawler:
             if 'puerto rico' in self.united_states['territories']:
                 # Puerto Rico craigslist is not in English.
                 del self.united_states['territories']['puerto rico']
-        for state in self.united_states:
-            for region, url in self.united_states[state].items():
-                response = self._craigs_validate_get(url)
-                cars_and_trucks_path = search(
-                        '(?<=href=").+?(?=")',
-                        str(BeautifulSoup(response.text, 'lxml').select('a:contains("cars+trucks")'))
-                        ).group()
-                domain = search('.+(.org)', url).group()
-                encoded_query = query.replace(' ', '%20')
-                search_url = '{}/{}?query={}'.format(
-                    domain, cars_and_trucks_path.strip('/'), encoded_query)
-                response = self._craigs_validate_get(search_url)
-                for result in BeautifulSoup(response.text, 'lxml') \
-                        .findAll('div', {'class': 'result-info'}):
-                    result_heading = BeautifulSoup(str(result), 'lxml') \
-                        .find('h3', {'class': 'result-heading'})
-                    heading = result_heading.get_text()
-                    result_url = search('(?<=href=").+?(?=")', str(result_heading)).group()
-                    result_date = search(
-                        '(?<=datetime=").+?(?=")',
-                        str(BeautifulSoup(str(result), 'lxml').find('time'))
-                        ).group()
-                    result_price = BeautifulSoup(str(result), 'lxml') \
-                        .find('span', {'class': 'result-price'}).get_text()
-                    response = self._craigs_validate_get(result_url)
-                    image_url = search(
-                        '(?<=content=").+?(?=")',
-                        str(BeautifulSoup(response.text, 'lxml')
-                            .find('meta', {'property': 'og:image'}))
-                        ).group()
-                    response = self._craigs_validate_get(image_url)
-                    result_image = Image.open(BytesIO(response.content))
-                    result = {
-                        'price': result_price,
-                        'date': result_date,
-                        'url': result_url,
-                        'image': result_image
-                        }
-                    if heading not in result_headers:
-                        if state not in self.search_results:
-                            self.search_results[state] = {}
-                        if region not in self.search_results[state]:
-                            self.search_results[state][region] = {}
-                        self.search_results[state][region][heading] = result
-                        result_headers.add(heading)
+        num_loops = sum(len(self.united_states[state])
+                        for state in self.united_states)
+        with tqdm(total=num_loops) as progress_bar:
+            for state in self.united_states:
+                for region, url in self.united_states[state].items():
+                    response = self._craigs_validate_get(url)
+                    cars_and_trucks_path = search(
+                            '(?<=href=").+?(?=")',
+                            str(BeautifulSoup(response.text, 'lxml').select('a:contains("cars+trucks")'))
+                            ).group()
+                    domain = search('.+(.org)', url).group()
+                    encoded_query = query.replace(' ', '%20')
+                    search_url = '{}/{}?query={}'.format(
+                        domain, cars_and_trucks_path.strip('/'), encoded_query)
+                    response = self._craigs_validate_get(search_url)
+                    for result in BeautifulSoup(response.text, 'lxml') \
+                            .findAll('div', {'class': 'result-info'}):
+                        result_heading = BeautifulSoup(str(result), 'lxml') \
+                            .find('h3', {'class': 'result-heading'})
+                        heading = result_heading.get_text()
+                        result_url = search('(?<=href=").+?(?=")', str(result_heading)).group()
+                        result_date = search(
+                            '(?<=datetime=").+?(?=")',
+                            str(BeautifulSoup(str(result), 'lxml').find('time'))
+                            ).group()
+                        result_price = BeautifulSoup(str(result), 'lxml') \
+                            .find('span', {'class': 'result-price'}).get_text()
+                        response = self._craigs_validate_get(result_url)
+                        image_url = search(
+                            '(?<=content=").+?(?=")',
+                            str(BeautifulSoup(response.text, 'lxml')
+                                .find('meta', {'property': 'og:image'}))
+                            ).group()
+                        response = self._craigs_validate_get(image_url)
+                        result_image = Image.open(BytesIO(response.content))
+                        result = {
+                            'price': result_price,
+                            'date': result_date,
+                            'url': result_url,
+                            'image': result_image
+                            }
+                        if heading not in result_headers:
+                            if state not in self.search_results:
+                                self.search_results[state] = {}
+                            if region not in self.search_results[state]:
+                                self.search_results[state][region] = {}
+                            self.search_results[state][region][heading] = result
+                            result_headers.add(heading)
+                    progress_bar.update(1)
         return self.search_results
 
     def close(self) -> None:
