@@ -88,3 +88,4 @@ craigs_crawler.close()
 print(results)
 ```
 See "main.py" to change the search parameters.
+Run "main.py" to begin the search.
