@@ -60,7 +60,7 @@ pprint(results, width=4)
 ```
 
 Furthermore, the search can be narrowed down to city and state,
-using the optional parameter "states_and_region_dict."
+using the optional parameter "state_and_region_dict."
 Note that the region you choose must exist on the craigslist website 
 https://www.craigslist.org/about/sites#US. 
 Additionally, Puerto Rico cannot be chosen, because the Puerto Rico craigslist is not in English.
