@@ -1,5 +1,4 @@
 from io import BytesIO
-import json
 from PIL import Image
 from re import search
 from tqdm import tqdm
@@ -77,7 +76,7 @@ class CraigsCrawler:
     def search_cars_and_trucks(
             self, query: str,
             enforce_substrings: Optional[List[str]] = None
-            ) -> str:
+            ) -> Dict:
         prev_results = set()  # Used to prevent duplicates
         search_results = {}
         self._scrape_states_and_regions()
@@ -145,7 +144,7 @@ class CraigsCrawler:
                     progress_bar.update(1)
                 if not search_results[state]:
                     del search_results[state]
-        return json.dumps(search_results, indent=4)
+        return search_results
 
     def close(self) -> None:
         self.session.close()
