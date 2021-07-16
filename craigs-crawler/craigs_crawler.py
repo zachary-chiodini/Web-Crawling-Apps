@@ -1,8 +1,9 @@
 from io import BytesIO
+import json
 from PIL import Image
 from re import search
 from tqdm import tqdm
-from typing import Dict, Optional, Set
+from typing import Dict, List, Optional, Set
 
 from bs4 import BeautifulSoup
 from requests import Response, Session
@@ -24,7 +25,6 @@ class CraigsCrawler:
             state_and_regions_dict: Dict[str, Set[str]] = {}
             ) -> None:
         self.united_states = {}
-        self.search_results = {}
         self.session = Session()
         self._state_set = {text.lower().strip() for text in state_set}
         self._state_and_cities_dict = {
@@ -75,10 +75,11 @@ class CraigsCrawler:
         return None
 
     def search_cars_and_trucks(
-            self, query: str, enforce_substring: str = ''
-            ) -> Dict:
+            self, query: str,
+            enforce_substrings: Optional[List[str]] = None
+            ) -> str:
         prev_results = set()  # Used to prevent duplicates
-        self.search_results = {}
+        search_results = {}
         self._scrape_states_and_regions()
         if 'territories' in self.united_states:
             if 'puerto rico' in self.united_states['territories']:
@@ -88,9 +89,9 @@ class CraigsCrawler:
                         for state in self.united_states)
         with tqdm(total=num_loops) as progress_bar:
             for state in self.united_states:
-                self.search_results[state] = {}
+                search_results[state] = {}
                 for region, url in self.united_states[state].items():
-                    self.search_results[state][region] = {}
+                    search_results[state][region] = {}
                     response = self._craigs_validate_get(url)
                     cars_and_trucks_path = search(
                             '(?<=href=").+?(?=")',
@@ -106,8 +107,13 @@ class CraigsCrawler:
                         result_heading = BeautifulSoup(str(result), 'lxml') \
                             .find('h3', {'class': 'result-heading'})
                         heading = result_heading.get_text()
-                        if enforce_substring:
-                            if enforce_substring.lower() not in heading.lower():
+                        if enforce_substrings:
+                            substring_not_found = False
+                            for substring in enforce_substrings:
+                                if substring.lower() not in heading.lower():
+                                    substring_not_found = True
+                                    break
+                            if substring_not_found:
                                 continue
                         result_url = search('(?<=href=").+?(?=")', str(result_heading)).group()
                         result_date = search(
@@ -132,14 +138,14 @@ class CraigsCrawler:
                             }
                         if str(result) in prev_results:
                             continue
-                        self.search_results[state][region][heading] = result
+                        search_results[state][region][heading] = result
                         prev_results.add(str(result))
-                    if not self.search_results[state][region]:
-                        del self.search_results[state][region]
+                    if not search_results[state][region]:
+                        del search_results[state][region]
                     progress_bar.update(1)
-                if not self.search_results[state]:
-                    del self.search_results[state]
-        return self.search_results
+                if not search_results[state]:
+                    del search_results[state]
+        return json.dumps(search_results, indent=4)
 
     def close(self) -> None:
         self.session.close()
