@@ -74,7 +74,9 @@ class CraigsCrawler:
         self.united_states = united_states
         return None
 
-    def search_cars_and_trucks(self, query: str = '') -> Dict:
+    def search_cars_and_trucks(
+            self, query: str, enforce_substring: str = ''
+            ) -> Dict:
         result_headers = set()  # Used to prevent duplicates
         self.search_results = {}
         self._scrape_states_and_regions()
@@ -123,6 +125,9 @@ class CraigsCrawler:
                             'url': result_url,
                             'image': result_image
                             }
+                        if enforce_substring:
+                            if enforce_substring.lower() not in heading.lower():
+                                continue
                         if heading not in result_headers:
                             if state not in self.search_results:
                                 self.search_results[state] = {}
