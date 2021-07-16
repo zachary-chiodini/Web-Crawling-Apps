@@ -1,5 +1,4 @@
 from io import BytesIO
-from os import path
 from PIL import Image
 from re import search
 from typing import Dict, Optional, Set
@@ -79,12 +78,14 @@ class CraigsCrawler:
         self.search_results = {}
         self._scrape_states_and_regions()
         for state in self.united_states:
-            self.search_results[state] = {}
             for region, url in self.united_states[state].items():
-                self.search_results[state][region] = {}
+                response = self._craigs_validate_get(url)
+                cars_and_trucks_path = search(
+                    '(?<=href=").+?(?=")',
+                    str(BeautifulSoup(response.text, 'lxml').select('a:contains("cars+trucks")'))
+                    ).group()
                 encoded_query = query.replace(' ', '%20')
-                search_path = 'd/cars-trucks/search/cta?query={}'
-                search_url = path.join(url, search_path.format(encoded_query))
+                search_url = '{}{}?query={}'.format(url, cars_and_trucks_path, encoded_query)
                 response = self._craigs_validate_get(search_url)
                 for result in BeautifulSoup(response.text, 'lxml') \
                         .findAll('div', {'class': 'result-info'}):
@@ -113,6 +114,10 @@ class CraigsCrawler:
                         'image': result_image
                         }
                     if heading not in result_headers:
+                        if state not in self.search_results:
+                            self.search_results[state] = {}
+                        if region not in self.search_results[state]:
+                            self.search_results[state][region] = {}
                         self.search_results[state][region][heading] = result
                         result_headers.add(heading)
         return self.search_results
