@@ -128,9 +128,12 @@ class CraigsCrawler:
                             '(?<=content=").+?(?=")',
                             str(BeautifulSoup(response.text, 'lxml')
                                 .find('meta', {'property': 'og:image'}))
-                            ).group()
-                        response = self._craigs_validate_get(image_url)
-                        result_image = Image.open(BytesIO(response.content))
+                            )
+                        if image_url:
+                            response = self._craigs_validate_get(image_url.group())
+                            result_image = Image.open(BytesIO(response.content))
+                        else:
+                            result_image = None
                         search_results[state][region][heading] = {
                             'price': result_price,
                             'date': result_date,
