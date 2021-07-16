@@ -87,7 +87,6 @@ class CraigsCrawler:
                         '(?<=href=").+?(?=")',
                         str(BeautifulSoup(response.text, 'lxml').select('a:contains("cars+trucks")'))
                         ).group()
-                cars_and_trucks_path = cars_and_trucks_path.group()
                 domain = search('.+(.org)', url).group()
                 encoded_query = query.replace(' ', '%20')
                 search_url = '{}/{}?query={}'.format(
