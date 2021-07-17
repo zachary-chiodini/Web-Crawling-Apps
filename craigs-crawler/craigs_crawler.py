@@ -19,8 +19,7 @@ class CraigsException(HTTPError):
 
 class CraigsCrawler:
     def __init__(
-            self,
-            state_set: Set[str] = set(),
+            self, state_set: Set[str] = set(),
             state_and_regions_dict: Dict[str, Set[str]] = {}
             ) -> None:
         self.united_states = {}
