@@ -149,4 +149,4 @@ class CraigsCrawler:
 
     def close(self) -> None:
         self.session.close()
-        return
+        return None
