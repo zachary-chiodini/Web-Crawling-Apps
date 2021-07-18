@@ -155,7 +155,7 @@ class BestBuyCrawler:
         return None
 
     def _fill_in_credit_card_security_code(self) -> None:
-        try :
+        try:
             # Sometimes the CVV is not needed.
             WebDriverWait(self._browser, 10).until(
                 expected_conditions.element_to_be_clickable(
