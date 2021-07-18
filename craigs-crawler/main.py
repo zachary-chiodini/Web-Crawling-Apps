@@ -6,8 +6,8 @@ from craigs_crawler import CraigsCrawler
 # This may result in a connection error.
 craigs_crawler = CraigsCrawler()
 results = craigs_crawler.search_cars_and_trucks(
-    query='Volvo S80 V8',
-    enforce_substrings=['Volvo', 'S80', 'V8']
+    query='Volvo S80',
+    enforce_substrings=['Volvo', 'S80', '2010']
     )
 craigs_crawler.close()
 pprint(results, width=4)

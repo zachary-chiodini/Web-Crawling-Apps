@@ -4,8 +4,10 @@ from re import search
 from bs4 import BeautifulSoup
 from selenium.webdriver import Firefox, FirefoxProfile
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions
 from selenium.common.exceptions import TimeoutException
 
 DRIVER_PATH = 'driver'
@@ -51,10 +53,13 @@ except TimeoutException as e:
 browser.get('https://www.indeed.com/jobs?q={query}&fromage={days}&start={start}'
             .format(query='data', days=14, start=1))
 
+x = 'Please list 2-3 dates and time ranges that you could do an interview.'
+
+main_window = browser.current_window_handle
 mobtk = search('(?<=data-mobtk=").+?(?=")', browser.page_source).group()
 
 for tag in BeautifulSoup(browser.page_source, 'lxml').findAll('a', {'data-mobtk': mobtk}):
-    identifier = search('(?<=id=").+?(?=")', str(tag)).group()
+    job_jk = search('(?<=data-jk=").+?(?=")', str(tag)).group()
     result_content = BeautifulSoup(str(tag), 'lxml').find('td', {'class': 'resultContent'})
     job_title = BeautifulSoup(str(result_content), 'lxml')\
         .find('h2', {'class': 'jobTitle jobTitle-color-purple jobTitle-newJob'})
@@ -62,11 +67,11 @@ for tag in BeautifulSoup(browser.page_source, 'lxml').findAll('a', {'data-mobtk'
         .find('span', {'class': 'companyName'})
     location = BeautifulSoup(str(result_content), 'lxml')\
         .find('div', {'class': 'companyLocation'})
-    salary = BeautifulSoup(str(result_content), 'lxml')\E
+    salary = BeautifulSoup(str(result_content), 'lxml')\
         .find('span', {'class': 'salary-snippet'})
     quick_apply = BeautifulSoup(str(tag), 'lxml')\
         .find('span', {'class': 'ialbl iaTextBlack'})
-    print(identifier)
+    print(job_jk)
     if job_title:
         print(job_title.get_text())
     if company_name:
@@ -77,6 +82,45 @@ for tag in BeautifulSoup(browser.page_source, 'lxml').findAll('a', {'data-mobtk'
         print(salary.get_text())
     if quick_apply:
         print(quick_apply.get_text())
-    print()
-    print()
-
+    if quick_apply:
+        job_url = 'https://www.indeed.com/viewjob?jk={}'.format(job_jk)
+        browser.execute_script('window.open()')
+        tab = browser.window_handles[-1]
+        browser.switch_to.window(tab)
+        browser.get(job_url)
+        WebDriverWait(browser, 10).until(
+            expected_conditions.element_to_be_clickable(
+                (By.XPATH, '//*[@id="indeedApplyButton"]')
+                )
+            )
+        browser.find_element_by_xpath('//*[@id="indeedApplyButton"]').click()
+        while True:
+            try:
+                WebDriverWait(browser, 10).until(
+                    expected_conditions.element_to_be_clickable(
+                        (By.XPATH, '//button//span[text()="Continue"]')
+                        )
+                    )
+                browser.find_element_by_xpath('//button//span[text()="Continue"]').click()
+            except TimeoutException:
+                break
+        WebDriverWait(browser, 10).until(
+            expected_conditions.element_to_be_clickable(
+                (By.XPATH, '//button//span[text()="Review your application"]')
+                )
+            )
+        browser.find_element_by_xpath('//button//span[text()="Review your application"]').click()
+        WebDriverWait(browser, 10).until(
+            expected_conditions.element_to_be_clickable(
+                (By.XPATH, '//button//span[text()="Submit your application"]')
+            )
+        )
+        browser.find_element_by_xpath('//button//span[text()="Submit your application"]').click()
+        WebDriverWait(browser, 10).until(
+            expected_conditions.element_to_be_clickable(
+                (By.XPATH, '//button//span[text()="Return to job search"]')
+            )
+        )
+        browser.find_element_by_xpath('//button//span[text()="Return to job search"]').click()
+        browser.close()
+        break
