@@ -1,7 +1,9 @@
 import os
 import atexit
-import requests
 from re import search
+from typing import Dict
+
+import requests
 from bs4 import BeautifulSoup
 from selenium.webdriver import Firefox, FirefoxProfile
 from selenium.webdriver.firefox.options import Options
@@ -10,7 +12,6 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.common.exceptions import TimeoutException
-from typing import Dict
 
 DRIVER_PATH = 'gpu-crawler//code//driver'
 
