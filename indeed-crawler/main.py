@@ -7,14 +7,14 @@ DEBUG = True
 
 if __name__ == '__main__':
 
-    indeed_crawler = IndeedCrawler(debug=True)
+    indeed_crawler = IndeedCrawler(debug=DEBUG)
     indeed_crawler.setup_browser()
     indeed_crawler.login(
-        email='',
-        password=''
+        email='zachary.chiodini@outlook.com',
+        password='12Bryant$$'
         )
     try:
-        indeed_crawler.search_jobs('data')
+        indeed_crawler.search_jobs('poopy ding dong')
     except Exception as e:
         if DEBUG:
             traceback.print_exc()
