@@ -162,11 +162,10 @@ class IndeedCrawler:
                         traceback.print_exc()
                         error_encountered = True
                         break
-                    with open('{}-ERROR.html'.format(job_jk), 'w', encoding='utf-8') as file:
-                        file.write(self._browser.page_source)
                     if self._browser.current_window_handle != self._main_window:
                         self._browser.close()
                         self._browser.switch_to.window(self._main_window)
+                    continue
                 result_content = BeautifulSoup(str(tag), 'lxml').find('td', {'class': 'resultContent'})
                 job_title = BeautifulSoup(str(result_content), 'lxml')\
                     .find('h2', {'class': 'jobTitle jobTitle-color-purple jobTitle-newJob'})
