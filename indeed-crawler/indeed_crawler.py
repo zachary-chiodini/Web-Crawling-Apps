@@ -1,5 +1,6 @@
 from os import path
 from re import search
+import traceback
 
 from bs4 import BeautifulSoup
 from selenium.webdriver import Firefox, FirefoxProfile
@@ -15,12 +16,13 @@ from selenium.common.exceptions import (
 
 class IndeedCrawler:
     def __init__(self, headless_mode=False,
-                 driver_path='driver') -> None:
+                 driver_path='driver', debug=False) -> None:
         self.results = {}
         self._browser = None
         self._headless_mode = headless_mode
         self._driver_path = driver_path
         self._main_window = ''
+        self._debug = debug
         self._cache = set()
         with open('cache.txt', 'a+') as file:
             for line in file:
@@ -132,6 +134,7 @@ class IndeedCrawler:
 
     def search_jobs(self, query: str) -> None:
         start = 0
+        error_encountered = False
         while True:
             self._browser.get(
                 'https://www.indeed.com/jobs?q={query}&fromage={days}&start={start}'
@@ -155,14 +158,15 @@ class IndeedCrawler:
                         ElementNotInteractableException,
                         StaleElementReferenceException,
                         TimeoutException) as e:
-                    print(str(e))
-                    WebDriverWait(self._browser, 10)
+                    if self._debug:
+                        traceback.print_exc()
+                        error_encountered = True
+                        break
                     with open('{}-ERROR.html'.format(job_jk), 'w', encoding='utf-8') as file:
                         file.write(self._browser.page_source)
                     if self._browser.current_window_handle != self._main_window:
                         self._browser.close()
                         self._browser.switch_to.window(self._main_window)
-                    continue
                 result_content = BeautifulSoup(str(tag), 'lxml').find('td', {'class': 'resultContent'})
                 job_title = BeautifulSoup(str(result_content), 'lxml')\
                     .find('h2', {'class': 'jobTitle jobTitle-color-purple jobTitle-newJob'})
@@ -190,6 +194,9 @@ class IndeedCrawler:
                 self._cache.add(job_jk)
                 with open('cache.txt', 'a') as file:
                     file.write(job_jk + '\n')
+            if error_encountered:
+                break
+        return None
 
     def close(self) -> None:
         self._browser.quit()
