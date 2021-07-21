@@ -10,8 +10,8 @@ if __name__ == '__main__':
     indeed_crawler = IndeedCrawler(debug=DEBUG)
     indeed_crawler.setup_browser()
     indeed_crawler.login(
-        email='zachary.chiodini@outlook.com',
-        password='12Bryant$$'
+        email='',
+        password=''
         )
     try:
         indeed_crawler.search_jobs('poopy ding dong')
