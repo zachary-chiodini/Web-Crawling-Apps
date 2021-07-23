@@ -40,13 +40,14 @@ if __name__ == '__main__':
         debug=False,
         manually_fill_out_questions=False
         )
+    indeed_crawler.setup_browser()
     indeed_crawler.login(
         email='',
         password=''
         )
     try:
         indeed_crawler.search_jobs(
-            query='data entry',
+            query='gamer',
             past_14_days=False,
             job_type='',
             salary='',

@@ -242,7 +242,8 @@ class IndeedCrawler:
                         continue
                 result_content = BeautifulSoup(str(tag), 'lxml').find('td', {'class': 'resultContent'})
                 job_title = BeautifulSoup(str(result_content), 'lxml')\
-                    .find('h2', {'class': 'jobTitle jobTitle-color-purple jobTitle-newJob'})
+                    .find('h2', {'class': ['jobTitle jobTitle-color-purple jobTitle-newJob',
+                                           'jobTitle jobTitle-color-purple']})
                 company_name = BeautifulSoup(str(result_content), 'lxml')\
                     .find('span', {'class': 'companyName'})
                 job_location = BeautifulSoup(str(result_content), 'lxml')\
