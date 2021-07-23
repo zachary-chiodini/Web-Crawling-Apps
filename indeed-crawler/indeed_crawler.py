@@ -16,6 +16,7 @@ from selenium.common.exceptions import (
 
 
 class IndeedCrawler:
+
     def __init__(
             self, number_of_jobs: int, headless_mode=False,
             driver_path='driver', debug=False,
