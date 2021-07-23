@@ -8,7 +8,7 @@ from pandas import DataFrame, ExcelWriter
 
 from indeed_crawler import IndeedCrawler
 
-DEBUG = True
+DEBUG = False
 
 
 def append_df_to_excel(
