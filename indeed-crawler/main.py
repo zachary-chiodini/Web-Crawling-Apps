@@ -6,7 +6,6 @@ from openpyxl import Workbook
 from openpyxl import load_workbook
 from pandas import DataFrame, ExcelWriter
 
-
 from indeed_crawler import IndeedCrawler
 
 DEBUG = True
