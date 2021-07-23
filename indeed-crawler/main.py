@@ -10,11 +10,19 @@ if __name__ == '__main__':
     indeed_crawler = IndeedCrawler(number_of_jobs=1, debug=DEBUG)
     indeed_crawler.setup_browser()
     indeed_crawler.login(
-        email='zachary.chiodini@outlook.com',
-        password='12Bryant$$'
+        email='',
+        password=''
         )
     try:
-        indeed_crawler.search_jobs('game')
+        indeed_crawler.search_jobs(
+            query='',
+            job_type='',
+            salary='',
+            exp_lvl='',
+            remote=False,
+            temp_remote=False,
+            location=''
+            )
     except Exception as e:
         if DEBUG:
             traceback.print_exc()
