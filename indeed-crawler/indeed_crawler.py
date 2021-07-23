@@ -1,5 +1,6 @@
 from os import path
 from re import search
+from time import sleep
 import traceback
 
 from bs4 import BeautifulSoup
@@ -15,9 +16,17 @@ from selenium.common.exceptions import (
 
 
 class IndeedCrawler:
-    def __init__(self, headless_mode=False,
-                 driver_path='driver', debug=False) -> None:
-        self.results = {}
+    def __init__(
+            self, number_of_jobs: int, headless_mode=False,
+            driver_path='driver', debug=False,
+            ) -> None:
+        self.results = {
+            'Title': [],
+            'Company': [],
+            'Location': [],
+            'Salary': [],
+            'URL': []
+            }
         self._browser = None
         self._headless_mode = headless_mode
         self._driver_path = driver_path
@@ -74,7 +83,7 @@ class IndeedCrawler:
             '//input[@type="password"]'
             ).send_keys(password)
         self._browser.find_element_by_xpath(
-            '//input[ @type="password" ]'
+            '//input[@type="password"]'
             ).send_keys(Keys.RETURN)
         try:
             WebDriverWait(self._browser, 10).until(
@@ -88,8 +97,7 @@ class IndeedCrawler:
                 )
         return None
 
-    def _apply_for_job(self, job_jk: str) -> None:
-        job_url = 'https://www.indeed.com/viewjob?jk={}'.format(job_jk)
+    def _apply_for_job(self, job_url: str) -> None:
         self._browser.execute_script('window.open()')
         tab = self._browser.window_handles[-1]
         self._browser.switch_to.window(tab)
@@ -132,13 +140,55 @@ class IndeedCrawler:
         self._browser.switch_to.window(self._main_window)
         return None
 
-    def search_jobs(self, query: str) -> None:
+    def search_jobs(
+            self, query: str,
+            job_type: str = '',
+            salary: str = '',
+            exp_lvl: str = '',
+            remote: bool = False,
+            temp_remote: bool = False,
+            location: str = ''
+            ) -> None:
         start = 0
-        error_encountered = False
-        while True:
+        jobs_applied_to = 0
+        stop_search = False
+        if remote or temp_remote:
             self._browser.get(
                 'https://www.indeed.com/jobs?q={query}&fromage={days}&start={start}'
-                .format(query=query, days=14, start=start))
+                .format(query=query, days=14, start=start)
+                )
+            if remote:
+                remote_id = BeautifulSoup(str(self._browser.page_source), 'lxml') \
+                    .select_one('a:contains("Remote")')
+                if remote_id:
+                    remote_id = search('(?<=remotejob=).+?(?=")', str(remote_id)).group()
+            else:
+                remote_id = BeautifulSoup(str(self._browser.page_source), 'lxml') \
+                    .select_one('a:contains("Temporarily remote")')
+                if remote_id:
+                    remote_id = search('(?<=remotejob=).+?(?=")', str(remote_id)).group()
+        else:
+            remote_id = ''
+        while True:
+            self._browser.get(
+                'https://www.indeed.com/jobs'
+                '?q={query}'
+                '&fromage={days}'
+                '&start={start}'
+                '&jt={type}'
+                '&explvl={lvl}'
+                '&remotejob={remote_id}'
+                '&l={location}'
+                .format(
+                    query=query + ' '*bool(salary) + salary,
+                    days=14,
+                    start=start,
+                    type=job_type,
+                    lvl=exp_lvl,
+                    remote_id=(remote or temp_remote)*remote_id,
+                    location=location
+                    )
+                )
             self._main_window = self._browser.current_window_handle
             mobtk = search('(?<=data-mobtk=").+?(?=")', self._browser.page_source).group()
             soup_list = BeautifulSoup(self._browser.page_source, 'lxml')\
@@ -150,25 +200,29 @@ class IndeedCrawler:
                 if not quick_apply:
                     continue
                 job_jk = search('(?<=data-jk=").+?(?=")', str(tag)).group()
+                job_url = 'https://www.indeed.com/viewjob?jk={}'.format(job_jk)
                 if job_jk in self._cache:
                     continue
                 try:
-                    self._apply_for_job(job_jk)
+                    self._apply_for_job(job_url)
                 except (ElementClickInterceptedException,
                         ElementNotInteractableException,
                         StaleElementReferenceException,
                         TimeoutException) as e:
                     if self._debug:
                         traceback.print_exc()
-                        error_encountered = True
+                        stop_search = True
                         break
                     if self._browser.current_window_handle != self._main_window:
                         self._browser.close()
                         self._browser.switch_to.window(self._main_window)
+                    sleep(3)  # let's take a break
                     continue
                 result_content = BeautifulSoup(str(tag), 'lxml').find('td', {'class': 'resultContent'})
                 job_title = BeautifulSoup(str(result_content), 'lxml')\
                     .find('h2', {'class': 'jobTitle jobTitle-color-purple jobTitle-newJob'})
+                if job_title:
+                    job_title = BeautifulSoup(str(job_title), 'lxml').findAll('span')[-1]
                 company_name = BeautifulSoup(str(result_content), 'lxml')\
                     .find('span', {'class': 'companyName'})
                 location = BeautifulSoup(str(result_content), 'lxml')\
@@ -183,17 +237,19 @@ class IndeedCrawler:
                     location = location.get_text()
                 if salary:
                     salary = salary.get_text()
-                result = {
-                    'Title': job_title,
-                    'Company': company_name,
-                    'Location': location,
-                    'Salary': salary
-                    }
-                self.results[job_jk] = result
+                self.results['Title'].append(job_title)
+                self.results['Company'].append(company_name)
+                self.results['Location'].append(location)
+                self.results['Salary'].append(salary)
+                self.results['URL'].append(job_url)
                 self._cache.add(job_jk)
+                jobs_applied_to += 1
                 with open('cache.txt', 'a') as file:
                     file.write(job_jk + '\n')
-            if error_encountered:
+                if jobs_applied_to == self._number_of_jobs:
+                    stop_search = True
+                    break
+            if stop_search:
                 break
         return None
 
