@@ -1,6 +1,6 @@
 from os import path
 from re import search
-import traceback
+from traceback import print_exc
 from typing import Callable
 
 from bs4 import BeautifulSoup
@@ -36,9 +36,13 @@ class IndeedCrawler:
         self._debug = debug
         self._manually_fill_out_question = manually_fill_out_questions
         self._cache = set()
-        with open('cache.txt', 'a+') as file:
-            for line in file:
-                self._cache.add(line)
+        if path.exists('cache.txt'):
+            with open('cache.txt', 'r') as file:
+                for line in file:
+                    self._cache.add(line.strip())
+        else:
+            with open('cache.txt', 'w') as file:
+                pass
 
     def _setup_real_browser(self) -> None:
         kwargs = {
@@ -156,6 +160,8 @@ class IndeedCrawler:
             temp_remote: bool = False,
             location: str = ''
             ) -> None:
+        if self._number_of_jobs == 0:
+            return None
         start = 0
         jobs_applied_to = 0
         stop_search = False
@@ -217,7 +223,7 @@ class IndeedCrawler:
                         StaleElementReferenceException,
                         TimeoutException):
                     if self._debug:
-                        traceback.print_exc()
+                        print_exc()
                         stop_search = True
                         break
                     if self._manually_fill_out_question:
