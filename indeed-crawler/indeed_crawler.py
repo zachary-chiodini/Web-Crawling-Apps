@@ -1,7 +1,7 @@
 from os import path
 from re import search
-from time import sleep
 import traceback
+from typing import Callable
 
 from bs4 import BeautifulSoup
 from selenium.webdriver import Firefox, FirefoxProfile
@@ -19,6 +19,7 @@ class IndeedCrawler:
     def __init__(
             self, number_of_jobs: int, headless_mode=False,
             driver_path='driver', debug=False,
+            manually_fill_out_questions=False
             ) -> None:
         self.results = {
             'Title': [],
@@ -28,10 +29,12 @@ class IndeedCrawler:
             'URL': []
             }
         self._browser = None
+        self._number_of_jobs = number_of_jobs
         self._headless_mode = headless_mode
         self._driver_path = driver_path
         self._main_window = ''
         self._debug = debug
+        self._manually_fill_out_question = manually_fill_out_questions
         self._cache = set()
         with open('cache.txt', 'a+') as file:
             for line in file:
@@ -87,7 +90,7 @@ class IndeedCrawler:
             ).send_keys(Keys.RETURN)
         try:
             WebDriverWait(self._browser, 10).until(
-                lambda driver: driver.current_url == 'https://secure.indeed.com/settings?hl=en'
+                lambda driver: 'https://secure.indeed.com/settings' in driver.current_url
                 )
         except TimeoutException:
             print('The captcha and/or two-step verification must be done manually.'
@@ -97,12 +100,12 @@ class IndeedCrawler:
                 )
         return None
 
-    def _apply_for_job(self, job_url: str) -> None:
+    def _apply_for_job(self, job_url: str, wait=5) -> None:
         self._browser.execute_script('window.open()')
         tab = self._browser.window_handles[-1]
         self._browser.switch_to.window(tab)
         self._browser.get(job_url)
-        WebDriverWait(self._browser, 10).until(
+        WebDriverWait(self._browser, wait).until(
             expected_conditions.element_to_be_clickable(
                 (By.XPATH, '//*[@id="indeedApplyButton"]')
                 )
@@ -110,7 +113,7 @@ class IndeedCrawler:
         self._browser.find_element_by_xpath('//*[@id="indeedApplyButton"]').click()
         while True:
             try:
-                WebDriverWait(self._browser, 10).until(
+                WebDriverWait(self._browser, wait).until(
                     expected_conditions.element_to_be_clickable(
                         (By.XPATH, '//button//span[text()="Continue"]')
                         )
@@ -118,19 +121,22 @@ class IndeedCrawler:
                 self._browser.find_element_by_xpath('//button//span[text()="Continue"]').click()
             except TimeoutException:
                 break
-        WebDriverWait(self._browser, 10).until(
-            expected_conditions.element_to_be_clickable(
-                (By.XPATH, '//button//span[text()="Review your application"]')
+        try:
+            WebDriverWait(self._browser, wait).until(
+                expected_conditions.element_to_be_clickable(
+                    (By.XPATH, '//button//span[text()="Review your application"]')
+                    )
                 )
-            )
-        self._browser.find_element_by_xpath('//button//span[text()="Review your application"]').click()
-        WebDriverWait(self._browser, 10).until(
-            expected_conditions.element_to_be_clickable(
-                (By.XPATH, '//button//span[text()="Submit your application"]')
+            self._browser.find_element_by_xpath('//button//span[text()="Review your application"]').click()
+            WebDriverWait(self._browser, wait).until(
+                expected_conditions.element_to_be_clickable(
+                    (By.XPATH, '//button//span[text()="Submit your application"]')
+                    )
                 )
-            )
-        self._browser.find_element_by_xpath('//button//span[text()="Submit your application"]').click()
-        WebDriverWait(self._browser, 10).until(
+            self._browser.find_element_by_xpath('//button//span[text()="Submit your application"]').click()
+        except TimeoutException:
+            pass
+        WebDriverWait(self._browser, wait).until(
             expected_conditions.element_to_be_clickable(
                 (By.XPATH, '//button//span[text()="Return to job search"]')
                 )
@@ -142,6 +148,7 @@ class IndeedCrawler:
 
     def search_jobs(
             self, query: str,
+            past_14_days: bool = True,
             job_type: str = '',
             salary: str = '',
             exp_lvl: str = '',
@@ -173,20 +180,20 @@ class IndeedCrawler:
             self._browser.get(
                 'https://www.indeed.com/jobs'
                 '?q={query}'
-                '&fromage={days}'
-                '&start={start}'
-                '&jt={type}'
-                '&explvl={lvl}'
-                '&remotejob={remote_id}'
-                '&l={location}'
+                '{days}'
+                '{start}'
+                '{type}'
+                '{lvl}'
+                '{remote_job}'
+                '{location}'
                 .format(
                     query=query + ' '*bool(salary) + salary,
-                    days=14,
-                    start=start,
-                    type=job_type,
-                    lvl=exp_lvl,
-                    remote_id=(remote or temp_remote)*remote_id,
-                    location=location
+                    days='&fromage=14'*past_14_days,
+                    start='&start=' + str(start),
+                    type='&jt='*bool(job_type) + job_type,
+                    lvl='&explvl='*bool(exp_lvl) + exp_lvl,
+                    remote_job=(remote or temp_remote)*('&remotejob=' + str(remote_id)),
+                    location='&l='*bool(location) + location
                     )
                 )
             self._main_window = self._browser.current_window_handle
@@ -208,39 +215,48 @@ class IndeedCrawler:
                 except (ElementClickInterceptedException,
                         ElementNotInteractableException,
                         StaleElementReferenceException,
-                        TimeoutException) as e:
+                        TimeoutException):
                     if self._debug:
                         traceback.print_exc()
                         stop_search = True
                         break
-                    if self._browser.current_window_handle != self._main_window:
+                    if self._manually_fill_out_question:
+                        WebDriverWait(self._browser, 600).until(
+                            expected_conditions.element_to_be_clickable(
+                                (By.XPATH, '//button//span[text()="Return to job search"]')
+                                )
+                            )
+                        self._browser.find_element_by_xpath('//button//span[text()="Return to job search"]').click()
                         self._browser.close()
                         self._browser.switch_to.window(self._main_window)
-                    sleep(3)  # let's take a break
-                    continue
+                    else:
+                        if self._browser.current_window_handle != self._main_window:
+                            self._browser.close()
+                            self._browser.switch_to.window(self._main_window)
+                        continue
                 result_content = BeautifulSoup(str(tag), 'lxml').find('td', {'class': 'resultContent'})
                 job_title = BeautifulSoup(str(result_content), 'lxml')\
                     .find('h2', {'class': 'jobTitle jobTitle-color-purple jobTitle-newJob'})
-                if job_title:
-                    job_title = BeautifulSoup(str(job_title), 'lxml').findAll('span')[-1]
                 company_name = BeautifulSoup(str(result_content), 'lxml')\
                     .find('span', {'class': 'companyName'})
-                location = BeautifulSoup(str(result_content), 'lxml')\
+                job_location = BeautifulSoup(str(result_content), 'lxml')\
                     .find('div', {'class': 'companyLocation'})
-                salary = BeautifulSoup(str(result_content), 'lxml')\
+                job_salary = BeautifulSoup(str(result_content), 'lxml')\
                     .find('span', {'class': 'salary-snippet'})
                 if job_title:
-                    job_title = job_title.get_text()
+                    job_title = search('(?<=title=").+?(?=")', str(job_title))
+                    if job_title:
+                        job_title = job_title.group()
                 if company_name:
                     company_name = company_name.get_text()
-                if location:
-                    location = location.get_text()
-                if salary:
-                    salary = salary.get_text()
+                if job_location:
+                    job_location = job_location.get_text()
+                if job_salary:
+                    job_salary = job_salary.get_text()
                 self.results['Title'].append(job_title)
                 self.results['Company'].append(company_name)
-                self.results['Location'].append(location)
-                self.results['Salary'].append(salary)
+                self.results['Location'].append(job_location)
+                self.results['Salary'].append(job_salary)
                 self.results['URL'].append(job_url)
                 self._cache.add(job_jk)
                 jobs_applied_to += 1

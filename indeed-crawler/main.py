@@ -7,7 +7,11 @@ from indeed_crawler import IndeedCrawler
 DEBUG = True
 
 if __name__ == '__main__':
-    indeed_crawler = IndeedCrawler(number_of_jobs=1, debug=DEBUG)
+    indeed_crawler = IndeedCrawler(
+        number_of_jobs=100,
+        debug=False,
+        manually_fill_out_questions=False
+        )
     indeed_crawler.setup_browser()
     indeed_crawler.login(
         email='',
@@ -15,13 +19,14 @@ if __name__ == '__main__':
         )
     try:
         indeed_crawler.search_jobs(
-            query='',
+            query='gamer',
+            past_14_days=True,
             job_type='',
             salary='',
             exp_lvl='',
-            remote=False,
+            remote=True,
             temp_remote=False,
-            location=''
+            location='remote'
             )
     except Exception as e:
         if DEBUG:
