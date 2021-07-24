@@ -63,5 +63,5 @@ if __name__ == '__main__':
         results = indeed_crawler.results
         dataframe = DataFrame(data=results)
         print('\n\nApplied to {} jobs.'.format(len(dataframe)), end='\n\n')
-        append_df_to_excel(dataframe, 'jobs_submissions.xlsx',
-                           sheet_name='jobs', index=False)
+        append_df_to_excel(dataframe, 'submissions.xlsx',
+                           sheet_name='job', index=False)
