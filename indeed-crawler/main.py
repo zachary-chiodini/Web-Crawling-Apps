@@ -2,7 +2,6 @@ from os import path
 from pprint import pprint
 from traceback import print_exc
 
-from openpyxl import Workbook
 from openpyxl import load_workbook
 from pandas import DataFrame, ExcelWriter
 
