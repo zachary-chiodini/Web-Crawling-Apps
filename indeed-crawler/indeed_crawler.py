@@ -12,7 +12,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.common.exceptions import (
     ElementClickInterceptedException, ElementNotInteractableException,
-    StaleElementReferenceException, TimeoutException)
+    NoSuchElementException, StaleElementReferenceException, TimeoutException)
 
 
 class IndeedCrawler:
@@ -221,6 +221,7 @@ class IndeedCrawler:
                     self._apply_for_job(job_url)
                 except (ElementClickInterceptedException,
                         ElementNotInteractableException,
+                        NoSuchElementException,
                         StaleElementReferenceException,
                         TimeoutException):
                     if self._debug:
