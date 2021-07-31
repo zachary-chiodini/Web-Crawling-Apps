@@ -11,8 +11,14 @@ from requests.exceptions import HTTPError
 
 class CraigsException(HTTPError):
     def __init__(self, response: Response) -> None:
-        super().__init__('Get response to URL {url} failed with code {code}'
-                         .format(url=response.url, code=response.status_code))
+        super().__init__(
+            'Get response to URL {url} failed with code {code}.\n{text}'
+            .format(
+                url=response.url,
+                code=response.status_code,
+                text=BeautifulSoup(response.text, 'lxml').prettify()
+                )
+            )
         self.code = response.status_code
         self.headers = response.headers
 
@@ -24,6 +30,7 @@ class CraigsCrawler:
             ) -> None:
         self.united_states = {}
         self.session = Session()
+        self.session.headers.update({'User-Agent': 'Mozilla/5.0'})
         self._state_set = {text.lower().strip() for text in state_set}
         self._state_and_cities_dict = {
             state.lower().strip():
