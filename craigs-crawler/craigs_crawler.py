@@ -1,6 +1,7 @@
 from io import BytesIO
 from PIL import Image
 from re import search
+from time import sleep
 from tqdm import tqdm
 from typing import Dict, List, Optional, Set
 
@@ -43,6 +44,7 @@ class CraigsCrawler:
         response = self.session.get(url)
         if response.status_code != 200:
             raise CraigsException(response)
+        sleep(2)  # avoid being blocked
         return response
 
     def _scrape_states_and_regions(self) -> None:
