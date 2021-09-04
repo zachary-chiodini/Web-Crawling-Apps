@@ -129,6 +129,24 @@ class IndeedCrawler:
         try:
             WebDriverWait(self._browser, wait).until(
                 expected_conditions.element_to_be_clickable(
+                    (By.XPATH, '//button//span[text()="Continue to application"]')
+                )
+            )
+            self._browser.find_element_by_xpath('//button//span[text()="Continue to application"]').click()
+        except TimeoutException:
+            pass
+        try:
+            WebDriverWait(self._browser, wait).until(
+                expected_conditions.element_to_be_clickable(
+                    (By.XPATH, '//button//span[text()="Continue"]')
+                )
+            )
+            self._browser.find_element_by_xpath('//button//span[text()="Continue"]').click()
+        except TimeoutException:
+            pass
+        try:
+            WebDriverWait(self._browser, wait).until(
+                expected_conditions.element_to_be_clickable(
                     (By.XPATH, '//button//span[text()="Review your application"]')
                     )
                 )
@@ -203,8 +221,15 @@ class IndeedCrawler:
                     location='&l='*bool(location) + location
                     )
                 )
+            try:
+                mobtk = search('(?<=data-mobtk=").+?(?=")', self._browser.page_source).group()
+            except AttributeError:
+                current_url = self._browser.current_url
+                WebDriverWait(self._browser, 600).until(
+                    lambda driver: driver.current_url != current_url
+                )
+                continue
             self._main_window = self._browser.current_window_handle
-            mobtk = search('(?<=data-mobtk=").+?(?=")', self._browser.page_source).group()
             soup_list = BeautifulSoup(self._browser.page_source, 'lxml')\
                 .findAll('a', {'data-mobtk': mobtk})
             start += len(soup_list)
@@ -267,10 +292,11 @@ class IndeedCrawler:
                 self.results['Location'].append(job_location)
                 self.results['Salary'].append(job_salary)
                 self.results['URL'].append(job_url)
-                self._cache.add(job_jk)
-                jobs_applied_to += 1
-                with open('cache.txt', 'a') as file:
-                    file.write(job_jk + '\n')
+                if job_jk not in self._cache:
+                    self._cache.add(job_jk)
+                    jobs_applied_to += 1
+                    with open('cache.txt', 'a') as file:
+                        file.write(job_jk + '\n')
                 if jobs_applied_to == self._number_of_jobs:
                     stop_search = True
                     break

@@ -34,7 +34,7 @@ def append_df_to_excel(
 if __name__ == '__main__':
 
     indeed_crawler = IndeedCrawler(
-        number_of_jobs=100,
+        number_of_jobs=0,
         debug=False,
         manually_fill_out_questions=False
         )
@@ -45,14 +45,14 @@ if __name__ == '__main__':
         )
     try:
         indeed_crawler.search_jobs(
-            query='python',
+            query='',
             past_14_days=True,
             job_type='',
             salary='',
             exp_lvl='',
-            remote=True,
+            remote=False,
             temp_remote=False,
-            location='remote'
+            location='california'
             )
     except Exception as e:
         if DEBUG:
