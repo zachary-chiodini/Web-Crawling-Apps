@@ -12,10 +12,14 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.common.exceptions import (
     ElementClickInterceptedException, ElementNotInteractableException,
-    NoSuchElementException, StaleElementReferenceException, TimeoutException)
+    NoSuchElementException, NoSuchWindowException, StaleElementReferenceException,
+    TimeoutException, WebDriverException)
 
 
 class IndeedCrawler:
+    """
+    Indeed Crawler
+    """
 
     def __init__(
             self, number_of_jobs: int, headless_mode=False,
@@ -98,6 +102,7 @@ class IndeedCrawler:
                 lambda driver: 'https://secure.indeed.com/settings' in driver.current_url
                 )
         except TimeoutException:
+            # A captcha was likely encountered.
             print('The captcha and/or two-step verification must be done manually.'
                   'Afterward, you must manually sign in.')
             WebDriverWait(self._browser, 600).until(
@@ -120,30 +125,12 @@ class IndeedCrawler:
             try:
                 WebDriverWait(self._browser, wait).until(
                     expected_conditions.element_to_be_clickable(
-                        (By.XPATH, '//button//span[text()="Continue"]')
+                        (By.XPATH, '//button//span[text()[contains(.,"Continue")]]')
                         )
                     )
-                self._browser.find_element_by_xpath('//button//span[text()="Continue"]').click()
+                self._browser.find_element_by_xpath('//button//span[text()[contains(.,"Continue")]]').click()
             except TimeoutException:
                 break
-        try:
-            WebDriverWait(self._browser, wait).until(
-                expected_conditions.element_to_be_clickable(
-                    (By.XPATH, '//button//span[text()="Continue to application"]')
-                )
-            )
-            self._browser.find_element_by_xpath('//button//span[text()="Continue to application"]').click()
-        except TimeoutException:
-            pass
-        try:
-            WebDriverWait(self._browser, wait).until(
-                expected_conditions.element_to_be_clickable(
-                    (By.XPATH, '//button//span[text()="Continue"]')
-                )
-            )
-            self._browser.find_element_by_xpath('//button//span[text()="Continue"]').click()
-        except TimeoutException:
-            pass
         try:
             WebDriverWait(self._browser, wait).until(
                 expected_conditions.element_to_be_clickable(
@@ -254,14 +241,17 @@ class IndeedCrawler:
                         stop_search = True
                         break
                     if self._manually_fill_out_question:
-                        WebDriverWait(self._browser, 600).until(
-                            expected_conditions.element_to_be_clickable(
-                                (By.XPATH, '//button//span[text()="Return to job search"]')
+                        try:
+                            WebDriverWait(self._browser, 600).until(
+                                expected_conditions.element_to_be_clickable(
+                                    (By.XPATH, '//button//span[text()="Return to job search"]')
+                                    )
                                 )
-                            )
-                        self._browser.find_element_by_xpath('//button//span[text()="Return to job search"]').click()
-                        self._browser.close()
-                        self._browser.switch_to.window(self._main_window)
+                            self._browser.find_element_by_xpath('//button//span[text()="Return to job search"]').click()
+                            self._browser.close()
+                            self._browser.switch_to.window(self._main_window)
+                        except (NoSuchWindowException, WebDriverException, TimeoutException):
+                            continue
                     else:
                         if self._browser.current_window_handle != self._main_window:
                             self._browser.close()
