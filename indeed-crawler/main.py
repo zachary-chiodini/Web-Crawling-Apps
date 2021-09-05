@@ -40,12 +40,12 @@ if __name__ == '__main__':
         )
     indeed_crawler.setup_browser()
     indeed_crawler.login(
-        email='zacharybchiodini@gmail.com',
-        password='12Bryant'
+        email='',
+        password=''
         )
     try:
         indeed_crawler.search_jobs(
-            query='sex',
+            query='',
             past_14_days=True,
             job_type='',
             salary='',
