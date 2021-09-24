@@ -261,10 +261,13 @@ class IndeedCrawler:
                     .find('span', {'class': 'salary-snippet'})
                 if min_salary and job_salary:
                     max_salary_found = ''
-                    for char in job_salary.get_text().split('-')[-1].strip().replace(',', ''):
+                    salary_text = job_salary.get_text().split('-')[-1].strip().replace(',', '')
+                    for char in salary_text:
                         if char.isdigit():
                             max_salary_found += char
                     if max_salary_found.isdigit():
+                        if 'per hour' in salary_text:
+                            max_salary_found = int(max_salary_found)*40*4*12
                         if int(max_salary_found) < int(min_salary):
                             continue
                 company_name = BeautifulSoup(str(result_content), 'lxml') \

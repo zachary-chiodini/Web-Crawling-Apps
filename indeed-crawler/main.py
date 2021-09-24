@@ -45,7 +45,7 @@ if __name__ == '__main__':
         )
     try:
         indeed_crawler.search_jobs(
-            query='',
+            query='aws',
             job_title_negate_lst=[],
             company_name_negate_lst=[],
             past_14_days=False,
