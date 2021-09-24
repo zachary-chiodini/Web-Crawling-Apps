@@ -1,7 +1,7 @@
 from os import path
 from re import search
 from traceback import print_exc
-from typing import Callable
+from typing import Callable, List
 
 from bs4 import BeautifulSoup
 from selenium.webdriver import Firefox, FirefoxProfile

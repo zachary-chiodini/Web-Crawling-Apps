@@ -45,7 +45,7 @@ if __name__ == '__main__':
         )
     try:
         indeed_crawler.search_jobs(
-            query='job title',
+            query='',
             job_title_negate_lst=[],
             company_name_negate_lst=[],
             past_14_days=False,
@@ -55,7 +55,7 @@ if __name__ == '__main__':
             remote=False,
             temp_remote=False,
             country='united states',
-            location='',
+            location='remote',
             radius=''
             )
     except Exception as e:
