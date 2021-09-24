@@ -166,7 +166,6 @@ class IndeedCrawler:
             company_name_negate_lst: List[str] = [],
             past_14_days: bool = True,
             job_type: str = '',
-            salary: str = '',
             min_salary: str = '',
             exp_lvl: str = '',
             remote: bool = False,
@@ -211,7 +210,7 @@ class IndeedCrawler:
                 '{radius}'
                 .format(
                     country=self._map_country[country],
-                    query=query + ' '*bool(salary) + salary,
+                    query=query,
                     days='&fromage=14'*past_14_days,
                     start='&start=' + str(start),
                     type='&jt='*bool(job_type) + job_type,

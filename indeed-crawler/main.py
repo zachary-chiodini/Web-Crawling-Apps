@@ -50,7 +50,6 @@ if __name__ == '__main__':
             company_name_negate_lst=[],
             past_14_days=False,
             job_type='',
-            salary='',
             min_salary='',
             exp_lvl='',
             remote=False,
