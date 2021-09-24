@@ -22,7 +22,8 @@ class IndeedCrawler:
     """
 
     def __init__(
-            self, number_of_jobs: int, headless_mode=False,
+            self, number_of_jobs: int,
+            headless_mode=False,
             driver_path='driver', debug=False,
             manually_fill_out_questions=False
             ) -> None:
@@ -32,6 +33,10 @@ class IndeedCrawler:
             'Location': [],
             'Salary': [],
             'URL': []
+            }
+        self._map_country = {
+            'united states': '',
+            'united kingdom': 'uk.'
             }
         self._browser = None
         self._number_of_jobs = number_of_jobs
@@ -106,7 +111,7 @@ class IndeedCrawler:
             print('The captcha and/or two-step verification must be done manually.'
                   'Afterward, you must manually sign in.')
             WebDriverWait(self._browser, 600).until(
-                lambda driver: driver.current_url == 'https://secure.indeed.com/settings?hl=en'
+                lambda driver: ('https://secure.indeed.com/settings' in driver.current_url)
                 )
         return None
 
@@ -151,20 +156,24 @@ class IndeedCrawler:
                 (By.XPATH, '//button//span[text()="Return to job search"]')
                 )
             )
-        self._browser.find_element_by_xpath('//button//span[text()="Return to job search"]').click()
         self._browser.close()
         self._browser.switch_to.window(self._main_window)
         return None
 
     def search_jobs(
             self, query: str,
+            job_title_negate_lst: List[str] = [],
+            company_name_negate_lst: List[str] = [],
             past_14_days: bool = True,
             job_type: str = '',
             salary: str = '',
+            min_salary: str = '',
             exp_lvl: str = '',
             remote: bool = False,
             temp_remote: bool = False,
-            location: str = ''
+            country: str = '',
+            location: str = '',
+            radius: str = ''
             ) -> None:
         if self._number_of_jobs == 0:
             return None
@@ -173,8 +182,9 @@ class IndeedCrawler:
         stop_search = False
         if remote or temp_remote:
             self._browser.get(
-                'https://www.indeed.com/jobs?q={query}&fromage={days}&start={start}'
-                .format(query=query, days=14, start=start)
+                'https://{country}indeed.com/jobs?q={query}&fromage={days}&start={start}'
+                .format(country=self._map_country[country],
+                        query=query, days=14, start=start)
                 )
             if remote:
                 remote_id = BeautifulSoup(str(self._browser.page_source), 'lxml') \
@@ -190,7 +200,7 @@ class IndeedCrawler:
             remote_id = ''
         while True:
             self._browser.get(
-                'https://www.indeed.com/jobs'
+                'https://{country}indeed.com/jobs'
                 '?q={query}'
                 '{days}'
                 '{start}'
@@ -198,14 +208,17 @@ class IndeedCrawler:
                 '{lvl}'
                 '{remote_job}'
                 '{location}'
+                '{radius}'
                 .format(
+                    country=self._map_country[country],
                     query=query + ' '*bool(salary) + salary,
                     days='&fromage=14'*past_14_days,
                     start='&start=' + str(start),
                     type='&jt='*bool(job_type) + job_type,
                     lvl='&explvl='*bool(exp_lvl) + exp_lvl,
                     remote_job=(remote or temp_remote)*('&remotejob=' + str(remote_id)),
-                    location='&l='*bool(location) + location
+                    location='&l='*bool(location) + location,
+                    radius='&radius='*bool(radius) + radius
                     )
                 )
             try:
@@ -229,6 +242,43 @@ class IndeedCrawler:
                 job_url = 'https://www.indeed.com/viewjob?jk={}'.format(job_jk)
                 if job_jk in self._cache:
                     continue
+                result_content = BeautifulSoup(str(tag), 'lxml').find('td', {'class': 'resultContent'})
+                job_title = BeautifulSoup(str(result_content), 'lxml') \
+                    .find('h2', {'class': ['jobTitle jobTitle-color-purple jobTitle-newJob',
+                                           'jobTitle jobTitle-color-purple']})
+                if job_title:
+                    job_title = search('(?<=title=").+?(?=")', str(job_title))
+                    if job_title:
+                        job_title = job_title.group()
+                if job_title_negate_lst and job_title:
+                    negate_word_found = False
+                    for word in job_title_negate_lst:
+                        if word in job_title.lower():
+                            negate_word_found = True
+                            break
+                    if negate_word_found:
+                        continue
+                job_salary = BeautifulSoup(str(result_content), 'lxml') \
+                    .find('span', {'class': 'salary-snippet'})
+                if min_salary and job_salary:
+                    max_salary_found = ''
+                    for char in job_salary.get_text().split('-')[-1].strip().replace(',', ''):
+                        if char.isdigit():
+                            max_salary_found += char
+                    if max_salary_found.isdigit():
+                        if int(max_salary_found) < int(min_salary):
+                            continue
+                company_name = BeautifulSoup(str(result_content), 'lxml') \
+                    .find('span', {'class': 'companyName'})
+                if company_name_negate_lst and company_name:
+                    company_name_text = company_name.get_text()
+                    negate_word_found = False
+                    for word in company_name_negate_lst:
+                        if word in company_name_text.lower():
+                            negate_word_found = True
+                            break
+                    if negate_word_found:
+                        continue
                 try:
                     self._apply_for_job(job_url)
                 except (ElementClickInterceptedException,
@@ -244,33 +294,27 @@ class IndeedCrawler:
                         try:
                             WebDriverWait(self._browser, 600).until(
                                 expected_conditions.element_to_be_clickable(
-                                    (By.XPATH, '//button//span[text()="Return to job search"]')
+                                    (By.XPATH, '//button//span[text()="Submit your application"]')
                                     )
                                 )
-                            self._browser.find_element_by_xpath('//button//span[text()="Return to job search"]').click()
+                            self._browser.find_element_by_xpath('//button//span[text()="Submit your application"]').click()
+                            WebDriverWait(self._browser, 5).until(
+                                expected_conditions.element_to_be_clickable(
+                                    (By.XPATH, '//button//span[text()="Return to job search"]')
+                                )
+                            )
                             self._browser.close()
                             self._browser.switch_to.window(self._main_window)
                         except (NoSuchWindowException, WebDriverException, TimeoutException):
+                            self._browser.switch_to.window(self._main_window)
                             continue
                     else:
                         if self._browser.current_window_handle != self._main_window:
                             self._browser.close()
                             self._browser.switch_to.window(self._main_window)
                         continue
-                result_content = BeautifulSoup(str(tag), 'lxml').find('td', {'class': 'resultContent'})
-                job_title = BeautifulSoup(str(result_content), 'lxml')\
-                    .find('h2', {'class': ['jobTitle jobTitle-color-purple jobTitle-newJob',
-                                           'jobTitle jobTitle-color-purple']})
-                company_name = BeautifulSoup(str(result_content), 'lxml')\
-                    .find('span', {'class': 'companyName'})
                 job_location = BeautifulSoup(str(result_content), 'lxml')\
                     .find('div', {'class': 'companyLocation'})
-                job_salary = BeautifulSoup(str(result_content), 'lxml')\
-                    .find('span', {'class': 'salary-snippet'})
-                if job_title:
-                    job_title = search('(?<=title=").+?(?=")', str(job_title))
-                    if job_title:
-                        job_title = job_title.group()
                 if company_name:
                     company_name = company_name.get_text()
                 if job_location:
