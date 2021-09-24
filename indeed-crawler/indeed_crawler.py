@@ -197,6 +197,7 @@ class IndeedCrawler:
                     remote_id = search('(?<=remotejob=).+?(?=")', str(remote_id)).group()
         else:
             remote_id = ''
+        prev_last_tag = ''
         while True:
             self._browser.get(
                 'https://{country}indeed.com/jobs'
@@ -231,6 +232,9 @@ class IndeedCrawler:
             self._main_window = self._browser.current_window_handle
             soup_list = BeautifulSoup(self._browser.page_source, 'lxml')\
                 .findAll('a', {'data-mobtk': mobtk})
+            if str(soup_list[-1]) == prev_last_tag:
+                break
+            prev_last_tag = str(soup_list[-1])
             start += len(soup_list)
             for tag in soup_list:
                 quick_apply = BeautifulSoup(str(tag), 'lxml')\
