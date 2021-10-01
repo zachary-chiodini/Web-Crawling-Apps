@@ -1,5 +1,6 @@
 from os import path
 from re import search
+from time import sleep
 from traceback import print_exc
 from typing import Callable, List
 
@@ -36,7 +37,8 @@ class IndeedCrawler:
             }
         self._map_country = {
             'united states': '',
-            'united kingdom': 'uk.'
+            'united kingdom': 'uk.',
+            'canada': 'ca.'
             }
         self._browser = None
         self._number_of_jobs = number_of_jobs
@@ -293,9 +295,10 @@ class IndeedCrawler:
                         stop_search = True
                         break
                     if self._manually_fill_out_question:
+                        sleep(1)
                         try:
                             WebDriverWait(self._browser, 600).until(
-                                expected_conditions.element_to_be_clickable(
+                                expected_conditions.presence_of_element_located(
                                     (By.XPATH, '//button//span[text()="Submit your application"]')
                                     )
                                 )
