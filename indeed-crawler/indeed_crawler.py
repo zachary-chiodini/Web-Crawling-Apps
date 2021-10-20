@@ -156,7 +156,7 @@ class IndeedCrawler:
             pass
         WebDriverWait(self._browser, wait).until(
             expected_conditions.element_to_be_clickable(
-                (By.XPATH, '//button//span[text()="Return to job search"]')
+                (By.XPATH, '//div//h1[text()="Your application has been submitted!"]')
                 )
             )
         self._browser.close()
@@ -310,7 +310,6 @@ class IndeedCrawler:
                                     (By.XPATH, '//button//span[text()="Return to job search"]')
                                 )
                             )
-                            print('FUCK!!!!!!!!!!!!!!!!!')
                             self._browser.close()
                             self._browser.switch_to.window(self._main_window)
                         except (NoSuchWindowException, WebDriverException, TimeoutException):

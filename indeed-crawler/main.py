@@ -34,7 +34,7 @@ def append_df_to_excel(
 if __name__ == '__main__':
 
     indeed_crawler = IndeedCrawler(
-        number_of_jobs=100,
+        number_of_jobs=50,
         debug=False,
         manually_fill_out_questions=True
         )
@@ -45,13 +45,13 @@ if __name__ == '__main__':
         )
     try:
         indeed_crawler.search_jobs(
-            query='software',
+            query='finance analyst',
             job_title_negate_lst=['senior', 'sr.', 'lead', 'chief', 'supervisor'],
             company_name_negate_lst=[],
             past_14_days=False,
             job_type='',  # fulltime
             min_salary='28000',
-            exp_lvl='',  # entry_level, mid_level
+            exp_lvl='entry_level',  # entry_level, mid_level
             remote=False,
             temp_remote=False,
             country='united kingdom',
