@@ -25,7 +25,8 @@ class IndeedCrawler:
     def __init__(
             self, number_of_jobs: int,
             headless_mode=False,
-            driver_path='driver', debug=False,
+            driver_path='driver',
+            debug=False,
             manually_fill_out_questions=False
             ) -> None:
         self.results = {
@@ -46,7 +47,7 @@ class IndeedCrawler:
         self._driver_path = driver_path
         self._main_window = ''
         self._debug = debug
-        self._manually_fill_out_question = manually_fill_out_questions
+        self._manually_fill_out_questions = manually_fill_out_questions
         self._cache = set()
         if path.exists('cache.txt'):
             with open('cache.txt', 'r') as file:
@@ -128,7 +129,7 @@ class IndeedCrawler:
                 )
             )
         self._browser.find_element_by_xpath('//*[@id="indeedApplyButton"]').click()
-        while True:
+        for _ in range(10):
             try:
                 WebDriverWait(self._browser, wait).until(
                     expected_conditions.element_to_be_clickable(
@@ -288,17 +289,18 @@ class IndeedCrawler:
                 except (ElementClickInterceptedException,
                         ElementNotInteractableException,
                         NoSuchElementException,
+                        NoSuchWindowException,
                         StaleElementReferenceException,
-                        TimeoutException):
+                        TimeoutException,
+                        WebDriverException):
                     if self._debug:
                         print_exc()
                         stop_search = True
                         break
-                    if self._manually_fill_out_question:
-                        sleep(1)
+                    if self._manually_fill_out_questions:
                         try:
                             WebDriverWait(self._browser, 600).until(
-                                expected_conditions.presence_of_element_located(
+                                expected_conditions.element_to_be_clickable(
                                     (By.XPATH, '//button//span[text()="Submit your application"]')
                                     )
                                 )
@@ -308,6 +310,7 @@ class IndeedCrawler:
                                     (By.XPATH, '//button//span[text()="Return to job search"]')
                                 )
                             )
+                            print('FUCK!!!!!!!!!!!!!!!!!')
                             self._browser.close()
                             self._browser.switch_to.window(self._main_window)
                         except (NoSuchWindowException, WebDriverException, TimeoutException):

@@ -7,7 +7,7 @@ from pandas import DataFrame, ExcelWriter
 
 from indeed_crawler import IndeedCrawler
 
-DEBUG = False
+DEBUG = True
 
 
 def append_df_to_excel(
@@ -45,18 +45,18 @@ if __name__ == '__main__':
         )
     try:
         indeed_crawler.search_jobs(
-            query='',
-            job_title_negate_lst=[],
+            query='software',
+            job_title_negate_lst=['senior', 'sr.', 'lead', 'chief', 'supervisor'],
             company_name_negate_lst=[],
             past_14_days=False,
-            job_type='',
-            min_salary='',
-            exp_lvl='',
+            job_type='',  # fulltime
+            min_salary='28000',
+            exp_lvl='',  # entry_level, mid_level
             remote=False,
             temp_remote=False,
             country='united kingdom',
-            location='',
-            radius=''
+            location='london',
+            radius='10'
             )
     except Exception as e:
         if DEBUG:
