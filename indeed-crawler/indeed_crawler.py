@@ -39,7 +39,8 @@ class IndeedCrawler:
         self._map_country = {
             'united states': '',
             'united kingdom': 'uk.',
-            'canada': 'ca.'
+            'canada': 'ca.',
+            'netherlands': 'nl.'
             }
         self._browser = None
         self._number_of_jobs = number_of_jobs
@@ -261,7 +262,7 @@ class IndeedCrawler:
                     if negate_word_found:
                         continue
                 job_salary = BeautifulSoup(str(result_content), 'lxml') \
-                    .find('span', {'class': 'salary-snippet'})
+                    .find('span', {'class': ['salary-snippet', 'metadata salary-snippet-container']})
                 if min_salary and job_salary:
                     max_salary_found = ''
                     salary_text = job_salary.get_text().split('-')[-1].strip().replace(',', '')
