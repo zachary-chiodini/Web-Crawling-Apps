@@ -263,6 +263,9 @@ class IndeedCrawler:
                         continue
                 job_salary = BeautifulSoup(str(result_content), 'lxml') \
                     .find('span', {'class': ['salary-snippet', 'metadata salary-snippet-container']})
+                if not job_salary:
+                    job_salary = BeautifulSoup(str(result_content), 'lxml') \
+                        .find('div', {'class': 'metadata salary-snippet-container'})
                 if min_salary and job_salary:
                     max_salary_found = ''
                     salary_text = job_salary.get_text().split('-')[-1].strip().replace(',', '')
@@ -271,7 +274,9 @@ class IndeedCrawler:
                             max_salary_found += char
                     if max_salary_found.isdigit():
                         if 'per hour' in salary_text:
-                            max_salary_found = int(max_salary_found)*40*4*12
+                            max_salary_found = int(max_salary_found)*2080
+                        elif 'month' in salary_text:
+                            max_salary_found = int(max_salary_found)*12
                         if int(max_salary_found) < int(min_salary):
                             continue
                 company_name = BeautifulSoup(str(result_content), 'lxml') \

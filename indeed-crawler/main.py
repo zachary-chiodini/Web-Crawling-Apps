@@ -34,7 +34,7 @@ def append_df_to_excel(
 if __name__ == '__main__':
 
     indeed_crawler = IndeedCrawler(
-        number_of_jobs=5,
+        number_of_jobs=100,
         debug=False,
         manually_fill_out_questions=True
         )
