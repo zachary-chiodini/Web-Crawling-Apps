@@ -171,6 +171,7 @@ class IndeedCrawler:
             past_14_days: bool = True,
             job_type: str = '',
             min_salary: str = '',
+            enforce_salary: bool = False,
             exp_lvl: str = '',
             remote: bool = False,
             temp_remote: bool = False,
@@ -266,15 +267,19 @@ class IndeedCrawler:
                 if not job_salary:
                     job_salary = BeautifulSoup(str(result_content), 'lxml') \
                         .find('div', {'class': 'metadata salary-snippet-container'})
+                if not job_salary and enforce_salary:
+                    continue
                 if min_salary and job_salary:
                     max_salary_found = ''
                     salary_text = job_salary.get_text().split('-')[-1].strip().replace(',', '')
                     for char in salary_text:
                         if char.isdigit():
                             max_salary_found += char
+                        if char == '.' and '.' not in max_salary_found:
+                            max_salary_found += char
                     if max_salary_found.isdigit():
-                        if 'per hour' in salary_text:
-                            max_salary_found = int(max_salary_found)*2080
+                        if 'hour' in salary_text:
+                            max_salary_found = float(max_salary_found)*2080
                         elif 'month' in salary_text:
                             max_salary_found = int(max_salary_found)*12
                         if int(max_salary_found) < int(min_salary):

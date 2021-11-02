@@ -45,12 +45,13 @@ if __name__ == '__main__':
         )
     try:
         indeed_crawler.search_jobs(
-            query='gamer',
+            query='',
             job_title_negate_lst=[],
             company_name_negate_lst=[],
             past_14_days=False,
             job_type='',  # fulltime
             min_salary='',
+            enforce_salary=False,  # consider only jobs with salary listed
             exp_lvl='',  # entry_level, mid_level, #senior_level
             remote=False,
             temp_remote=False,
