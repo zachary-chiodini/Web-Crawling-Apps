@@ -36,7 +36,7 @@ if __name__ == '__main__':
     indeed_crawler = IndeedCrawler(
         number_of_jobs=100,
         debug=False,
-        manually_fill_out_questions=True
+        manually_fill_out_questions=False
         )
     indeed_crawler.setup_browser()
     indeed_crawler.login(
@@ -57,7 +57,8 @@ if __name__ == '__main__':
             temp_remote=False,
             country='united states',
             location='',
-            radius=''
+            radius='',
+            auto_answer_questions=True
             )
     except Exception as e:
         if DEBUG:
