@@ -1,2 +1,1 @@
-This page is purposefully left blank.
-Vagueness in descriptions are purposeful.
+This page is purposefully left blank. I do not want random people to use this package.
