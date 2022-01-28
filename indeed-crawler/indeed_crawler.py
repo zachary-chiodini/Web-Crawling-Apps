@@ -371,8 +371,6 @@ class IndeedCrawler:
             self._browser.find_element_by_xpath(
                 '//div[@id="{}"]'.format(resume_div.get('id'))
                 ).click()
-        else:
-            print('No resume div!')
         self._continue(answer_questions, collect_q_and_a)
         if not collect_q_and_a:
             try:
