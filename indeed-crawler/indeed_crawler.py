@@ -131,14 +131,16 @@ class IndeedCrawler:
             ).send_keys(Keys.RETURN)
         try:
             WebDriverWait(self._browser, 10).until(
-                lambda driver: 'https://secure.indeed.com/settings' in driver.current_url
+                lambda driver: ('https://secure.indeed.com/settings' in driver.current_url
+                                or 'https://my.indeed.com/resume?from=login' in driver.current_url)
                 )
         except TimeoutException:
             # A captcha was likely encountered.
             print('The captcha and/or two-step verification must be done manually.'
                   'Afterward, you must manually sign in.')
             WebDriverWait(self._browser, 600).until(
-                lambda driver: ('https://secure.indeed.com/settings' in driver.current_url)
+                lambda driver: ('https://secure.indeed.com/settings' in driver.current_url
+                                or 'https://my.indeed.com/resume?from=login' in driver.current_url)
                 )
         return None
 
