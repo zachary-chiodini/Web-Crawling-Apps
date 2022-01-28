@@ -74,6 +74,8 @@ class IndeedCrawler:
             'service_log_path': 'NUL'
             }
         self._browser = Firefox(**kwargs)
+        self._browser.execute_script(
+            "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
         return None
 
     def _setup_headless_browser(self) -> None:
@@ -116,7 +118,7 @@ class IndeedCrawler:
             self._browser.find_element_by_xpath(
                 '//input[@autocomplete="email"]'
                 ).send_keys(Keys.RETURN)
-            WebDriverWait(self._browser, 10).until(
+            WebDriverWait(self._browser, 600).until(
                 expected_conditions.element_to_be_clickable(
                     (By.XPATH, '//input[@type="password"]')
                     )
@@ -163,7 +165,7 @@ class IndeedCrawler:
         if update:
             self._df = read_excel('questionnaire.xlsx')
             for _, series in self._df.iterrows():
-                self._q_and_a[series['Question']] = series['Answer']
+                self._q_and_a[series['Question']] = {series['Answer']}
             self._load_model()
         self._browser.get('https://www.indeed.com/jobs?q={}'.format(query))
         try:
@@ -181,7 +183,7 @@ class IndeedCrawler:
             self._browser.page_source, 'lxml'
             ).find('nav', {'role': 'navigation'})
         pages = []
-        for page in navigation.findAll(['a', 'b']):
+        for page in [navigation.findAll(['a', 'b'])[0]]:
             page = page.get_text()
             if page:
                 pages.append(page)
@@ -194,7 +196,7 @@ class IndeedCrawler:
                         '//nav//span[text()[contains(.,"{}")]]'.format(page))
                     page_element.click()
                 except ElementClickInterceptedException:
-                    ActionChains(browser).move_to_element(page_element).click().perform()
+                    ActionChains(self._browser).move_to_element(page_element).click().perform()
                     page_element.click()
                 except NoSuchElementException:
                     pass
@@ -225,6 +227,7 @@ class IndeedCrawler:
                 stored_record = self._df[self._df['Question'] == question]
                 if not stored_record.empty:
                     worksheet.write(row, 1, str(stored_record['Answer'].iloc[0]))
+                    row += 1
                     continue
             if answers:
                 worksheet.data_validation(
@@ -312,6 +315,7 @@ class IndeedCrawler:
         return None
 
     def _apply_to_job(self, job_url: str, answer_questions=False, collect_q_and_a=False, wait=10) -> None:
+        self._main_window = self._browser.current_window_handle
         self._browser.execute_script('window.open()')
         tab = self._browser.window_handles[-1]
         self._browser.switch_to.window(tab)
@@ -324,7 +328,10 @@ class IndeedCrawler:
         self._browser.find_element_by_xpath(
             '//*[@id="indeedApplyButton"]').click()
         resume_div = BeautifulSoup(self._browser.page_source, 'lxml')\
-            .find('span', text='Save file')
+            .find('span', text=compile_regex('Last'))
+        if not resume_div:
+            resume_div = BeautifulSoup(self._browser.page_source, 'lxml') \
+                .find('span', text=compile_regex('resume'))
         if resume_div:
             resume_div = resume_div.find_parent('div', {'id': compile_regex('resume')})
         if resume_div:
