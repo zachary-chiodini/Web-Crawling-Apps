@@ -112,29 +112,39 @@ class IndeedCrawler:
                 '//input[@type="email"]'
                 ).send_keys(email)
         except NoSuchElementException:
-            self._browser.find_element_by_xpath(
-                '//input[@autocomplete="email"]'
-                ).send_keys(email)
-            self._browser.find_element_by_xpath(
-                '//input[@autocomplete="email"]'
-                ).send_keys(Keys.RETURN)
-            WebDriverWait(self._browser, 10).until(
-                expected_conditions.element_to_be_clickable(
-                    (By.XPATH, '//input[@type="password"]')
+            try:
+                self._browser.find_element_by_xpath(
+                    '//input[@autocomplete="email"]'
+                    ).send_keys(email)
+                self._browser.find_element_by_xpath(
+                    '//input[@autocomplete="email"]'
+                    ).send_keys(Keys.RETURN)
+                WebDriverWait(self._browser, 10).until(
+                    expected_conditions.element_to_be_clickable(
+                        (By.XPATH, '//input[@type="password"]')
+                        )
                     )
-                )
-        self._browser.find_element_by_xpath(
-            '//input[@type="password"]'
-            ).send_keys(password)
-        self._browser.find_element_by_xpath(
-            '//input[@type="password"]'
-            ).send_keys(Keys.RETURN)
+            except (NoSuchWindowException, TimeoutException):
+                # A captcha was likely encountered.
+                print('The captcha and/or two-step verification must be done manually.'
+                      'Afterward, you must manually sign in.')
+                WebDriverWait(self._browser, 600).until(
+                    lambda driver: ('https://secure.indeed.com/settings' in driver.current_url
+                                    or 'https://my.indeed.com/resume?from=login' in driver.current_url)
+                    )
+                return None
         try:
+            self._browser.find_element_by_xpath(
+                '//input[@type="password"]'
+                ).send_keys(password)
+            self._browser.find_element_by_xpath(
+                '//input[@type="password"]'
+                ).send_keys(Keys.RETURN)
             WebDriverWait(self._browser, 10).until(
                 lambda driver: ('https://secure.indeed.com/settings' in driver.current_url
                                 or 'https://my.indeed.com/resume?from=login' in driver.current_url)
                 )
-        except TimeoutException:
+        except (NoSuchWindowException, TimeoutException):
             # A captcha was likely encountered.
             print('The captcha and/or two-step verification must be done manually.'
                   'Afterward, you must manually sign in.')
@@ -185,7 +195,7 @@ class IndeedCrawler:
             self._browser.page_source, 'lxml'
             ).find('nav', {'role': 'navigation'})
         pages = []
-        for page in [navigation.findAll(['a', 'b'])[0]]:
+        for page in navigation.findAll(['a', 'b']):
             page = page.get_text()
             if page:
                 pages.append(page)
