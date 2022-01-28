@@ -249,7 +249,7 @@ class IndeedCrawler:
         workbook.close()
         return None
 
-    def _continue(self, answer_questions: bool, collect_q_and_a: bool, wait=10) -> None:
+    def _continue(self, answer_questions: bool, collect_q_and_a: bool, wait=5) -> None:
         for _ in range(10):
             try:
                 resume_div = BeautifulSoup(self._browser.page_source, 'lxml') \
@@ -340,7 +340,10 @@ class IndeedCrawler:
                 break
         return None
 
-    def _apply_to_job(self, job_url: str, answer_questions=False, collect_q_and_a=False, wait=10) -> None:
+    def _apply_to_job(self, job_url: str,
+                      answer_questions=False,
+                      collect_q_and_a=False,
+                      wait=3) -> None:
         self._main_window = self._browser.current_window_handle
         self._browser.execute_script('window.open()')
         tab = self._browser.window_handles[-1]
