@@ -430,9 +430,9 @@ class IndeedCrawler:
         stop_search = False
         if remote or temp_remote:
             self._browser.get(
-                'https://{country}indeed.com/jobs?q={query}{days}&start={start}'
+                'https://{country}indeed.com/jobs?q={query}{days}'
                 .format(country=self._map_country[country],
-                        query=query, days='&fromage=14'*past_14_days, start=start)
+                        query=query, days='&fromage=14'*past_14_days)
                 )
             if remote:
                 remote_id = BeautifulSoup(str(self._browser.page_source), 'lxml') \
