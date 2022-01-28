@@ -14,8 +14,8 @@ indeed_crawler.login(
     )
 try:
     indeed_crawler.collect_questionnaire(
-        query='AI',
-        update=True
+        query='',
+        update=False
         )
 except Exception as e:
     if DEBUG:

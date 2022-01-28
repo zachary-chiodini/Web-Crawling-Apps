@@ -240,6 +240,17 @@ class IndeedCrawler:
     def _continue(self, answer_questions: bool, collect_q_and_a: bool, wait=10) -> None:
         for _ in range(10):
             try:
+                resume_div = BeautifulSoup(self._browser.page_source, 'lxml') \
+                    .find('span', text=compile_regex('Last'))
+                if not resume_div:
+                    resume_div = BeautifulSoup(self._browser.page_source, 'lxml') \
+                        .find('span', text=compile_regex('resume'))
+                if resume_div:
+                    resume_div = resume_div.find_parent('div', {'id': compile_regex('resume')})
+                if resume_div:
+                    self._browser.find_element_by_xpath(
+                        '//div[@id="{}"]'.format(resume_div.get('id'))
+                        ).click()
                 if collect_q_and_a or answer_questions:
                     questions = BeautifulSoup(
                         self._browser.page_source, 'lxml') \
@@ -272,13 +283,13 @@ class IndeedCrawler:
                                         if div.find('input'):
                                             div_id = div.get('id')
                                             self._browser.find_element_by_xpath(
-                                                '//div[@id="{}"]//label//span[text()[contains(.,"{}")]]'\
+                                                '//div[@id="{}"]//label//span[text()[contains(.,"{}")]]'
                                                 .format(div_id, answer)
                                                 ).click()
                                         elif div.find('select'):
                                             div_id = div.get('id')
                                             self._browser.find_element_by_xpath(
-                                                '//div[@id="{}"]//option[contains(@label, "{}")]'\
+                                                '//div[@id="{}"]//option[contains(@label, "{}")]'
                                                 .format(div_id, answer)
                                                 ).click()
                                     # No answers found implies a text input type
@@ -311,6 +322,9 @@ class IndeedCrawler:
                 self._browser.find_element_by_xpath(
                     '//button//span[text()[contains(.,"Continue")]]').click()
             except TimeoutException:
+                break
+            except NoSuchElementException:
+                print('NoSuchElementException encountered!')
                 break
         return None
 
@@ -385,7 +399,7 @@ class IndeedCrawler:
             country: str = '',
             location: str = '',
             radius: str = '',
-            auto_answer_questions = False
+            auto_answer_questions=False
             ) -> None:
         if self._number_of_jobs == 0:
             print('Number of jobs is zero.')
