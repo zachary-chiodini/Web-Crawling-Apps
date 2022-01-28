@@ -590,6 +590,7 @@ class IndeedCrawler:
                     jobs_applied_to += 1
                     with open('cache.txt', 'a') as file:
                         file.write(job_jk + '\n')
+                    print(f"You've applied to {jobs_applied_to} job(s).")
                 if jobs_applied_to == self._number_of_jobs:
                     stop_search = True
                     break
@@ -603,6 +604,10 @@ class IndeedCrawler:
             try:
                 next_page_element = self._browser.find_element_by_xpath(
                     '//nav//a[@aria-label="Next"]')
+                next_page_element.click()
+            except ElementClickInterceptedException:
+                ActionChains(self._browser).move_to_element(next_page_element)\
+                    .click().perform()
                 next_page_element.click()
             except NoSuchElementException:
                 break
