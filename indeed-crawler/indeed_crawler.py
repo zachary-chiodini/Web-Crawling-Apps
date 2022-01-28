@@ -270,7 +270,7 @@ class IndeedCrawler:
                     if questions:
                         questions.pop(0)
                         for div in questions:
-                            labels = BeautifulSoup(str(div), 'lxml').findAll('label')
+                            labels = div.findAll('label')
                             if not labels:
                                 continue
                             question_found = labels.pop(0).get_text().replace('(optional)', '').strip()
@@ -307,15 +307,19 @@ class IndeedCrawler:
                                     # No answers found implies a text input type
                                     # or a text area
                                     elif div.find('input'):
-                                        input_id = div.find('input').get('id')
-                                        self._browser.find_element_by_xpath(
-                                            '//input[@id="{}"]'.format(input_id)
-                                            ).send_keys(answer)
+                                        auto_filled = search('(?<=value=").+?(?=")', str(div))
+                                        if not auto_filled:
+                                            input_id = div.find('input').get('id')
+                                            self._browser.find_element_by_xpath(
+                                                '//input[@id="{}"]'.format(input_id)
+                                                ).send_keys(answer)
                                     elif div.find('textarea'):
-                                        text_id = div.find('textarea').get('id')
-                                        self._browser.find_element_by_xpath(
-                                            '//textarea[@id="{}"]'.format(text_id)
-                                            ).send_keys(answer)
+                                        auto_filled = div.find('textarea')
+                                        if not auto_filled:
+                                            text_id = div.find('textarea').get('id')
+                                            self._browser.find_element_by_xpath(
+                                                '//textarea[@id="{}"]'.format(text_id)
+                                                ).send_keys(answer)
                                 except (InvalidArgumentException, InvalidSelectorException,
                                         NoSuchElementException, ElementNotInteractableException,
                                         StaleElementReferenceException):
