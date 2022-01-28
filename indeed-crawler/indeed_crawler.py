@@ -118,7 +118,7 @@ class IndeedCrawler:
             self._browser.find_element_by_xpath(
                 '//input[@autocomplete="email"]'
                 ).send_keys(Keys.RETURN)
-            WebDriverWait(self._browser, 600).until(
+            WebDriverWait(self._browser, 10).until(
                 expected_conditions.element_to_be_clickable(
                     (By.XPATH, '//input[@type="password"]')
                     )
