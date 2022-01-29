@@ -424,7 +424,7 @@ class IndeedCrawler:
         if self._number_of_jobs == 0:
             print('Number of jobs is zero.')
             return None
-        if auto_answer_questions:
+        if auto_answer_questions and not self._sentence2vec:
             self._df = read_excel('questionnaire.xlsx')
             for _, series in self._df.iterrows():
                 self._q_and_a[series['Question']] = series['Answer']
@@ -532,6 +532,8 @@ class IndeedCrawler:
                             max_salary_found = int(max_salary_found)*12
                         if int(max_salary_found) < int(min_salary):
                             continue
+                    elif enforce_salary:
+                        continue
                 company_name = BeautifulSoup(str(result_content), 'lxml')\
                     .find(class_=compile_regex('companyName'))
                 if company_name_negate_lst and company_name:
