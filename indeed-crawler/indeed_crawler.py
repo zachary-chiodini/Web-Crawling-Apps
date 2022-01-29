@@ -260,9 +260,12 @@ class IndeedCrawler:
                 if resume_div:
                     resume_div = resume_div.find_parent('div', {'id': compile_regex('resume')})
                 if resume_div:
-                    self._browser.find_element_by_xpath(
-                        '//div[@id="{}"]'.format(resume_div.get('id'))
-                        ).click()
+                    try:
+                        self._browser.find_element_by_xpath(
+                            '//div[@id="{}"]'.format(resume_div.get('id'))
+                            ).click()
+                    except ElementNotInteractableException:
+                        pass
                 if collect_q_and_a or answer_questions:
                     questions = BeautifulSoup(
                         self._browser.page_source, 'lxml') \
