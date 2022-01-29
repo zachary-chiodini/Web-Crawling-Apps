@@ -60,8 +60,8 @@ indeed_crawler = IndeedCrawler(
     )
 indeed_crawler.setup_browser()
 indeed_crawler.login(
-    email='kyleboykoindeed@gmail.com',
-    password='P4$$W0RD'
+    email='',
+    password=''
     )
 for query in queries:
     for region, country in places:
