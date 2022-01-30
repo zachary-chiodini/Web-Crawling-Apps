@@ -10,6 +10,7 @@ from fasttext import load_model
 from numpy import apply_along_axis, argmin, array, char, float32, ndarray, vectorize
 from numpy.typing import NDArray
 from pandas import DataFrame, read_excel
+from scipy.spatial import distance
 from selenium.webdriver import ActionChains, Firefox, FirefoxProfile
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
@@ -21,14 +22,11 @@ from selenium.common.exceptions import (
     InvalidArgumentException, InvalidSelectorException, NoSuchElementException,
     NoSuchWindowException, StaleElementReferenceException, TimeoutException,
     WebDriverException)
-from scipy.spatial import distance
 from xlsxwriter import Workbook
 
 
 class IndeedCrawler:
-    """
-    Indeed Crawler
-    """
+    """Indeed Crawler"""
 
     def __init__(
             self, number_of_jobs=0,
@@ -312,8 +310,8 @@ class IndeedCrawler:
                 self._select_resume()
                 if collect_q_and_a or answer_questions:
                     questions = BeautifulSoup(
-                        self._browser.page_source, 'lxml') \
-                        .findAll(class_=compile_regex('Questions'))
+                        self._browser.page_source, 'lxml'
+                        ).findAll(class_=compile_regex('Questions'))
                     if questions:
                         questions.pop(0)
                         for div in questions:
@@ -321,7 +319,8 @@ class IndeedCrawler:
                             if not labels:
                                 self._select_continue(wait)
                                 continue
-                            question_found = labels.pop(0).get_text().replace('(optional)', '').strip()
+                            question_found = labels.pop(0).get_text()\
+                                .replace('(optional)', '').strip()
                             if not question_found:
                                 self._select_continue(wait)
                                 continue
@@ -575,13 +574,17 @@ class IndeedCrawler:
                         try:
                             WebDriverWait(self._browser, 600).until(
                                 expected_conditions.element_to_be_clickable(
-                                    (By.XPATH, '//button//span[text()="Submit your application"]')
+                                    (By.XPATH,
+                                     '//button//span[text()="Submit your application"]')
                                     )
                                 )
-                            self._browser.find_element_by_xpath('//button//span[text()="Submit your application"]').click()
+                            self._browser.find_element_by_xpath(
+                                '//button//span[text()="Submit your application"]'
+                                ).click()
                             WebDriverWait(self._browser, 5).until(
                                 expected_conditions.element_to_be_clickable(
-                                    (By.XPATH, '//button//span[text()="Return to job search"]')
+                                    (By.XPATH,
+                                     '//button//span[text()="Return to job search"]')
                                 )
                             )
                             self._browser.close()
