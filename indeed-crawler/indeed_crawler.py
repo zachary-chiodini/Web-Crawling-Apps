@@ -2,9 +2,10 @@ from os import path
 from re import compile as compile_regex, findall, search
 from time import sleep
 from traceback import print_exc
-from typing import Callable, List, Optional
+from typing import Callable, List, Optional, Set
 
 from bs4 import BeautifulSoup
+from bs4.element import Tag
 from fasttext import load_model
 from numpy import apply_along_axis, argmin, array, char, float32, ndarray, vectorize
 from numpy.typing import NDArray
@@ -249,23 +250,66 @@ class IndeedCrawler:
         workbook.close()
         return None
 
-    def _continue(self, answer_questions: bool, collect_q_and_a: bool, wait=5) -> None:
+    def _select_continue(self, wait=5) -> None:
+        WebDriverWait(self._browser, wait).until(
+            expected_conditions.element_to_be_clickable(
+                (By.XPATH,
+                 '//button//span[text()[contains(.,"Continue")]]')
+                )
+            )
+        self._browser.find_element_by_xpath(
+            '//button//span[text()[contains(.,"Continue")]]').click()
+        return None
+
+    def _answer_questions(
+            self, question_div: Tag,
+            question_found: str,
+            answers_found: NDArray[str]
+            ) -> None:
+        answer = self._get_answer(question_found, answers_found)
+        try:
+            # Multiple answers found implies a radio input type
+            # or a selection.
+            if answers_found.size:
+                if question_div.find('input'):
+                    div_id = question_div.get('id')
+                    self._browser.find_element_by_xpath(
+                        '//div[@id="{}"]//label//span[text()[contains(.,"{}")]]'
+                        .format(div_id, answer)
+                        ).click()
+                elif question_div.find('select'):
+                    div_id = question_div.get('id')
+                    self._browser.find_element_by_xpath(
+                        '//div[@id="{}"]//option[contains(@label, "{}")]'
+                        .format(div_id, answer)
+                        ).click()
+            # No answers found implies a text input type
+            # or a text area
+            elif question_div.find('input'):
+                auto_filled = search('(?<=value=").+?(?=")', str(question_div))
+                if not auto_filled:
+                    input_id = question_div.find('input').get('id')
+                    self._browser.find_element_by_xpath(
+                        '//input[@id="{}"]'.format(input_id)
+                        ).send_keys(answer)
+            elif question_div.find('textarea'):
+                auto_filled = question_div.find('textarea')
+                if not auto_filled:
+                    text_id = question_div.find('textarea').get('id')
+                    self._browser.find_element_by_xpath(
+                        '//textarea[@id="{}"]'.format(text_id)
+                        ).send_keys(answer)
+        except (InvalidArgumentException, InvalidSelectorException,
+                NoSuchElementException, ElementNotInteractableException,
+                StaleElementReferenceException):
+            pass
+        return None
+
+    def _handle_screening_questions(
+            self, answer_questions: bool, collect_q_and_a: bool, wait=5) -> None:
         for _ in range(10):
             try:
-                resume_div = BeautifulSoup(self._browser.page_source, 'lxml') \
-                    .find('span', text=compile_regex('Last'))
-                if not resume_div:
-                    resume_div = BeautifulSoup(self._browser.page_source, 'lxml') \
-                        .find('span', text=compile_regex('resume'))
-                if resume_div:
-                    resume_div = resume_div.find_parent('div', {'id': compile_regex('resume')})
-                if resume_div:
-                    try:
-                        self._browser.find_element_by_xpath(
-                            '//div[@id="{}"]'.format(resume_div.get('id'))
-                            ).click()
-                    except ElementNotInteractableException:
-                        pass
+                self._select_resume()
                 if collect_q_and_a or answer_questions:
                     questions = BeautifulSoup(
                         self._browser.page_source, 'lxml') \
@@ -275,76 +319,55 @@ class IndeedCrawler:
                         for div in questions:
                             labels = div.findAll('label')
                             if not labels:
+                                self._select_continue(wait)
                                 continue
                             question_found = labels.pop(0).get_text().replace('(optional)', '').strip()
                             if not question_found:
+                                self._select_continue(wait)
                                 continue
                             answers_set = set()
                             select = div.find('select')
                             if select:
                                 labels = select.findAll('option')
+                                if not labels:
+                                    self._select_continue(wait)
+                                    continue
                             for answer_found in labels:
                                 if answer_found:
                                     answer_found = answer_found.get_text().strip()
                                     if answer_found:
                                         answers_set.add(answer_found)
                             if answer_questions:
-                                answer = self._get_answer(
-                                    question_found, array(list(answers_set)))
-                                try:
-                                    # Multiple answers found implies a radio input type
-                                    # or a selection.
-                                    if answers_set:
-                                        if div.find('input'):
-                                            div_id = div.get('id')
-                                            self._browser.find_element_by_xpath(
-                                                '//div[@id="{}"]//label//span[text()[contains(.,"{}")]]'
-                                                .format(div_id, answer)
-                                                ).click()
-                                        elif div.find('select'):
-                                            div_id = div.get('id')
-                                            self._browser.find_element_by_xpath(
-                                                '//div[@id="{}"]//option[contains(@label, "{}")]'
-                                                .format(div_id, answer)
-                                                ).click()
-                                    # No answers found implies a text input type
-                                    # or a text area
-                                    elif div.find('input'):
-                                        auto_filled = search('(?<=value=").+?(?=")', str(div))
-                                        if not auto_filled:
-                                            input_id = div.find('input').get('id')
-                                            self._browser.find_element_by_xpath(
-                                                '//input[@id="{}"]'.format(input_id)
-                                                ).send_keys(answer)
-                                    elif div.find('textarea'):
-                                        auto_filled = div.find('textarea')
-                                        if not auto_filled:
-                                            text_id = div.find('textarea').get('id')
-                                            self._browser.find_element_by_xpath(
-                                                '//textarea[@id="{}"]'.format(text_id)
-                                                ).send_keys(answer)
-                                except (InvalidArgumentException, InvalidSelectorException,
-                                        NoSuchElementException, ElementNotInteractableException,
-                                        StaleElementReferenceException):
-                                    pass
+                                self._answer_questions(
+                                    div, question_found, array(list(answers_set)))
                             if collect_q_and_a:
                                 if question_found in self._q_and_a:
                                     self._q_and_a[question_found].update(answers_set)
                                 else:
                                     self._q_and_a[question_found] = answers_set
-                WebDriverWait(self._browser, wait).until(
-                    expected_conditions.element_to_be_clickable(
-                        (By.XPATH,
-                         '//button//span[text()[contains(.,"Continue")]]')
-                        )
-                    )
-                self._browser.find_element_by_xpath(
-                    '//button//span[text()[contains(.,"Continue")]]').click()
+                self._select_continue(wait)
             except TimeoutException:
                 break
             except NoSuchElementException:
                 print('NoSuchElementException encountered!')
                 break
+        return None
+
+    def _select_resume(self) -> None:
+        resume_div = BeautifulSoup(self._browser.page_source, 'lxml') \
+            .find('span', text=compile_regex('Last'))
+        if not resume_div:
+            resume_div = BeautifulSoup(self._browser.page_source, 'lxml') \
+                .find('span', text=compile_regex('resume'))
+        if resume_div:
+            resume_div = resume_div.find_parent('div', {'id': compile_regex('resume')})
+            if resume_div:
+                try:
+                    self._browser.find_element_by_xpath(
+                        '//div[@id="{}"]'.format(resume_div.get('id'))
+                        ).click()
+                except ElementNotInteractableException:
+                    pass
         return None
 
     def _apply_to_job(self, job_url: str,
@@ -363,18 +386,7 @@ class IndeedCrawler:
             )
         self._browser.find_element_by_xpath(
             '//*[@id="indeedApplyButton"]').click()
-        resume_div = BeautifulSoup(self._browser.page_source, 'lxml')\
-            .find('span', text=compile_regex('Last'))
-        if not resume_div:
-            resume_div = BeautifulSoup(self._browser.page_source, 'lxml') \
-                .find('span', text=compile_regex('resume'))
-        if resume_div:
-            resume_div = resume_div.find_parent('div', {'id': compile_regex('resume')})
-        if resume_div:
-            self._browser.find_element_by_xpath(
-                '//div[@id="{}"]'.format(resume_div.get('id'))
-                ).click()
-        self._continue(answer_questions, collect_q_and_a)
+        self._handle_screening_questions(answer_questions, collect_q_and_a)
         if not collect_q_and_a:
             try:
                 WebDriverWait(self._browser, wait).until(
