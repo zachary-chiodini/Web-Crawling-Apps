@@ -259,7 +259,7 @@ class IndeedCrawler:
             '//button//span[text()[contains(.,"Continue")]]').click()
         return None
 
-    def _answer_questions(
+    def _answer_question(
             self, question_div: Tag,
             question_found: str,
             answers_found: NDArray[str]
@@ -337,7 +337,7 @@ class IndeedCrawler:
                                     if answer_found:
                                         answers_set.add(answer_found)
                             if answer_questions:
-                                self._answer_questions(
+                                self._answer_question(
                                     div, question_found, array(list(answers_set)))
                             if collect_q_and_a:
                                 if question_found in self._q_and_a:
