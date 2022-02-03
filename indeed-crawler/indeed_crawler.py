@@ -209,7 +209,7 @@ class IndeedCrawler:
                 except ElementClickInterceptedException:
                     ActionChains(self._browser).move_to_element(page_element).click().perform()
                     page_element.click()
-                except NoSuchElementException:
+                except (NoSuchElementException, ElementNotInteractableException):
                     pass
             mobtk = search(
                 '(?<=data-mobtk=").+?(?=")',
@@ -354,6 +354,7 @@ class IndeedCrawler:
                                     self._answer_question(
                                         div, question_found, answers_found)
                             if collect_q_and_a:
+                                answers_set = set(answers_found)
                                 if question_found in self._q_and_a:
                                     self._q_and_a[question_found].update(answers_set)
                                 else:
