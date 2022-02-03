@@ -2,7 +2,7 @@ from os import path
 from re import compile as compile_regex, findall, search
 from time import sleep
 from traceback import print_exc
-from typing import Callable, List, Optional, Set
+from typing import Callable, List, Optional
 
 from bs4 import BeautifulSoup
 from bs4.element import Tag
@@ -262,24 +262,27 @@ class IndeedCrawler:
     def _answer_question(
             self, question_div: Tag,
             question_found: str,
-            answers_found: NDArray[str]
+            answers_found: List[str]
             ) -> None:
-        answer = self._get_answer(question_found, answers_found)
+        answer = self._get_answer(question_found, array(answers_found))
         try:
             # Multiple answers found implies a radio input type
             # or a selection.
-            if answers_found.size:
+            if answers_found:
                 if question_div.find('input'):
-                    div_id = question_div.get('id')
+                    index = answers_found.index(answer)
                     self._browser.find_element_by_xpath(
-                        '//div[@id="{}"]//label//span[text()[contains(.,"{}")]]'
-                        .format(div_id, answer)
+                         f'//label[{index + 1}]/span[text()[contains(.,"{answer}")]]'
                         ).click()
                 elif question_div.find('select'):
                     div_id = question_div.get('id')
+                    for i, chr_ in enumerate(div_id):
+                        if chr_ == '{':
+                            div_id = div_id[:i]
+                            break
                     self._browser.find_element_by_xpath(
-                        '//div[@id="{}"]//option[contains(@label, "{}")]'
-                        .format(div_id, answer)
+                        f'//select[starts-with(@id, "{div_id}")]'
+                        f'//option[contains(@label, "{answer}")]'
                         ).click()
             # No answers found implies a text input type
             # or a text area
@@ -288,20 +291,30 @@ class IndeedCrawler:
                 if not auto_filled:
                     input_id = question_div.find('input').get('id')
                     self._browser.find_element_by_xpath(
-                        '//input[@id="{}"]'.format(input_id)
+                        f'//input[@id="{input_id}"]'
                         ).send_keys(answer)
             elif question_div.find('textarea'):
                 auto_filled = question_div.find('textarea')
                 if not auto_filled:
                     text_id = question_div.find('textarea').get('id')
                     self._browser.find_element_by_xpath(
-                        '//textarea[@id="{}"]'.format(text_id)
+                        f'//textarea[@id="{text_id}"]'
                         ).send_keys(answer)
         except (InvalidArgumentException, InvalidSelectorException,
                 NoSuchElementException, ElementNotInteractableException,
                 StaleElementReferenceException):
             pass
         return None
+
+    @staticmethod
+    def _get_answers_list(labels) -> List[str]:
+        answers_list = []
+        for answer_found in labels:
+            if answer_found:
+                answer_found = answer_found.get_text().strip()
+                if answer_found:
+                    answers_list.append(answer_found)
+        return answers_list
 
     def _handle_screening_questions(
             self, answer_questions: bool, collect_q_and_a: bool, wait=5) -> None:
@@ -324,21 +337,22 @@ class IndeedCrawler:
                             if not question_found:
                                 self._select_continue(wait)
                                 continue
-                            answers_set = set()
-                            select = div.find('select')
+                            select = div.findAll('select')
                             if select:
-                                labels = select.findAll('option')
-                                if not labels:
-                                    self._select_continue(wait)
-                                    continue
-                            for answer_found in labels:
-                                if answer_found:
-                                    answer_found = answer_found.get_text().strip()
-                                    if answer_found:
-                                        answers_set.add(answer_found)
-                            if answer_questions:
-                                self._answer_question(
-                                    div, question_found, array(list(answers_set)))
+                                for element in select:
+                                    labels = element.findAll('option')
+                                    answers_found = self._get_answers_list(labels)
+                                    if not answers_found:
+                                        self._select_continue(wait)
+                                        break
+                                    if answer_questions:
+                                        self._answer_question(
+                                            element, question_found, answers_found)
+                            else:
+                                answers_found = self._get_answers_list(labels)
+                                if answer_questions:
+                                    self._answer_question(
+                                        div, question_found, answers_found)
                             if collect_q_and_a:
                                 if question_found in self._q_and_a:
                                     self._q_and_a[question_found].update(answers_set)
