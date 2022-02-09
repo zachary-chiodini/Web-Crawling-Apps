@@ -1,1 +1,1 @@
-This page is purposefully left blank. I do not want random people to use this package.
+This page is purposefully left blank.
