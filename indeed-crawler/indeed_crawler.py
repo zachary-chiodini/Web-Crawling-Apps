@@ -2,7 +2,7 @@ from os import path
 from re import compile as compile_regex, findall, search
 from time import sleep
 from traceback import print_exc
-from typing import Callable, List, Optional
+from typing import Callable, List, Optional, Set
 
 from bs4 import BeautifulSoup
 from bs4.element import Tag
@@ -262,17 +262,17 @@ class IndeedCrawler:
     def _answer_question(
             self, question_div: Tag,
             question_found: str,
-            answers_found: List[str]
+            answers_found: Set[str]
             ) -> None:
-        answer = self._get_answer(question_found, array(answers_found))
+        answer = self._get_answer(question_found, array(list(answers_found)))
         try:
             # Multiple answers found implies a radio input type
             # or a selection.
             if answers_found:
                 if question_div.find('input'):
-                    index = answers_found.index(answer)
+                    div_id = div.get('id')
                     self._browser.find_element_by_xpath(
-                         f'//label[{index + 1}]/span[text()[contains(.,"{answer}")]]'
+                        f'//div[contains(@id, "{div_id}")]//span[text()[contains(.,"{answer}")]]'
                         ).click()
                 elif question_div.find('select'):
                     div_id = question_div.get('id')
@@ -307,17 +307,18 @@ class IndeedCrawler:
         return None
 
     @staticmethod
-    def _get_answers_list(labels) -> List[str]:
-        answers_list = []
+    def _get_answers_set(labels: List[str]) -> Set[str]:
+        answers_set = set()
         for answer_found in labels:
             if answer_found:
                 answer_found = answer_found.get_text().strip()
                 if answer_found:
-                    answers_list.append(answer_found)
-        return answers_list
+                    answers_set.add(answer_found)
+        return answers_set
 
     def _handle_screening_questions(
-            self, answer_questions: bool, collect_q_and_a: bool, wait=5) -> None:
+            self, answer_questions: bool, collect_q_and_a: bool, wait=5
+            ) -> None:
         for _ in range(10):
             try:
                 self._select_resume()
@@ -341,24 +342,20 @@ class IndeedCrawler:
                             if select:
                                 for element in select:
                                     labels = element.findAll('option')
-                                    answers_found = self._get_answers_list(labels)
+                                    answers_found = self._get_answers_set(labels)
                                     if not answers_found:
                                         self._select_continue(wait)
                                         break
-                                    if answer_questions:
-                                        self._answer_question(
-                                            element, question_found, answers_found)
                             else:
-                                answers_found = self._get_answers_list(labels)
-                                if answer_questions:
-                                    self._answer_question(
-                                        div, question_found, answers_found)
+                                answers_found = self._get_answers_set(labels)
+                            if answer_questions:
+                                self._answer_question(
+                                    div, question_found, answers_found)
                             if collect_q_and_a:
-                                answers_set = set(answers_found)
                                 if question_found in self._q_and_a:
-                                    self._q_and_a[question_found].update(answers_set)
+                                    self._q_and_a[question_found].update(answers_found)
                                 else:
-                                    self._q_and_a[question_found] = answers_set
+                                    self._q_and_a[question_found] = answers_found
                 self._select_continue(wait)
             except TimeoutException:
                 break
@@ -495,17 +492,21 @@ class IndeedCrawler:
                 radius='&radius=' * bool(radius) + radius
                 )
             )
+        infinite_loop = False
         while True:
             try:
                 mobtk = search(
                     '(?<=data-mobtk=").+?(?=")',
                     self._browser.page_source).group()
             except AttributeError:
+                if infinite_loop:
+                    break
                 # captcha
                 current_url = self._browser.current_url
                 WebDriverWait(self._browser, 600).until(
                     lambda driver: driver.current_url != current_url
                 )
+                infinite_loop = True
                 continue
             self._main_window = self._browser.current_window_handle
             soup_list = BeautifulSoup(
