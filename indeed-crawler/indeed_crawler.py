@@ -343,11 +343,11 @@ class IndeedCrawler:
                                 for element in select:
                                     labels = element.findAll('option')
                                     answers_found = self._get_answers_set(labels)
-                                    if not answers_found:
-                                        self._select_continue(wait)
-                                        break
                             else:
                                 answers_found = self._get_answers_set(labels)
+                            if not answers_found:
+                                self._select_continue(wait)
+                                break
                             if answer_questions:
                                 self._answer_question(
                                     div, question_found, answers_found)
