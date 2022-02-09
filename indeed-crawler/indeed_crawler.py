@@ -270,7 +270,7 @@ class IndeedCrawler:
             # or a selection.
             if answers_found:
                 if question_div.find('input'):
-                    div_id = div.get('id')
+                    div_id = question_div.get('id')
                     self._browser.find_element_by_xpath(
                         f'//div[contains(@id, "{div_id}")]//span[text()[contains(.,"{answer}")]]'
                         ).click()
