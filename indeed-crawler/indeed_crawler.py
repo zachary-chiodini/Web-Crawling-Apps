@@ -225,7 +225,23 @@ class IndeedCrawler:
                     continue
                 job_jk = search('(?<=data-jk=").+?(?=")', str(tag)).group()
                 job_url = 'https://www.indeed.com/viewjob?jk={}'.format(job_jk)
-                self._apply_to_job(job_url, update, collect_q_and_a=True)
+                try:
+                    self._apply_to_job(job_url, update, collect_q_and_a=True)
+                except (ElementClickInterceptedException,
+                        ElementNotInteractableException,
+                        NoSuchElementException,
+                        NoSuchWindowException,
+                        StaleElementReferenceException,
+                        TimeoutException,
+                        WebDriverException):
+                    if self._debug:
+                        print_exc()
+                        stop_search = True
+                        break
+                    if self._browser.current_window_handle != self._main_window:
+                        self._browser.close()
+                        self._browser.switch_to.window(self._main_window)
+                    continue
         workbook = Workbook('questionnaire.xlsx')
         worksheet = workbook.add_worksheet('questionnaire')
         worksheet.write(0, 0, 'Question')
