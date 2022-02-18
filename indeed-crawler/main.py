@@ -34,7 +34,7 @@ def append_df_to_excel(
 if __name__ == '__main__':
 
     indeed_crawler = IndeedCrawler(
-        number_of_jobs=100,
+        number_of_jobs=0,
         debug=False,
         manually_fill_out_questions=False
         )
@@ -63,7 +63,8 @@ if __name__ == '__main__':
     except Exception as e:
         if DEBUG:
             print_exc()
-        print(str(e))
+        else:
+            print(str(e))
     finally:
         results = indeed_crawler.results
         dataframe = DataFrame(data=results)
