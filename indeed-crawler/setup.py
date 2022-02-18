@@ -20,4 +20,5 @@ try:
 except Exception as e:
     if DEBUG:
         print_exc()
-    print(str(e))
+    else:
+        print(str(e))
