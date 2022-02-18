@@ -291,13 +291,13 @@ class IndeedCrawler:
                         f'//div[contains(@id, "{div_id}")]//span[text()[contains(.,"{answer}")]]'
                         ).click()
                 elif question_div.find('select'):
-                    div_id = question_div.get('id')
-                    for i, chr_ in enumerate(div_id):
+                    select_id = question_div.find('select').get('id')
+                    for i, chr_ in enumerate(select_id):
                         if chr_ == '{':
-                            div_id = div_id[:i]
+                            select_id = select_id[:i]
                             break
                     self._browser.find_element_by_xpath(
-                        f'//select[starts-with(@id, "{div_id}")]'
+                        f'//select[starts-with(@id, "{select_id}")]'
                         f'//option[contains(@label, "{answer}")]'
                         ).click()
             # No answers found implies a text input type
