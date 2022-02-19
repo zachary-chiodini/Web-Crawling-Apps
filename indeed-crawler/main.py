@@ -2,7 +2,6 @@ from traceback import print_exc
 from typing import List, Tuple
 
 from pandas import DataFrame
-from selenium.common.exceptions import NoSuchWindowException
 
 from helper_funs import append_df_to_excel
 from indeed_crawler import IndeedCrawler
@@ -12,13 +11,16 @@ DEBUG = True
 
 
 queries: List[str] = [
+    'Project Manager', 'Project Coordinator', 'Junior Project Manager'
 ]
 
 Location, Country = str, str
 places: List[Tuple[Location, Country]] = [
+    ('remote', 'united states')
 ]
 
 negate_jobs: List[str] = [
+    'senior'
 ]
 
 negate_comps: List[str] = [
@@ -37,8 +39,8 @@ indeed_crawler = IndeedCrawler(
 
 indeed_crawler.setup_browser()
 indeed_crawler.login(
-    email='',
-    password=''
+    email='tgreg3415@gmail.com',
+    password='P4$$W0RD'
     )
 
 abort = False
@@ -51,8 +53,8 @@ for region, country in places:
                 company_name_negate_lst=negate_comps,
                 past_14_days=False,
                 job_type='',  # fulltime
-                min_salary='',
-                enforce_salary=False,  # consider only jobs with salary listed
+                min_salary='100000',
+                enforce_salary=True,  # consider only jobs with salary listed
                 exp_lvl='',  # entry_level, mid_level, #senior_level
                 remote='',
                 temp_remote=False,
@@ -61,8 +63,6 @@ for region, country in places:
                 radius='',
                 auto_answer_questions=True
                 )
-        except NoSuchWindowException:
-            abort = True
         except Exception as e:
             if DEBUG:
                 print_exc()
@@ -74,7 +74,3 @@ for region, country in places:
                 append_df_to_excel(dataframe, 'submissions.xlsx',
                                    sheet_name='jobs', index=False)
                 indeed_crawler.reset_results()
-            if abort:
-                break
-    if abort:
-        break
