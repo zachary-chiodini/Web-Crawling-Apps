@@ -11,19 +11,20 @@ DEBUG = True
 
 
 queries: List[str] = [
-    'Project Manager', 'Project Coordinator', 'Junior Project Manager'
+
 ]
 
 Location, Country = str, str
 places: List[Tuple[Location, Country]] = [
-    ('remote', 'united states')
+
 ]
 
 negate_jobs: List[str] = [
-    'senior'
+
 ]
 
 negate_comps: List[str] = [
+
 ]
 
 number_of_jobs = int(TOTAL_NUMBER_OF_JOBS/(len(queries) * len(places)))
@@ -39,8 +40,8 @@ indeed_crawler = IndeedCrawler(
 
 indeed_crawler.setup_browser()
 indeed_crawler.login(
-    email='tgreg3415@gmail.com',
-    password='P4$$W0RD'
+    email='',
+    password=''
     )
 
 abort = False
@@ -53,8 +54,8 @@ for region, country in places:
                 company_name_negate_lst=negate_comps,
                 past_14_days=False,
                 job_type='',  # fulltime
-                min_salary='100000',
-                enforce_salary=True,  # consider only jobs with salary listed
+                min_salary='',
+                enforce_salary=False,  # consider only jobs with salary listed
                 exp_lvl='',  # entry_level, mid_level, #senior_level
                 remote='',
                 temp_remote=False,
