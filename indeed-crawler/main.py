@@ -37,8 +37,8 @@ indeed_crawler = IndeedCrawler(
 
 indeed_crawler.setup_browser()
 indeed_crawler.login(
-    email='tgreg3415@gmail.com',
-    password='P4$$W0RD'
+    email='',
+    password=''
     )
 
 abort = False
