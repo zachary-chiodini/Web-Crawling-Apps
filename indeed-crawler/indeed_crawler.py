@@ -237,7 +237,6 @@ class IndeedCrawler:
                         WebDriverException):
                     if self._debug:
                         print_exc()
-                        stop_search = True
                         break
                     if self._browser.current_window_handle != self._main_window:
                         self._browser.close()
