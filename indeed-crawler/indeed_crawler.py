@@ -564,16 +564,12 @@ class IndeedCrawler:
                 if not job_salary and enforce_salary:
                     continue
                 if min_salary and job_salary:
-                    max_salary_found = ''
-                    salary_text = job_salary.get_text()\
-                        .split('-')[-1].strip().replace(',', '')\
-                        .lower()
-                    for chr_ in salary_text:
-                        if chr_.isdigit():
-                            max_salary_found += chr_
-                        if chr_ == '.' and '.' not in max_salary_found:
-                            max_salary_found += chr_
-                    if max_salary_found.isdigit():
+                    salary_text = job_salary.get_text().lower()
+                    max_salary_found = findall('[0-9]*,*[0-9]*\.*[0-9]', salary_text)
+                    if max_salary_found:
+                        max_salary_found = max_salary_found[-1].replace(',', '')
+                        if max_salary_found.count('.') > 1:
+                            max_salary_found = max_salary_found[:max_salary_found.index('.')]
                         if 'hour' in salary_text:
                             max_salary_found = float(max_salary_found)*2080
                         elif 'month' in salary_text:
