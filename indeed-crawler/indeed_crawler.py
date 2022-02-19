@@ -280,7 +280,7 @@ class IndeedCrawler:
             question_found: str,
             answers_found: Set[str]
             ) -> None:
-        answer = self._get_answer(question_found, array(list(answers_found)))
+        answer = self._get_answer(question_found, array(list(answers_found), dtype=str))
         try:
             # Multiple answers found implies a radio input type
             # or a selection.
