@@ -42,6 +42,7 @@ class IndeedCrawler:
             'Salary': [],
             'URL': []
             }
+        self.total_jobs_applied_to = 0
         self._map_country = {
             'united states': '',
             'united kingdom': 'uk.',
@@ -473,7 +474,7 @@ class IndeedCrawler:
             for _, series in self._df.iterrows():
                 self._q_and_a[series['Question']] = series['Answer']
             self._load_model()
-        jobs_applied_to = 0
+        batch_jobs_applied_to = 0
         stop_search = False
         if remote or temp_remote:
             self._browser.get(
@@ -649,11 +650,12 @@ class IndeedCrawler:
                 self.results['URL'].append(job_url)
                 if job_jk not in self._cache:
                     self._cache.add(job_jk)
-                    jobs_applied_to += 1
+                    batch_jobs_applied_to += 1
+                    self.total_jobs_applied_to += 1
                     with open('cache.txt', 'a') as file:
                         file.write(job_jk + '\n')
-                    print(f"You've applied to {jobs_applied_to} job(s).")
-                if jobs_applied_to == self._number_of_jobs:
+                    print(f"You've applied to {self.total_jobs_applied_to} job(s).")
+                if batch_jobs_applied_to == self._number_of_jobs:
                     stop_search = True
                     break
             if stop_search:
@@ -673,6 +675,16 @@ class IndeedCrawler:
                 next_page_element.click()
             except NoSuchElementException:
                 break
+        return None
+
+    def reset_results(self) -> None:
+        self.results = {
+            'Title': [],
+            'Company': [],
+            'Location': [],
+            'Salary': [],
+            'URL': []
+            }
         return None
 
     def close(self) -> None:
