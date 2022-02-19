@@ -1,0 +1,75 @@
+ {
+     "Date Available": "",
+
+     "Please list 2-3 dates and time ranges that you could do an interview.": "",
+
+     "How many years of [SKILL] experience do you have?": "",
+
+     "Will you be able to reliably commute to or relocate to the job site?": "",
+     "Do you have your own transportation?": "Yes",
+
+     "Do you possess a valid drivers license and have a safe driving record?": "Yes",
+
+     "Do you currently require sponsorship to work in [COUNTRY]?": "No",
+     "Will you now or in the future require sponsorship for employment visa status in [COUNTRY]?": "No",
+
+     "Are you legally eligible to work in the [COUNTRY]?": "Yes",
+     "Are you legally eligible to work in [COUNTRY]?": "Yes",
+     "Are you legally entitled to work in [COUNTRY]?": "Yes",
+     "Are you legally authorized to work in [COUNTRY]": "Yes",
+     "Are you authorized to work in the job's location?": "Yes",
+     "Are you currently legally eligible to work in [COUNTRY]?": "Yes",
+     "Are you currently authorized to work in [COUNTRY]?": "Yes",
+
+     "What is the highest level of education you have completed?": "",
+     "Highest Education Obtained": "",
+
+     "What are you salary expectations for this role?": "",
+     "What are your salary expectations?": "",
+     "Desired Pay": "",
+     "What is your desired salary?": "",
+     "Please enter the amount": "",
+
+     "If you were referred, please share your referrer's name with us.": "No referral",
+
+     "Phone Number": "",
+
+     "LinkedIn URL": "",
+     "LinkedIn Profile": "",
+
+     "Website": "",
+
+     "Do you speak [LANGUAGE]?": "",
+
+     "What is your current location?": "",
+     "Address": "",
+
+     "City": "",
+
+     "State/Province": "",
+     "State": "",
+
+     "Postal/ZIP": "",
+     "Postal Code": "",
+
+     "Have you previously worked for our company or any of its divisions?": "No",
+     "Have you been employed by our company before?": "No",
+     "Have you ever been employed with our company or its affiliates in the past?": "No",
+     "Have you previously worked at our company as either a full-time or part-time employee, or been engaged as a contract worker?"): "No",
+     "Are you currently employed by our client or partner?": "No",
+
+     "Do you have a non-compete, non-solicitation, confidentiality or similar agreement that could impact your ability to work for us?"): "No",
+
+     "Do you have relatives currently employed at our company": "No",
+     "If you have relatives currently employed at our company, please provide their name and title."): "No relatives",
+
+     "Do you consent to being contacted about this job via text/SMS?": "Yes",
+
+     "I consent to a criminal record check, which will be conducted in accordance with applicable legislation."): "Yes",
+
+     "Check the box to confirm.": "I understand",
+
+     "Privacy Policy": "I consent",
+
+     "Covid-19 Vaccination Acknowledgement": "Accept"
+ }
