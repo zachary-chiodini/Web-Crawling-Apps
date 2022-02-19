@@ -172,13 +172,13 @@ class IndeedCrawler:
             return answers_found[argmin(self._cosine_distances(answers_found, answer_stored))]
         return answer_stored
 
-    def collect_questionnaire(self, query: str, update=False) -> None:
+    def collect_questionnaire(self, query: str, country='united states', update=False) -> None:
         if update:
             self._df = read_excel('questionnaire.xlsx')
             for _, series in self._df.iterrows():
                 self._q_and_a[series['Question']] = {series['Answer']}
             self._load_model()
-        self._browser.get('https://www.indeed.com/jobs?q={}'.format(query))
+        self._browser.get(f'https://{self._map_country[country]}indeed.com/jobs?q={query}')
         try:
             mobtk = search(
                 '(?<=data-mobtk=").+?(?=")',
@@ -189,7 +189,7 @@ class IndeedCrawler:
             WebDriverWait(self._browser, 600).until(
                 lambda driver: driver.current_url != current_url
                 )
-            return self.collect_questionnaire(query, update)
+            return self.collect_questionnaire(query, country, update)
         navigation = BeautifulSoup(
             self._browser.page_source, 'lxml'
             ).find('nav', {'role': 'navigation'})
