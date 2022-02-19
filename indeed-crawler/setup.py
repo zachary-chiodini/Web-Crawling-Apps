@@ -4,7 +4,7 @@ from indeed_crawler import IndeedCrawler
 
 DEBUG = True
 
-# generate or update a 'questionnaire.xlsx file
+# generate or update a 'questionnaire.xlsx' file
 
 indeed_crawler = IndeedCrawler()
 indeed_crawler.setup_browser()
@@ -15,7 +15,7 @@ indeed_crawler.login(
 try:
     indeed_crawler.collect_questionnaire(
         query='',
-        country='united states',
+        country='',
         update=False
         )
 except Exception as e:
