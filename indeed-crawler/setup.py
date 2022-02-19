@@ -1,10 +1,11 @@
+"""Generate or update a 'questionnaire.xlsx' file"""
+
 from traceback import print_exc
 
 from indeed_crawler import IndeedCrawler
 
 DEBUG = True
 
-# generate or update a 'questionnaire.xlsx' file
 
 indeed_crawler = IndeedCrawler()
 indeed_crawler.setup_browser()

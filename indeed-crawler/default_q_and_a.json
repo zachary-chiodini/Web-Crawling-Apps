@@ -1,75 +1,105 @@
  {
-     "Date Available": "",
+      "Date Available": "",
+      "Date available to begin work": "",
+      "What is your projected start date?": "",
 
-     "Please list 2-3 dates and time ranges that you could do an interview.": "",
+      "Are you over the age of 18?": "Yes",
 
-     "How many years of [SKILL] experience do you have?": "",
+      "What is your desired employment status?": "Full-time",
+      "Are you looking for a full-time or a part-time position?": "Full-time",
 
-     "Will you be able to reliably commute to or relocate to the job site?": "",
-     "Do you have your own transportation?": "Yes",
+      "How many hours per week (on average) are you available to work?": "40",
 
-     "Do you possess a valid drivers license and have a safe driving record?": "Yes",
+      "Are you willing to work overtime and weekends?": "Yes",
 
-     "Do you currently require sponsorship to work in [COUNTRY]?": "No",
-     "Will you now or in the future require sponsorship for employment visa status in [COUNTRY]?": "No",
+      "Please list 2-3 dates and time ranges that you could do an interview.": "",
 
-     "Are you legally eligible to work in the [COUNTRY]?": "Yes",
-     "Are you legally eligible to work in [COUNTRY]?": "Yes",
-     "Are you legally entitled to work in [COUNTRY]?": "Yes",
-     "Are you legally authorized to work in [COUNTRY]": "Yes",
-     "Are you authorized to work in the job's location?": "Yes",
-     "Are you currently legally eligible to work in [COUNTRY]?": "Yes",
-     "Are you currently authorized to work in [COUNTRY]?": "Yes",
+      "How many years of [SKILL] experience do you have?": "",
 
-     "What is the highest level of education you have completed?": "",
-     "Highest Education Obtained": "",
+      "Will you be able to reliably commute to or relocate to the job site?": "",
+      "Do you have your own transportation?": "Yes",
 
-     "What are you salary expectations for this role?": "",
-     "What are your salary expectations?": "",
-     "Desired Pay": "",
-     "What is your desired salary?": "",
-     "Please enter the amount": "",
+      "Do you possess a valid drivers license and have a safe driving record?": "Yes",
+      "Do you have a valid Driver's License?": "Yes",
 
-     "If you were referred, please share your referrer's name with us.": "No referral",
+      "What percentage of the time are you willing to travel for work?": "",
 
-     "Phone Number": "",
+      "Do you currently require sponsorship to work in [COUNTRY]?": "No",
+      "Will you now or in the future require sponsorship for employment visa status in [COUNTRY]?": "No",
 
-     "LinkedIn URL": "",
-     "LinkedIn Profile": "",
+      "Are you legally eligible to work in the [COUNTRY]?": "Yes",
+      "Are you legally eligible to work in [COUNTRY]?": "Yes",
+      "Are you legally entitled to work in [COUNTRY]?": "Yes",
+      "Are you legally authorized to work in [COUNTRY]": "Yes",
+      "Are you authorized to work in the job's location?": "Yes",
+      "Are you currently legally eligible to work in [COUNTRY]?": "Yes",
+      "Are you currently authorized to work in [COUNTRY]?": "Yes",
+      "Are you authorized to work in the following country: [COUNTRY]?": "Yes",
 
-     "Website": "",
+      "What is the highest level of education you have completed?": "",
+      "Highest Education Obtained": "",
 
-     "Do you speak [LANGUAGE]?": "",
+      "What are you salary expectations for this role?": "",
+      "What are your salary expectations?": "",
+      "Desired Pay": "",
+      "What is your desired salary?": "",
+      "Select currency type": "USD",
+      "Please enter the amount": "",
 
-     "What is your current location?": "",
-     "Address": "",
+      "If you were referred, please share your referrer's name with us.": "No referral",
 
-     "City": "",
+      "On which website did you see this opening advertised?": "Indeed",
 
-     "State/Province": "",
-     "State": "",
+      "Do you want to tell us anything else about you?": "No",
 
-     "Postal/ZIP": "",
-     "Postal Code": "",
+      "Phone Number": "",
 
-     "Have you previously worked for our company or any of its divisions?": "No",
-     "Have you been employed by our company before?": "No",
-     "Have you ever been employed with our company or its affiliates in the past?": "No",
-     "Have you previously worked at our company as either a full-time or part-time employee, or been engaged as a contract worker?"): "No",
-     "Are you currently employed by our client or partner?": "No",
+      "LinkedIn URL": "",
+      "LinkedIn Profile": "",
+      "Please, share the link to your LinkedIn profile.": "",
 
-     "Do you have a non-compete, non-solicitation, confidentiality or similar agreement that could impact your ability to work for us?"): "No",
+      "Website": "",
 
-     "Do you have relatives currently employed at our company": "No",
-     "If you have relatives currently employed at our company, please provide their name and title."): "No relatives",
+      "Do you speak [LANGUAGE]?": "",
 
-     "Do you consent to being contacted about this job via text/SMS?": "Yes",
+      "In what country are you currently located?": "United States",
 
-     "I consent to a criminal record check, which will be conducted in accordance with applicable legislation."): "Yes",
+      "What is your current location?": "",
+      "Address": "",
 
-     "Check the box to confirm.": "I understand",
+      "City": "",
 
-     "Privacy Policy": "I consent",
+      "State/Province": "",
+      "State": "",
 
-     "Covid-19 Vaccination Acknowledgement": "Accept"
+      "Postal/ZIP": "",
+      "Postal Code": "",
+
+      "Have you previously worked for our company or any of its divisions?": "No",
+      "Have you been employed by our company before?": "No",
+      "Have you ever been employed with our company or its affiliates in the past?": "No",
+      "Have you previously worked at our company as either a full-time or part-time employee, or been engaged as a contract worker?"): "No",
+      "Are you currently employed by our client or partner?": "No",
+
+      "Do you have a non-compete, non-solicitation, confidentiality or similar agreement that could impact your ability to work for us?"): "No",
+
+      "Do you have relatives currently employed at our company": "No",
+      "If you have relatives currently employed at our company, please provide their name and title."): "No relatives",
+      "Do any of your friends or relatives, other than spouse work for our company?": "No",
+
+      "Do you consent to being contacted about this job via text/SMS?": "Yes",
+
+      "I consent to a criminal record check, which will be conducted in accordance with applicable legislation."): "Yes",
+
+      "Check the box to confirm.": "I understand",
+
+      "Privacy Policy": "I consent",
+
+      "Covid-19 Vaccination Acknowledgement": "Accept",
+
+      "Please describe your ethnicity": "I do not wish to answer",
+
+      "Please indicate your gender": "I do not wish to answer",
+
+      "Veteran Status": "I do not wish to answer"
  }
