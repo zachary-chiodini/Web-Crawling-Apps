@@ -23,3 +23,19 @@ def append_df_to_excel(
     writer.save()
     writer.close()
     return None
+
+
+def float_convertible(s: str) -> bool:
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+
+def int_convertible(s: str) -> bool:
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False

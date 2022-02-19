@@ -24,6 +24,8 @@ from selenium.common.exceptions import (
     WebDriverException)
 from xlsxwriter import Workbook
 
+from helper_funs import float_convertible, int_convertible
+
 
 class IndeedCrawler:
     """Indeed Crawler"""
@@ -219,9 +221,7 @@ class IndeedCrawler:
                 self._browser.page_source, 'lxml')\
                 .findAll('a', {'data-mobtk': mobtk})
             for tag in soup_list:
-                quick_apply = BeautifulSoup(
-                    str(tag), 'lxml')\
-                    .find('span', {'class': 'ialbl iaTextBlack'})
+                quick_apply = tag.find('span', {'class': 'ialbl iaTextBlack'})
                 if not quick_apply:
                     continue
                 job_jk = search('(?<=data-jk=").+?(?=")', str(tag)).group()
@@ -482,12 +482,12 @@ class IndeedCrawler:
                         query=query, days='&fromage=14'*past_14_days)
                 )
             if remote:
-                remote_id = BeautifulSoup(str(self._browser.page_source), 'lxml') \
+                remote_id = BeautifulSoup(self._browser.page_source, 'lxml') \
                     .select_one('a:contains("Remote")')
                 if remote_id:
                     remote_id = search('(?<=remotejob=).+?(?=")', str(remote_id)).group()
             else:
-                remote_id = BeautifulSoup(str(self._browser.page_source), 'lxml') \
+                remote_id = BeautifulSoup(self._browser.page_source, 'lxml') \
                     .select_one('a:contains("Temporarily remote")')
                 if remote_id:
                     remote_id = search('(?<=remotejob=).+?(?=")', str(remote_id)).group()
@@ -534,8 +534,7 @@ class IndeedCrawler:
                 self._browser.page_source, 'lxml')\
                 .findAll('a', {'data-mobtk': mobtk})
             for tag in soup_list:
-                quick_apply = BeautifulSoup(str(tag), 'lxml')\
-                    .find('span', {'class': 'ialbl iaTextBlack'})
+                quick_apply = tag.find('span', {'class': 'ialbl iaTextBlack'})
                 if not quick_apply:
                     continue
                 job_jk = search('(?<=data-jk=").+?(?=")', str(tag)).group()
@@ -543,10 +542,8 @@ class IndeedCrawler:
                     continue
                 job_url = 'https://www.indeed.com/viewjob?jk={}'\
                     .format(job_jk)
-                result_content = BeautifulSoup(str(tag), 'lxml')\
-                    .find('td', {'class': 'resultContent'})
-                job_title = BeautifulSoup(str(result_content), 'lxml')\
-                    .find('h2', {'class': compile_regex('jobTitle')})
+                result_content = tag.find('td', {'class': 'resultContent'})
+                job_title = result_content.find('h2', {'class': compile_regex('jobTitle')})
                 if job_title:
                     job_title = search('(?<=title=").+?(?=")', str(job_title))
                     if job_title:
@@ -559,27 +556,36 @@ class IndeedCrawler:
                             break
                     if negate_word_found:
                         continue
-                job_salary = BeautifulSoup(str(result_content), 'lxml')\
-                    .find(class_=compile_regex('salary'))
+                job_salary = result_content.find(class_=compile_regex('salary'))
                 if not job_salary and enforce_salary:
                     continue
                 if min_salary and job_salary:
                     salary_text = job_salary.get_text().lower()
                     max_salary_found = findall('[0-9]*,*[0-9]*\.*[0-9]', salary_text)
+                    print('Max salary found:', max_salary_found)
                     if max_salary_found:
-                        max_salary_found = max_salary_found[-1].replace(',', '')
+                        if len(max_salary_found) > 2:
+                            max_salary_found = max_salary_found[1]
+                        else:
+                            max_salary_found = max_salary_found[-1]
+                        max_salary_found = max_salary_found.replace(',', '')
                         if max_salary_found.count('.') > 1:
                             max_salary_found = max_salary_found[:max_salary_found.index('.')]
+                        if int_convertible(max_salary_found):
+                            max_salary_found = int(max_salary_found)
+                        elif float_convertible(max_salary_found):
+                            max_salary_found = float(max_salary_found)
+                        elif enforce_salary:
+                            continue
                         if 'hour' in salary_text:
-                            max_salary_found = float(max_salary_found)*2080
+                            max_salary_found = max_salary_found*2080
                         elif 'month' in salary_text:
-                            max_salary_found = int(max_salary_found)*12
-                        if int(max_salary_found) < int(min_salary):
+                            max_salary_found = max_salary_found*12
+                        if max_salary_found < int(min_salary):
                             continue
                     elif enforce_salary:
                         continue
-                company_name = BeautifulSoup(str(result_content), 'lxml')\
-                    .find(class_=compile_regex('companyName'))
+                company_name = result_content.find(class_=compile_regex('companyName'))
                 if company_name_negate_lst and company_name:
                     company_name_text = company_name.get_text().lower()
                     negate_word_found = False
@@ -630,8 +636,7 @@ class IndeedCrawler:
                             self._browser.close()
                             self._browser.switch_to.window(self._main_window)
                         continue
-                job_location = BeautifulSoup(str(result_content), 'lxml')\
-                    .find(class_=compile_regex('companyLocation'))
+                job_location = result_content.find(class_=compile_regex('companyLocation'))
                 if company_name:
                     company_name = company_name.get_text()
                 if job_location:
