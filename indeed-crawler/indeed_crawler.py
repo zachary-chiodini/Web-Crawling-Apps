@@ -288,7 +288,8 @@ class IndeedCrawler:
                 if question_div.find('input'):
                     div_id = question_div.get('id')
                     self._browser.find_element_by_xpath(
-                        f'//div[contains(@id, "{div_id}")]//span[text()[contains(.,"{answer}")]]'
+                        f'//div[contains(@id, "{div_id}")]'
+                        f'//span[text()[contains(.,"{answer}")]]'
                         ).click()
                 elif question_div.find('select'):
                     select_id = question_div.find('select').get('id')
@@ -304,13 +305,23 @@ class IndeedCrawler:
             # or a text area
             elif question_div.find('input'):
                 auto_filled = search('(?<=value=").+?(?=")', str(question_div))
+                print('Auto-filled:', auto_filled)
+                if auto_filled:
+                    auto_filled = auto_filled.group().strip()
+                    print('Auto-filled:', auto_filled)
+                auto_filled = False
                 if not auto_filled:
                     input_id = question_div.find('input').get('id')
                     self._browser.find_element_by_xpath(
                         f'//input[@id="{input_id}"]'
                         ).send_keys(answer)
             elif question_div.find('textarea'):
-                auto_filled = question_div.find('textarea')
+                auto_filled = search('(?<=value=").+?(?=")', str(question_div))
+                print('Auto-filled:', auto_filled)
+                if auto_filled:
+                    auto_filled = auto_filled.group().strip()
+                    print('Auto-filled:', auto_filled)
+                auto_filled = False
                 if not auto_filled:
                     text_id = question_div.find('textarea').get('id')
                     self._browser.find_element_by_xpath(
@@ -557,20 +568,33 @@ class IndeedCrawler:
                     if negate_word_found:
                         continue
                 job_salary = result_content.find(class_=compile_regex('salary'))
-                if not job_salary and enforce_salary:
+                if (not job_salary) and enforce_salary:
                     continue
                 if min_salary and job_salary:
-                    salary_text = job_salary.get_text().lower()
-                    max_salary_found = findall('[0-9]*,*[0-9]*\.*[0-9]', salary_text)
-                    print('Max salary found:', max_salary_found)
+                    salary_text = job_salary.get_text().lower().replace('8 hour shift', '')
+                    max_salary_found = findall('[0-9]+,*[0-9]*\.*[0-9]*k', salary_text)
+                    print(f'First max salary found for job {job_url}', max_salary_found)
+                    if max_salary_found:
+                        max_salary_converted = []
+                        for kilo_prefix in max_salary_found:
+                            max_salary_converted.append(
+                                float(kilo_prefix.replace('k', '')) * 1000)
+                        max_salary_found = max_salary_converted
+                    else:
+                        max_salary_found = findall('[0-9]+,*[0-9]*\.*[0-9]*', salary_text)
+                    print(f'Second max salary found for job {job_url}', max_salary_found)
+                    max_salary_filtered = []
+                    for salary in max_salary_found:
+                        if salary != '1':
+                            max_salary_filtered.append(salary)
+                    max_salary_found = max_salary_filtered
                     if max_salary_found:
                         if len(max_salary_found) > 2:
                             max_salary_found = max_salary_found[1]
                         else:
                             max_salary_found = max_salary_found[-1]
-                        max_salary_found = max_salary_found.replace(',', '')
-                        if max_salary_found.count('.') > 1:
-                            max_salary_found = max_salary_found[:max_salary_found.index('.')]
+                        if isinstance(max_salary_found, str):
+                            max_salary_found = max_salary_found.replace(',', '')
                         if int_convertible(max_salary_found):
                             max_salary_found = int(max_salary_found)
                         elif float_convertible(max_salary_found):
@@ -581,6 +605,7 @@ class IndeedCrawler:
                             max_salary_found = max_salary_found*2080
                         elif 'month' in salary_text:
                             max_salary_found = max_salary_found*12
+                        print(f'Third max salary found for job {job_url}', max_salary_found)
                         if max_salary_found < int(min_salary):
                             continue
                     elif enforce_salary:
@@ -635,6 +660,7 @@ class IndeedCrawler:
                         if self._browser.current_window_handle != self._main_window:
                             self._browser.close()
                             self._browser.switch_to.window(self._main_window)
+                        print('FAILED to apply to job:', job_url)
                         continue
                 job_location = result_content.find(class_=compile_regex('companyLocation'))
                 if company_name:
