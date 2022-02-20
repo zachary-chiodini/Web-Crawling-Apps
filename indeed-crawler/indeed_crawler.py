@@ -304,24 +304,18 @@ class IndeedCrawler:
             # No answers found implies a text input type
             # or a text area
             elif question_div.find('input'):
-                auto_filled = search('(?<=value=").+?(?=")', str(question_div))
-                print('Auto-filled:', auto_filled)
+                auto_filled = search('(?<=value=").*?(?=")', str(question_div))
                 if auto_filled:
                     auto_filled = auto_filled.group().strip()
-                    print('Auto-filled:', auto_filled)
-                auto_filled = False
                 if not auto_filled:
                     input_id = question_div.find('input').get('id')
                     self._browser.find_element_by_xpath(
                         f'//input[@id="{input_id}"]'
                         ).send_keys(answer)
             elif question_div.find('textarea'):
-                auto_filled = search('(?<=value=").+?(?=")', str(question_div))
-                print('Auto-filled:', auto_filled)
+                auto_filled = search('(?<=value=").*?(?=")', str(question_div))
                 if auto_filled:
                     auto_filled = auto_filled.group().strip()
-                    print('Auto-filled:', auto_filled)
-                auto_filled = False
                 if not auto_filled:
                     text_id = question_div.find('textarea').get('id')
                     self._browser.find_element_by_xpath(
@@ -573,7 +567,6 @@ class IndeedCrawler:
                 if min_salary and job_salary:
                     salary_text = job_salary.get_text().lower().replace('8 hour shift', '')
                     max_salary_found = findall('[0-9]+,*[0-9]*\.*[0-9]*k', salary_text)
-                    print(f'First max salary found for job {job_url}', max_salary_found)
                     if max_salary_found:
                         max_salary_converted = []
                         for kilo_prefix in max_salary_found:
@@ -582,7 +575,6 @@ class IndeedCrawler:
                         max_salary_found = max_salary_converted
                     else:
                         max_salary_found = findall('[0-9]+,*[0-9]*\.*[0-9]*', salary_text)
-                    print(f'Second max salary found for job {job_url}', max_salary_found)
                     max_salary_filtered = []
                     for salary in max_salary_found:
                         if salary != '1':
@@ -605,7 +597,6 @@ class IndeedCrawler:
                             max_salary_found = max_salary_found*2080
                         elif 'month' in salary_text:
                             max_salary_found = max_salary_found*12
-                        print(f'Third max salary found for job {job_url}', max_salary_found)
                         if max_salary_found < int(min_salary):
                             continue
                     elif enforce_salary:
