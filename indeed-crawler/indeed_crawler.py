@@ -434,12 +434,15 @@ class IndeedCrawler:
                     )
                 self._browser.find_element_by_xpath(
                     '//button//span[text()="Review your application"]').click()
+            except TimeoutException:
+                pass
+            try:
                 WebDriverWait(self._browser, wait).until(
                     expected_conditions.element_to_be_clickable(
                         (By.XPATH,
                          '//button//span[text()="Submit your application"]')
-                        )
                     )
+                )
                 self._browser.find_element_by_xpath(
                     '//button//span[text()="Submit your application"]').click()
             except TimeoutException:
