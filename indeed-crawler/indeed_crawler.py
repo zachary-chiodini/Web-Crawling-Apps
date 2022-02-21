@@ -416,7 +416,7 @@ class IndeedCrawler:
         tab = self._browser.window_handles[-1]
         self._browser.switch_to.window(tab)
         self._browser.get(job_url)
-        WebDriverWait(self._browser, wait).until(
+        WebDriverWait(self._browser, 300).until(
             expected_conditions.element_to_be_clickable(
                 (By.XPATH, '//*[@id="indeedApplyButton"]')
                 )
@@ -456,9 +456,10 @@ class IndeedCrawler:
 
     def search_jobs(
             self, query: str,
+            enforce_query: bool = False,
             job_title_negate_lst: List[str] = [],
             company_name_negate_lst: List[str] = [],
-            past_14_days: bool = True,
+            past_14_days: bool = False,
             job_type: str = '',
             min_salary: str = '',
             enforce_salary: bool = False,
@@ -468,7 +469,7 @@ class IndeedCrawler:
             country: str = '',
             location: str = '',
             radius: str = '',
-            auto_answer_questions=False
+            auto_answer_questions: bool = False
             ) -> None:
         if self._number_of_jobs == 0:
             print('Number of jobs is zero.')
@@ -553,6 +554,14 @@ class IndeedCrawler:
                     job_title = search('(?<=title=").+?(?=")', str(job_title))
                     if job_title:
                         job_title = job_title.group()
+                if not job_title and enforce_query:
+                    continue
+                if job_title and enforce_query:
+                    if ((query.lower() in job_title.lower())
+                            or (job_title.lower() in query.lower())):
+                        pass
+                    else:
+                        continue
                 if job_title_negate_lst and job_title:
                     negate_word_found = False
                     for word in job_title_negate_lst:
