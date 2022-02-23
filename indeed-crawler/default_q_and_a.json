@@ -1,11 +1,13 @@
  {
       "Please type your full name": "",
+      "Candidate Name": "",
 
       "Date Available": "",
       "Date available to begin work": "",
       "What is your projected start date?": "",
 
       "Are you over the age of 18?": "Yes",
+      "Are you 18 years of age or older?": "Yes",
 
       "What is your desired employment status?": "Full-time",
       "Are you looking for a full-time or a part-time position?": "Full-time",
@@ -13,6 +15,7 @@
       "How many hours per week (on average) are you available to work?": "40",
 
       "Are you willing to work overtime and weekends?": "Yes",
+      "If required, will you work overtime?": "Yes",
 
       "Please list 2-3 dates and time ranges that you could do an interview.": "",
 
@@ -29,6 +32,7 @@
 
       "Do you currently require sponsorship to work in [COUNTRY]?": "No",
       "Will you now or in the future require sponsorship for employment visa status in [COUNTRY]?": "No",
+      "Do you currently or will you in the future require visa sponsorship to work in [COUNTRY]?": "No",
 
       "Are you legally eligible to work in the [COUNTRY]?": "Yes",
       "Are you legally eligible to work in [COUNTRY]?": "Yes",
@@ -38,9 +42,14 @@
       "Are you currently legally eligible to work in [COUNTRY]?": "Yes",
       "Are you currently authorized to work in [COUNTRY]?": "Yes",
       "Are you authorized to work in the following country: [COUNTRY]?": "Yes",
+      "If offered employment, can you submit verification of your legal right to work in [COUNTRY]?": "Yes",
+      "Are you able to show proof of employment authorization?": "Yes",
+      "Are you legally eligible to be employed in [COUNTRY]?": "Yes",
 
       "What is the highest level of education you have completed?": "",
       "Highest Education Obtained": "",
+
+      "Do you have a valid [CERT] certification?": "Yes",
 
       "What are you salary expectations for this role?": "",
       "What are your salary expectations?": "",
@@ -93,24 +102,33 @@
 
       "Do you consent to being contacted about this job via text/SMS?": "Yes",
       "I consent to the hiring team of this job contacting me via text message.": "Yes",
+      "Would you like to communicate with us via text message? By selecting yes, you consent to receive text messages through an automated system. You will be able to unsubscribe at any time.": "Yes",
 
       "I consent to a criminal record check, which will be conducted in accordance with applicable legislation.": "Yes",
       "Are you willing to undergo a background check, in accordance with local law/regulations?": "Yes",
+      "Please Note:  Submission to a criminal background check as well as a drug and/or alcohol test are required conditions of employment.  Do you accept this requirement?": "Yes",
+      "If extended a job offer, are you willing to submit to a detailed background check?": "Yes",
 
       "Check the box to confirm.": "I understand",
 
       "Privacy Policy": "I consent",
 
       "Covid-19 Vaccination Acknowledgement": "Accept",
+      "I understand this role requires me to be fully vaccinated for COVID-19, to provide proof of vaccination prior to beginning employment and that I will abide by this requirement.": "Yes",
 
       "Please describe your ethnicity": "I do not wish to answer",
+      "Race/Ethnicity": "Decline To Self Identify",
+      "Please identify your ethnicity. Are you Hispanic or Latino?": "I choose not to disclose",
+      "Ethnic Background": "I choose not to disclose",
 
       "Please indicate your gender": "I do not wish to answer",
-      "Race/Ethnicity": "Decline To Self Identify",
+      "Please identify your gender.": "I choose not to disclose",
+      "Sex/Gender": "I choose not to disclose",
 
       "Veteran Status": "I do not wish to answer",
 
       "Are you able to perform all requirements for the position as outlined with or without accommodations? If no, please provide additional information.": "Yes",
+      "Are you physically able and willing to do the job that you are applying for, with or without reasonable accommodations?": "Yes",
 
       "Do you have a valid Secret Level or Higher Security Clearance?": "No",
 
