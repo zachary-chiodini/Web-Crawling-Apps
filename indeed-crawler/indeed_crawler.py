@@ -577,7 +577,10 @@ class IndeedCrawler:
                 if (not job_salary) and enforce_salary:
                     continue
                 if min_salary and job_salary:
-                    salary_text = job_salary.get_text().lower().replace('8 hour shift', '')
+                    salary_text = job_salary.get_text().lower()\
+                        .replace('8 hour shift', '')\
+                        .replace('10 hour shift', '')\
+                        .replace('12 hour shift', '')
                     max_salary_found = findall('[0-9]+,*[0-9]*\.*[0-9]*k', salary_text)
                     if max_salary_found:
                         max_salary_converted = []
