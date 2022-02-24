@@ -16,6 +16,8 @@
 
       "Are you willing to work overtime and weekends?": "Yes",
       "If required, will you work overtime?": "Yes",
+      "Are you available to work weekends (Saturday and/or Sunday)?": "Yes",
+      "Are you willing to work a variable schedule including weekends?": "Yes",
 
       "Please list 2-3 dates and time ranges that you could do an interview.": "",
 
@@ -45,6 +47,8 @@
       "If offered employment, can you submit verification of your legal right to work in [COUNTRY]?": "Yes",
       "Are you able to show proof of employment authorization?": "Yes",
       "Are you legally eligible to be employed in [COUNTRY]?": "Yes",
+      "Are you able to provide proof that you are eligible to legally work in [COUNTRY]?": "Yes",
+      "Can you provide legal documents establishing your eligibility to work in [COUNTRY]?": "Yes",
 
       "What is the highest level of education you have completed?": "",
       "Highest Education Obtained": "",
@@ -62,10 +66,13 @@
 
       "On which website did you see this opening advertised?": "Indeed",
       "How did you hear about us?": "Indeed",
+      "How did you hear about this opportunity?": "Indeed",
 
       "Do you want to tell us anything else about you?": "No",
 
       "Phone Number": "",
+      "Phone": "",
+      "Contact": "",
 
       "LinkedIn URL": "",
       "LinkedIn Profile": "",
@@ -76,6 +83,7 @@
       "Do you speak [LANGUAGE]?": "",
 
       "In what country are you currently located?": "United States",
+      "Country": "United States",
 
       "What is your current location?": "",
       "Address": "",
