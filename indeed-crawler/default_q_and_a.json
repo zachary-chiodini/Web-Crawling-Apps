@@ -73,6 +73,7 @@
       "Phone Number": "",
       "Phone": "",
       "Contact": "",
+      "Contact Phone Number": "",
 
       "LinkedIn URL": "",
       "LinkedIn Profile": "",
@@ -134,6 +135,8 @@
       "Sex/Gender": "I choose not to disclose",
 
       "Veteran Status": "I do not wish to answer",
+
+      "Disability form selection options for the candidate": "I Don't Wish To Answer",
 
       "Are you able to perform all requirements for the position as outlined with or without accommodations? If no, please provide additional information.": "Yes",
       "Are you physically able and willing to do the job that you are applying for, with or without reasonable accommodations?": "Yes",
