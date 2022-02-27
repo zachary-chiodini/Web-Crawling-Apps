@@ -63,6 +63,7 @@
       "Please enter the amount": "",
 
       "If you were referred, please share your referrer's name with us.": "No referral",
+      "If you were referred to this position by a current employee of our company, please enter their name below.": "No referral",
 
       "On which website did you see this opening advertised?": "Indeed",
       "How did you hear about us?": "Indeed",
@@ -74,6 +75,12 @@
       "Phone": "",
       "Contact": "",
       "Contact Phone Number": "",
+      "Enter number to receive text messages": "",
+      "Mobile Number": "",
+      "Provide valid phone number to allow Recruiters to contact you.": "",
+
+      "Email": "",
+      "Contact information": "",
 
       "LinkedIn URL": "",
       "LinkedIn Profile": "",
@@ -102,6 +109,9 @@
       "Have you ever been employed with our company or its affiliates in the past?": "No",
       "Have you previously worked at our company as either a full-time or part-time employee, or been engaged as a contract worker?": "No",
       "Are you currently employed by our client or partner?": "No",
+      "Are you a previous employee of our company": "No",
+      "Are you a current employee of our company?": "No",
+      "Do you have any relatives who are current employees of our company?": "No",
 
       "Do you have a non-compete, non-solicitation, confidentiality or similar agreement that could impact your ability to work for us?": "No",
 
@@ -111,6 +121,7 @@
 
       "Do you consent to being contacted about this job via text/SMS?": "Yes",
       "I consent to the hiring team of this job contacting me via text message.": "Yes",
+      "It is okay to send me text messages about this opportunity.": "Yes",
       "Would you like to communicate with us via text message? By selecting yes, you consent to receive text messages through an automated system. You will be able to unsubscribe at any time.": "Yes",
 
       "I consent to a criminal record check, which will be conducted in accordance with applicable legislation.": "Yes",
@@ -124,6 +135,7 @@
 
       "Covid-19 Vaccination Acknowledgement": "Accept",
       "I understand this role requires me to be fully vaccinated for COVID-19, to provide proof of vaccination prior to beginning employment and that I will abide by this requirement.": "Yes",
+      "Are you fully vaccinated against or willing to undergo weekly testing for COVID-19?": "Yes",
 
       "Please describe your ethnicity": "I do not wish to answer",
       "Race/Ethnicity": "Decline To Self Identify",
@@ -144,5 +156,8 @@
       "Do you have a valid Secret Level or Higher Security Clearance?": "No",
 
       "I declare that all statements and answers in this application are true and complete and agree that any untrue or misleading answer, omission, concealment or failure to answer any questions fully, completely and accurately may be grounds for terminating my employment, regardless of when it is discovered.": "I agree",
-      "By completing this application, I give this employer the permission to validate some of my answers with the appropriate authorities/institutions.": "I agree"
+      "By completing this application, I give this employer the permission to validate some of my answers with the appropriate authorities/institutions.": "I agree",
+
+      "I certify that all of the information furnished on this application and during the application process is true, complete and correct to the best of my knowledge. I understand that any misrepresentation or omission of facts called for may result in refusal to hire or, if hired, may result in my dismissal at any time regardless of when the false answer or omissions are discovered.": "Yes",
+      "I recognize that this employment application is not an offer of employment. I agree that if I am hired by the Company, I will be an at-will employee, meaning that either the Company or I may end the employment relationship at any time with or without cause or notice.": "Yes"
  }
