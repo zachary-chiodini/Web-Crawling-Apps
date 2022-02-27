@@ -49,6 +49,7 @@
       "Are you legally eligible to be employed in [COUNTRY]?": "Yes",
       "Are you able to provide proof that you are eligible to legally work in [COUNTRY]?": "Yes",
       "Can you provide legal documents establishing your eligibility to work in [COUNTRY]?": "Yes",
+      "Can you provide the necessary documentation to prove that you are a citizen, permanent resident, or a foreign national with authorization to work in [COUNTRY]?": "Yes",
 
       "What is the highest level of education you have completed?": "",
       "Highest Education Obtained": "",
@@ -149,6 +150,9 @@
       "Veteran Status": "I do not wish to answer",
 
       "Disability form selection options for the candidate": "I Don't Wish To Answer",
+
+      "Have you ever been convicted of a felony or misdemeanor? If yes, please explain the nature of the conviction.": "No",
+      "Have you ever been convicted of a felony or misdemeanor?": "No",
 
       "Are you able to perform all requirements for the position as outlined with or without accommodations? If no, please provide additional information.": "Yes",
       "Are you physically able and willing to do the job that you are applying for, with or without reasonable accommodations?": "Yes",
