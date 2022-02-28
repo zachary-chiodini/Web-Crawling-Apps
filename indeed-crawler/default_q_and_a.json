@@ -8,33 +8,83 @@
             "What is your name?": "",
             "Please type your full name": ""
       },
+      "Phone": {
+            "Phone Number": "",
+            "Phone": "",
+            "Contact": "",
+            "Contact information": "",
+            "Contact Phone Number": "",
+            "Enter number to receive text messages": "",
+            "Mobile Number": "",
+            "Provide valid phone number to allow Recruiters to contact you.": ""
+      },
+      "Email": {
+            "Email": ""
+      },
+      "Address": {
+            "What is your current location?": "",
+            "Address 1": "",
+            "Address 2": "",
+            "Address": ""
+      },
+      "City": {
+            "City": ""
+      },
+      "State": {
+            "State/Province": "",
+            "State": ""
+      },
+      "Postal": {
+            "Postal/ZIP": "",
+            "Postal Code": ""
+      },
+      "Country": {
+            "In what country are you currently located?": "United States",
+            "Country": "United States"
+      },
+      "Linkedin": {
+            "LinkedIn URL": "",
+            "LinkedIn Profile": "",
+            "Please, share the link to your LinkedIn profile.": ""
+      },
+      "Website": {
+            "Website": ""
+      },
+
       "Skills": {
             "How many years of [BLANK] experience do you have?": ""
+      },
+      "Education": {
+            "What is the highest level of education you have completed?": "",
+            "Highest Education Obtained": ""
       },
       "Certifications": {
             "Do you have a valid [BLANK] certification?": "",
             "Are you certified in [BLANK]": ""
       },
-      "Start Date": {
-            "Date Available": "",
-            "Projected start date": "",
-            "Date available to begin work": "",
-            "What is your projected start date?": ""
+      "Clearance": {
+            "Do you have a valid Secret Level or Higher Security Clearance?": ""
       },
-      "Of Legal Age": {
-            "Are you over the age of 18?": "Yes",
-            "Are you 18 years of age or older?": "Yes"
+      "Language": {
+            "Do you speak [BLANK]?": ""
+      },
+
+      "Salary": {
+            "What are you salary expectations for this role?": "",
+            "What are your salary expectations?": "",
+            "What is your desired salary?": "",
+            "Please enter the amount": ""
+      },
+      "Pay Type": {
+            "Desired Pay": ""
+      },
+      "Currency": {
+            "Select currency type": ""
       },
       "Employment Type": {
             "Employment type": "",
             "What is your desired employment status?": "",
             "Are you looking for a full-time or a part-time position?": ""
-      },
-      "Hours": {
-            "How many hours per week (on average) are you available to work?": "",
-            "Hours per week you are available to work?": "",
-            "What is your availability": "",
-            "Availability": ""
       },
       "Overtime": {
             "Are you willing to work overtime?": "",
@@ -45,21 +95,40 @@
             "Are you available to work weekends (Saturday and/or Sunday)?": "",
             "Are you willing to work a variable schedule including weekends?": ""
       },
+      "Hours": {
+            "How many hours per week (on average) are you available to work?": "",
+            "Hours per week you are available to work?": "",
+            "What is your availability": "",
+            "Availability": ""
+      },
+
+      "Start Date": {
+            "Date Available": "",
+            "Projected start date": "",
+            "Date available to begin work": "",
+            "What is your projected start date?": ""
+      },
       "Interview Date": {
             "Please list 2-3 dates and time ranges that you could do an interview.": ""
+      },
+
+      "Licence": {
+            "Do you possess a valid drivers license and have a safe driving record?": "",
+            "Do you have a valid Driver's License?": "",
+            "Do you have the following license or certification: Driver's License?": ""
       },
       "Transportation": {
             "Will you be able to reliably commute to or relocate to the job site?": "",
             "Do you have your own transportation?": "",
             "Do you have a reliable means of transportation?": ""
       },
-      "Licence": {
-            "Do you possess a valid drivers license and have a safe driving record?": "",
-            "Do you have a valid Driver's License?": "",
-            "Do you have the following license or certification: Driver's License?": ""
-      },
       "Travel": {
             "What percentage of the time are you willing to travel for work?": ""
+      },
+
+      "Of Legal Age": {
+            "Are you over the age of 18?": "Yes",
+            "Are you 18 years of age or older?": "Yes"
       },
       "Sponsorship": {
             "Do you currently require sponsorship to work in [BLANK]?": "No",
@@ -82,70 +151,7 @@
             "Can you provide legal documents establishing your eligibility to work in [BLANK]?": "Yes",
             "Can you provide the necessary documentation to prove that you are a citizen, permanent resident, or a foreign national with authorization to work in [BLANK]?": "Yes"
       },
-      "Education": {
-            "What is the highest level of education you have completed?": "",
-            "Highest Education Obtained": ""
-      },
-      "Salary": {
-            "What are you salary expectations for this role?": "",
-            "What are your salary expectations?": "",
-            "What is your desired salary?": "",
-            "Please enter the amount": ""
-      },
-      "Pay Type": {
-            "Desired Pay": ""
-      },
-      "Currency": {
-            "Select currency type": ""
-      },
-      "Phone Number": {
-            "Phone Number": "",
-            "Phone": "",
-            "Contact": "",
-            "Contact information": "",
-            "Contact Phone Number": "",
-            "Enter number to receive text messages": "",
-            "Mobile Number": "",
-            "Provide valid phone number to allow Recruiters to contact you.": ""
-      },
-      "Email": {
-            "Email": ""
-      },
-      "Linkedin": {
-            "LinkedIn URL": "",
-            "LinkedIn Profile": "",
-            "Please, share the link to your LinkedIn profile.": ""
-      },
-      "Website": {
-            "Website": ""
-      },
-      "Language": {
-            "Do you speak [BLANK]?": ""
-      },
-      "Country": {
-            "In what country are you currently located?": "United States",
-            "Country": "United States"
-      },
-      "Address": {
-            "What is your current location?": "",
-            "Address 1": "",
-            "Address 2": "",
-            "Address": ""
-      },
-      "City": {
-            "City": ""
-      },
-      "State": {
-            "State/Province": "",
-            "State": ""
-      },
-      "Postal": {
-            "Postal/ZIP": "",
-            "Postal Code": ""
-      },
-      "Clearance": {
-            "Do you have a valid Secret Level or Higher Security Clearance?": ""
-      },
+
       "Private": {
             "If you were referred, please share your referrer's name with us.": "No referral",
             "If you were referred to this position by a current employee of our company, please enter their name below.": "No referral",

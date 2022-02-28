@@ -24,15 +24,15 @@ salary = ''
 pay_type = ''  # Hourly/Salary
 currency = ''
 employment_type = ''  # Full-time, Part-time
+overtime = ''
+weekends = ''
 hours = ''
 
 # Availability
 start_date = ''
 interview_date = ''
 
-# Travel/Hours
-overtime = ''
-weekends = ''
+# Travel
 licence = ''
 transportation = ''
 travel = ''
