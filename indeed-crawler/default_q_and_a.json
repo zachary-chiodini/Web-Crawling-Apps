@@ -1,170 +1,217 @@
- {
+{
       "First Name": "",
       "Last Name": "",
+      "Full Name": {
+            "Name": "",
+            "Full Name": "",
+            "Candidate Name": "",
+            "What is your name?": "",
+            "Please type your full name": ""
+      },
+      "Skills": {
+            "How many years of [BLANK] experience do you have?": ""
+      },
+      "Certifications": {
+            "Do you have a valid [BLANK] certification?": "",
+            "Are you certified in [BLANK]": ""
+      },
+      "Start Date": {
+            "Date Available": "",
+            "Projected start date": "",
+            "Date available to begin work": "",
+            "What is your projected start date?": ""
+      },
+      "Of Legal Age": {
+            "Are you over the age of 18?": "Yes",
+            "Are you 18 years of age or older?": "Yes"
+      },
+      "Employment Type": {
+            "Employment type": "",
+            "What is your desired employment status?": "",
+            "Are you looking for a full-time or a part-time position?": ""
+      },
+      "Hours": {
+            "How many hours per week (on average) are you available to work?": "",
+            "Hours per week you are available to work?": "",
+            "What is your availability": "",
+            "Availability": ""
+      },
+      "Overtime": {
+            "Are you willing to work overtime?": "",
+            "If required, will you work overtime?": ""
+      },
+      "Weekends": {
+            "Are you willing to work weekends?": "",
+            "Are you available to work weekends (Saturday and/or Sunday)?": "",
+            "Are you willing to work a variable schedule including weekends?": ""
+      },
+      "Interview Date": {
+            "Please list 2-3 dates and time ranges that you could do an interview.": ""
+      },
+      "Transportation": {
+            "Will you be able to reliably commute to or relocate to the job site?": "",
+            "Do you have your own transportation?": "",
+            "Do you have a reliable means of transportation?": ""
+      },
+      "Licence": {
+            "Do you possess a valid drivers license and have a safe driving record?": "",
+            "Do you have a valid Driver's License?": "",
+            "Do you have the following license or certification: Driver's License?": ""
+      },
+      "Travel": {
+            "What percentage of the time are you willing to travel for work?": ""
+      },
+      "Sponsorship": {
+            "Do you currently require sponsorship to work in [BLANK]?": "No",
+            "Will you now or in the future require sponsorship for employment visa status in [BLANK]?": "No",
+            "Do you currently or will you in the future require visa sponsorship to work in [BLANK]?": "No"
+      },
+      "Eligibility": {
+            "Are you legally eligible to work in the [BLANK]?": "Yes",
+            "Are you legally eligible to work in [BLANK]?": "Yes",
+            "Are you legally entitled to work in [BLANK]?": "Yes",
+            "Are you legally authorized to work in [BLANK]": "Yes",
+            "Are you authorized to work in the job's location?": "Yes",
+            "Are you currently legally eligible to work in [BLANK]?": "Yes",
+            "Are you currently authorized to work in [BLANK]?": "Yes",
+            "Are you authorized to work in the following country: [BLANK]?": "Yes",
+            "If offered employment, can you submit verification of your legal right to work in [BLANK]?": "Yes",
+            "Are you able to show proof of employment authorization?": "Yes",
+            "Are you legally eligible to be employed in [BLANK]?": "Yes",
+            "Are you able to provide proof that you are eligible to legally work in [BLANK]?": "Yes",
+            "Can you provide legal documents establishing your eligibility to work in [BLANK]?": "Yes",
+            "Can you provide the necessary documentation to prove that you are a citizen, permanent resident, or a foreign national with authorization to work in [BLANK]?": "Yes"
+      },
+      "Education": {
+            "What is the highest level of education you have completed?": "",
+            "Highest Education Obtained": ""
+      },
+      "Salary": {
+            "What are you salary expectations for this role?": "",
+            "What are your salary expectations?": "",
+            "What is your desired salary?": "",
+            "Please enter the amount": ""
+      },
+      "Pay Type": {
+            "Desired Pay": ""
+      },
+      "Currency": {
+            "Select currency type": ""
+      },
+      "Phone Number": {
+            "Phone Number": "",
+            "Phone": "",
+            "Contact": "",
+            "Contact information": "",
+            "Contact Phone Number": "",
+            "Enter number to receive text messages": "",
+            "Mobile Number": "",
+            "Provide valid phone number to allow Recruiters to contact you.": ""
+      },
+      "Email": {
+            "Email": ""
+      },
+      "Linkedin": {
+            "LinkedIn URL": "",
+            "LinkedIn Profile": "",
+            "Please, share the link to your LinkedIn profile.": ""
+      },
+      "Website": {
+            "Website": ""
+      },
+      "Language": {
+            "Do you speak [BLANK]?": ""
+      },
+      "Country": {
+            "In what country are you currently located?": "United States",
+            "Country": "United States"
+      },
+      "Address": {
+            "What is your current location?": "",
+            "Address 1": "",
+            "Address 2": "",
+            "Address": ""
+      },
+      "City": {
+            "City": ""
+      },
+      "State": {
+            "State/Province": "",
+            "State": ""
+      },
+      "Postal": {
+            "Postal/ZIP": "",
+            "Postal Code": ""
+      },
+      "Clearance": {
+            "Do you have a valid Secret Level or Higher Security Clearance?": ""
+      },
+      "Private": {
+            "If you were referred, please share your referrer's name with us.": "No referral",
+            "If you were referred to this position by a current employee of our company, please enter their name below.": "No referral",
 
-      "Please type your full name": "",
-      "Candidate Name": "",
+            "On which website did you see this opening advertised?": "Indeed",
+            "How did you hear about us?": "Indeed",
+            "How did you hear about this opportunity?": "Indeed",
 
-      "Date Available": "",
-      "Date available to begin work": "",
-      "What is your projected start date?": "",
+            "Do you want to tell us anything else about you?": "No",
 
-      "Are you over the age of 18?": "Yes",
-      "Are you 18 years of age or older?": "Yes",
+            "Have you previously worked for our company or any of its divisions?": "No",
+            "Have you been employed by our company before?": "No",
+            "Have you ever been employed with our company or its affiliates in the past?": "No",
+            "Have you previously worked at our company as either a full-time or part-time employee, or been engaged as a contract worker?": "No",
+            "Are you currently employed by our client or partner?": "No",
+            "Are you a previous employee of our company": "No",
+            "Are you a current employee of our company?": "No",
+            "Do you have any relatives who are current employees of our company?": "No",
 
-      "What is your desired employment status?": "Full-time",
-      "Are you looking for a full-time or a part-time position?": "Full-time",
+            "Do you have a non-compete, non-solicitation, confidentiality or similar agreement that could impact your ability to work for us?": "No",
 
-      "How many hours per week (on average) are you available to work?": "40",
+            "Do you have relatives currently employed at our company": "No",
+            "If you have relatives currently employed at our company, please provide their name and title.": "No relatives",
+            "Do any of your friends or relatives, other than spouse work for our company?": "No",
 
-      "Are you willing to work overtime and weekends?": "Yes",
-      "If required, will you work overtime?": "Yes",
-      "Are you available to work weekends (Saturday and/or Sunday)?": "Yes",
-      "Are you willing to work a variable schedule including weekends?": "Yes",
+            "Do you consent to being contacted about this job via text/SMS?": "Yes",
+            "I consent to the hiring team of this job contacting me via text message.": "Yes",
+            "It is okay to send me text messages about this opportunity.": "Yes",
+            "Would you like to communicate with us via text message? By selecting yes, you consent to receive text messages through an automated system. You will be able to unsubscribe at any time.": "Yes",
 
-      "Please list 2-3 dates and time ranges that you could do an interview.": "",
+            "I consent to a criminal record check, which will be conducted in accordance with applicable legislation.": "Yes",
+            "Are you willing to undergo a background check, in accordance with local law/regulations?": "Yes",
+            "Please Note:  Submission to a criminal background check as well as a drug and/or alcohol test are required conditions of employment.  Do you accept this requirement?": "Yes",
+            "If extended a job offer, are you willing to submit to a detailed background check?": "Yes",
 
-      "How many years of [SKILL] experience do you have?": "",
+            "Check the box to confirm.": "I understand",
 
-      "Will you be able to reliably commute to or relocate to the job site?": "",
-      "Do you have your own transportation?": "Yes",
+            "Privacy Policy": "I consent",
 
-      "Do you possess a valid drivers license and have a safe driving record?": "Yes",
-      "Do you have a valid Driver's License?": "Yes",
-      "Do you have the following license or certification: Driver's License?": "Yes",
+            "Covid-19 Vaccination Acknowledgement": "Accept",
+            "I understand this role requires me to be fully vaccinated for COVID-19, to provide proof of vaccination prior to beginning employment and that I will abide by this requirement.": "Yes",
+            "Are you fully vaccinated against or willing to undergo weekly testing for COVID-19?": "Yes",
 
-      "What percentage of the time are you willing to travel for work?": "",
+            "Please describe your ethnicity": "I do not wish to answer",
+            "Race/Ethnicity": "Decline To Self Identify",
+            "Please identify your ethnicity. Are you Hispanic or Latino?": "I choose not to disclose",
+            "Ethnic Background": "I choose not to disclose",
 
-      "Do you currently require sponsorship to work in [COUNTRY]?": "No",
-      "Will you now or in the future require sponsorship for employment visa status in [COUNTRY]?": "No",
-      "Do you currently or will you in the future require visa sponsorship to work in [COUNTRY]?": "No",
+            "Please indicate your gender": "I do not wish to answer",
+            "Please identify your gender.": "I choose not to disclose",
+            "Sex/Gender": "I choose not to disclose",
 
-      "Are you legally eligible to work in the [COUNTRY]?": "Yes",
-      "Are you legally eligible to work in [COUNTRY]?": "Yes",
-      "Are you legally entitled to work in [COUNTRY]?": "Yes",
-      "Are you legally authorized to work in [COUNTRY]": "Yes",
-      "Are you authorized to work in the job's location?": "Yes",
-      "Are you currently legally eligible to work in [COUNTRY]?": "Yes",
-      "Are you currently authorized to work in [COUNTRY]?": "Yes",
-      "Are you authorized to work in the following country: [COUNTRY]?": "Yes",
-      "If offered employment, can you submit verification of your legal right to work in [COUNTRY]?": "Yes",
-      "Are you able to show proof of employment authorization?": "Yes",
-      "Are you legally eligible to be employed in [COUNTRY]?": "Yes",
-      "Are you able to provide proof that you are eligible to legally work in [COUNTRY]?": "Yes",
-      "Can you provide legal documents establishing your eligibility to work in [COUNTRY]?": "Yes",
-      "Can you provide the necessary documentation to prove that you are a citizen, permanent resident, or a foreign national with authorization to work in [COUNTRY]?": "Yes",
+            "Veteran Status": "I do not wish to answer",
 
-      "What is the highest level of education you have completed?": "",
-      "Highest Education Obtained": "",
+            "Disability form selection options for the candidate": "I Don't Wish To Answer",
 
-      "Do you have a valid [CERT] certification?": "Yes",
+            "Have you ever been convicted of a felony or misdemeanor? If yes, please explain the nature of the conviction.": "No",
+            "Have you ever been convicted of a felony or misdemeanor?": "No",
 
-      "What are you salary expectations for this role?": "",
-      "What are your salary expectations?": "",
-      "Desired Pay": "",
-      "What is your desired salary?": "",
-      "Select currency type": "USD",
-      "Please enter the amount": "",
+            "Are you able to perform all requirements for the position as outlined with or without accommodations? If no, please provide additional information.": "Yes",
+            "Are you physically able and willing to do the job that you are applying for, with or without reasonable accommodations?": "Yes",
 
-      "If you were referred, please share your referrer's name with us.": "No referral",
-      "If you were referred to this position by a current employee of our company, please enter their name below.": "No referral",
+            "I declare that all statements and answers in this application are true and complete and agree that any untrue or misleading answer, omission, concealment or failure to answer any questions fully, completely and accurately may be grounds for terminating my employment, regardless of when it is discovered.": "I agree",
+            "By completing this application, I give this employer the permission to validate some of my answers with the appropriate authorities/institutions.": "I agree",
 
-      "On which website did you see this opening advertised?": "Indeed",
-      "How did you hear about us?": "Indeed",
-      "How did you hear about this opportunity?": "Indeed",
-
-      "Do you want to tell us anything else about you?": "No",
-
-      "Phone Number": "",
-      "Phone": "",
-      "Contact": "",
-      "Contact Phone Number": "",
-      "Enter number to receive text messages": "",
-      "Mobile Number": "",
-      "Provide valid phone number to allow Recruiters to contact you.": "",
-
-      "Email": "",
-      "Contact information": "",
-
-      "LinkedIn URL": "",
-      "LinkedIn Profile": "",
-      "Please, share the link to your LinkedIn profile.": "",
-
-      "Website": "",
-
-      "Do you speak [LANGUAGE]?": "",
-
-      "In what country are you currently located?": "United States",
-      "Country": "United States",
-
-      "What is your current location?": "",
-      "Address": "",
-
-      "City": "",
-
-      "State/Province": "",
-      "State": "",
-
-      "Postal/ZIP": "",
-      "Postal Code": "",
-
-      "Have you previously worked for our company or any of its divisions?": "No",
-      "Have you been employed by our company before?": "No",
-      "Have you ever been employed with our company or its affiliates in the past?": "No",
-      "Have you previously worked at our company as either a full-time or part-time employee, or been engaged as a contract worker?": "No",
-      "Are you currently employed by our client or partner?": "No",
-      "Are you a previous employee of our company": "No",
-      "Are you a current employee of our company?": "No",
-      "Do you have any relatives who are current employees of our company?": "No",
-
-      "Do you have a non-compete, non-solicitation, confidentiality or similar agreement that could impact your ability to work for us?": "No",
-
-      "Do you have relatives currently employed at our company": "No",
-      "If you have relatives currently employed at our company, please provide their name and title.": "No relatives",
-      "Do any of your friends or relatives, other than spouse work for our company?": "No",
-
-      "Do you consent to being contacted about this job via text/SMS?": "Yes",
-      "I consent to the hiring team of this job contacting me via text message.": "Yes",
-      "It is okay to send me text messages about this opportunity.": "Yes",
-      "Would you like to communicate with us via text message? By selecting yes, you consent to receive text messages through an automated system. You will be able to unsubscribe at any time.": "Yes",
-
-      "I consent to a criminal record check, which will be conducted in accordance with applicable legislation.": "Yes",
-      "Are you willing to undergo a background check, in accordance with local law/regulations?": "Yes",
-      "Please Note:  Submission to a criminal background check as well as a drug and/or alcohol test are required conditions of employment.  Do you accept this requirement?": "Yes",
-      "If extended a job offer, are you willing to submit to a detailed background check?": "Yes",
-
-      "Check the box to confirm.": "I understand",
-
-      "Privacy Policy": "I consent",
-
-      "Covid-19 Vaccination Acknowledgement": "Accept",
-      "I understand this role requires me to be fully vaccinated for COVID-19, to provide proof of vaccination prior to beginning employment and that I will abide by this requirement.": "Yes",
-      "Are you fully vaccinated against or willing to undergo weekly testing for COVID-19?": "Yes",
-
-      "Please describe your ethnicity": "I do not wish to answer",
-      "Race/Ethnicity": "Decline To Self Identify",
-      "Please identify your ethnicity. Are you Hispanic or Latino?": "I choose not to disclose",
-      "Ethnic Background": "I choose not to disclose",
-
-      "Please indicate your gender": "I do not wish to answer",
-      "Please identify your gender.": "I choose not to disclose",
-      "Sex/Gender": "I choose not to disclose",
-
-      "Veteran Status": "I do not wish to answer",
-
-      "Disability form selection options for the candidate": "I Don't Wish To Answer",
-
-      "Have you ever been convicted of a felony or misdemeanor? If yes, please explain the nature of the conviction.": "No",
-      "Have you ever been convicted of a felony or misdemeanor?": "No",
-
-      "Are you able to perform all requirements for the position as outlined with or without accommodations? If no, please provide additional information.": "Yes",
-      "Are you physically able and willing to do the job that you are applying for, with or without reasonable accommodations?": "Yes",
-
-      "Do you have a valid Secret Level or Higher Security Clearance?": "No",
-
-      "I declare that all statements and answers in this application are true and complete and agree that any untrue or misleading answer, omission, concealment or failure to answer any questions fully, completely and accurately may be grounds for terminating my employment, regardless of when it is discovered.": "I agree",
-      "By completing this application, I give this employer the permission to validate some of my answers with the appropriate authorities/institutions.": "I agree",
-
-      "I certify that all of the information furnished on this application and during the application process is true, complete and correct to the best of my knowledge. I understand that any misrepresentation or omission of facts called for may result in refusal to hire or, if hired, may result in my dismissal at any time regardless of when the false answer or omissions are discovered.": "Yes",
-      "I recognize that this employment application is not an offer of employment. I agree that if I am hired by the Company, I will be an at-will employee, meaning that either the Company or I may end the employment relationship at any time with or without cause or notice.": "Yes"
- }
+            "I certify that all of the information furnished on this application and during the application process is true, complete and correct to the best of my knowledge. I understand that any misrepresentation or omission of facts called for may result in refusal to hire or, if hired, may result in my dismissal at any time regardless of when the false answer or omissions are discovered.": "Yes",
+            "I recognize that this employment application is not an offer of employment. I agree that if I am hired by the Company, I will be an at-will employee, meaning that either the Company or I may end the employment relationship at any time with or without cause or notice.": "Yes"
+      }
+}

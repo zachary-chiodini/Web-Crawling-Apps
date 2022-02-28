@@ -1,9 +1,47 @@
 from json import load
 
+# Personal Info
+full_name = ''
+phone = ''
+email = ''
+address = ''
+city = ''
+state = ''
+postal = ''
+country = ''
+linkedin = ''
+website = ''
 
-FIRST_NAME = ''
+# Education/Skills
+skills = []
+education = ''
+certifications = []
+clearance = ''
+language = []
+
+# Employment/Salary
+salary = ''
+pay_type = ''  # Hourly/Salary
+currency = ''
+employment_type = ''  # Full-time, Part-time
+hours = ''
+
+# Availability
+start_date = ''
+interview_date = ''
+
+# Travel/Hours
+overtime = ''
+weekends = ''
+licence = ''
+transportation = ''
+travel = ''
+
+# Personal
+of_legal_age = ''
+sponsorship = ''
+eligibility = ''
+
 
 if __name__ == '__main__':
-    with open('default_q_and_a.json') as json:
-        q_and_a = load(json)
-
+    pass
