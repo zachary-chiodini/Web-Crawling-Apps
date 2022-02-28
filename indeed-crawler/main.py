@@ -17,19 +17,19 @@ class App:
         self._search_stopped = True
         self._root_frame = Frame(root_window_)
         self._root_frame.pack(expand=True)
-        self._user_form(0, 0, 10, 10)
+        self._user_form(0, 0, 10, 10, 50)
         # self._log_box = Text(self._root_frame, height=10, width=100)
         # self._setup_log_box(10, 0, 10, 10)
 
     @staticmethod
     def _display_default_text(
-            var: StringVar, default_text: str, widget: Entry, secure: bool
+            var: StringVar, default_text: str, widget: Entry, secure: bool,
+            force_format=False, format_regex='', format_message=''
             ) -> None:
         def clear_default(*args) -> None:
-            if widget.get() == default_text:
+            if (widget.get() == default_text
+                    or force_format and widget.get() == format_message):
                 widget.config(textvariable=var)
-                widget.delete(0, 'end')
-                widget.insert(0, '')
                 widget.config(fg='black')
                 if secure:
                     widget.config(show='*')
@@ -42,6 +42,11 @@ class App:
                 widget.config(fg='grey')
                 if secure:
                     widget.config(show='')
+            elif force_format and not search(format_regex, widget.get()):
+                widget.config(textvariable='')
+                widget.delete(0, 'end')
+                widget.insert(0, format_message)
+                widget.config(fg='red')
             return None
 
         def on_window_open(*args) -> None:
@@ -70,44 +75,34 @@ class App:
         var.trace_add('write', force_regex)
         return None
 
-    def _set_force_format(
-            self, var: StringVar, default_text: str, widget: Entry,
-            regex: str, message: str, secure=False) -> None:
-        value = var.get()
-        widget.unbind('<FocusOut>')
-        if not search(regex, value):
-            var.set('')  # FUUUUUUUUU
-        else:
-            self._display_default_text(var, default_text, widget, secure)
-        return None
-
     def _entry_box(
             self, default_text: str, regex: str, width: int,
             row: Union[int, Tuple[int, int]], col: int,
-            padx: int, pady: int, secure=False
+            padx: int, pady: int, secure=False,
+            force_format=False, format_regex='', format_message=''
             ) -> Entry:
         widget = Entry(self._root_frame, width=width)
         widget.grid(row=row, column=col, sticky='w', padx=padx, pady=pady)
         var = self._user_input[default_text]
-        self._display_default_text(var, default_text, widget, secure)
+        self._display_default_text(
+            var, default_text, widget, secure, force_format, format_regex, format_message)
         self._set_force_regex(var, regex)
         return widget
 
-    def _user_form(self, row: int, col: int, padx: int, pady: int) -> None:
+    def _user_form(self, row: int, col: int, padx: int, pady: int, width: int) -> None:
         Label(self._root_frame, text='Personal Information').grid(
             row=row, column=col, sticky='w',
             padx=padx, pady=pady
             )
-        self._entry_box('First Name', '^[A-Z]{0,1}[a-z]*$', 30, row + 1, col, padx, pady)
-        self._entry_box('Last Name', '^[A-Z]{0,1}[a-z]*$', 30, row + 1, col + 1, padx, pady)
-        email_widget = self._entry_box(
+        self._entry_box('First Name', '^[A-Z]{0,1}[a-z]*$', width, row + 1, col, padx, pady)
+        self._entry_box('Last Name', '^[A-Z]{0,1}[a-z]*$', width, row + 1, col + 1, padx, pady)
+        self._entry_box(
             'Email Address',
-            '^[0-9a-z](?!.*?\.\.)(?!.*?@\.)[0-9a-z\.]*[0-9a-z]*@{0,1}[a-z]*\.{0,1}[a-z]*$',
-            30, row + 2, col, padx, pady)
-        self._set_force_format(
-            self._user_input['Email Address'], 'Email Address', email_widget,
-            '^[a-z0-9]+@[a-z]+\.[a-z]$', 'Email must be of the form "username@domain.extension."')
-        self._entry_box('Phone Number', '^[0-9]{0,10}$', 30, row + 2, col + 1, padx, pady)
+            '^[0-9a-z](?!.*?\.\.)(?!.*?@\.)(?!.*?\.@)[0-9a-z\.]*[0-9a-z]*@{0,1}[a-z]*\.{0,1}[a-z]*$',
+            width, row + 2, col, padx, pady,
+            force_format=True, format_regex='^[a-z0-9]+@[a-z]+\.[a-z]$',
+            format_message='Email format must be "username@domain.extension."')
+        self._entry_box('Phone Number', '^[0-9]{0,10}$', width, row + 2, col + 1, padx, pady)
         return None
 
     @staticmethod
