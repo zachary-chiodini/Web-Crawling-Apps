@@ -416,7 +416,7 @@ class IndeedCrawler:
         tab = self._browser.window_handles[-1]
         self._browser.switch_to.window(tab)
         self._browser.get(job_url)
-        WebDriverWait(self._browser, 300).until(
+        WebDriverWait(self._browser, wait).until(
             expected_conditions.element_to_be_clickable(
                 (By.XPATH, '//*[@id="indeedApplyButton"]')
                 )
