@@ -141,6 +141,7 @@
             "Are you legally entitled to work in [BLANK]?": "",
             "Are you legally authorized to work in [BLANK]": "",
             "Are you authorized to work in the job's location?": "",
+            "Are you authorised to work in [BLANK]?": "",
             "Are you currently legally eligible to work in [BLANK]?": "",
             "Are you currently authorized to work in [BLANK]?": "",
             "Are you authorized to work in the following country: [BLANK]?": "",
@@ -187,7 +188,11 @@
             "Please Note:  Submission to a criminal background check as well as a drug and/or alcohol test are required conditions of employment.  Do you accept this requirement?": "Yes",
             "If extended a job offer, are you willing to submit to a detailed background check?": "Yes",
 
+            "Do you have a criminal record?": "No",
+
             "Check the box to confirm.": "I understand",
+
+            "Why should you be considered for this role?": "Prefer not to answer",
 
             "Privacy Policy": "I consent",
 
