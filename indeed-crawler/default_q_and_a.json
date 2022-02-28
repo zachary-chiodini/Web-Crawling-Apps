@@ -39,10 +39,10 @@
             "Postal Code": ""
       },
       "Country": {
-            "In what country are you currently located?": "United States",
-            "Country": "United States"
+            "In what country are you currently located?": "",
+            "Country": ""
       },
-      "Linkedin": {
+      "LinkedIn": {
             "LinkedIn URL": "",
             "LinkedIn Profile": "",
             "Please, share the link to your LinkedIn profile.": ""
@@ -127,29 +127,29 @@
       },
 
       "Of Legal Age": {
-            "Are you over the age of 18?": "Yes",
-            "Are you 18 years of age or older?": "Yes"
+            "Are you over the age of 18?": "",
+            "Are you 18 years of age or older?": ""
       },
       "Sponsorship": {
-            "Do you currently require sponsorship to work in [BLANK]?": "No",
-            "Will you now or in the future require sponsorship for employment visa status in [BLANK]?": "No",
-            "Do you currently or will you in the future require visa sponsorship to work in [BLANK]?": "No"
+            "Do you currently require sponsorship to work in [BLANK]?": "",
+            "Will you now or in the future require sponsorship for employment visa status in [BLANK]?": "",
+            "Do you currently or will you in the future require visa sponsorship to work in [BLANK]?": ""
       },
       "Eligibility": {
-            "Are you legally eligible to work in the [BLANK]?": "Yes",
-            "Are you legally eligible to work in [BLANK]?": "Yes",
-            "Are you legally entitled to work in [BLANK]?": "Yes",
-            "Are you legally authorized to work in [BLANK]": "Yes",
-            "Are you authorized to work in the job's location?": "Yes",
-            "Are you currently legally eligible to work in [BLANK]?": "Yes",
-            "Are you currently authorized to work in [BLANK]?": "Yes",
-            "Are you authorized to work in the following country: [BLANK]?": "Yes",
-            "If offered employment, can you submit verification of your legal right to work in [BLANK]?": "Yes",
-            "Are you able to show proof of employment authorization?": "Yes",
-            "Are you legally eligible to be employed in [BLANK]?": "Yes",
-            "Are you able to provide proof that you are eligible to legally work in [BLANK]?": "Yes",
-            "Can you provide legal documents establishing your eligibility to work in [BLANK]?": "Yes",
-            "Can you provide the necessary documentation to prove that you are a citizen, permanent resident, or a foreign national with authorization to work in [BLANK]?": "Yes"
+            "Are you legally eligible to work in the [BLANK]?": "",
+            "Are you legally eligible to work in [BLANK]?": "",
+            "Are you legally entitled to work in [BLANK]?": "",
+            "Are you legally authorized to work in [BLANK]": "",
+            "Are you authorized to work in the job's location?": "",
+            "Are you currently legally eligible to work in [BLANK]?": "",
+            "Are you currently authorized to work in [BLANK]?": "",
+            "Are you authorized to work in the following country: [BLANK]?": "",
+            "If offered employment, can you submit verification of your legal right to work in [BLANK]?": "",
+            "Are you able to show proof of employment authorization?": "",
+            "Are you legally eligible to be employed in [BLANK]?": "",
+            "Are you able to provide proof that you are eligible to legally work in [BLANK]?": "",
+            "Can you provide legal documents establishing your eligibility to work in [BLANK]?": "",
+            "Can you provide the necessary documentation to prove that you are a citizen, permanent resident, or a foreign national with authorization to work in [BLANK]?": ""
       },
 
       "Private": {
