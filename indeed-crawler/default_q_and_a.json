@@ -8,7 +8,10 @@
             "What is your name?": "",
             "Please type your full name": ""
       },
-      "Phone": {
+      "Email Address": {
+            "Email": ""
+      },
+      "Phone Number": {
             "Phone Number": "",
             "Phone": "",
             "Contact": "",
@@ -18,10 +21,7 @@
             "Mobile Number": "",
             "Provide valid phone number to allow Recruiters to contact you.": ""
       },
-      "Email": {
-            "Email": ""
-      },
-      "Address": {
+      "Street Address": {
             "What is your current location?": "",
             "Address 1": "",
             "Address 2": "",
