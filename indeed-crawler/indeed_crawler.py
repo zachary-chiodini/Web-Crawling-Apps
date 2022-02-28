@@ -51,7 +51,8 @@ class IndeedCrawler:
             'united states': '',
             'united kingdom': 'uk.',
             'canada': 'ca.',
-            'netherlands': 'nl.'
+            'netherlands': 'nl.',
+            'ireland': 'ie.'
             }
         self._q_and_a = default_q_and_a
         self._df = DataFrame()
