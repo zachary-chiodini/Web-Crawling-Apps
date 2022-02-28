@@ -457,6 +457,12 @@ class IndeedCrawler:
         self._browser.switch_to.window(self._main_window)
         return None
 
+    def _cache_job(self, job_jk: str) -> None:
+        self._cache.add(job_jk)
+        with open('cache.txt', 'a') as file:
+            file.write(job_jk + '\n')
+        return None
+
     def search_jobs(
             self, query: str,
             enforce_query: bool = False,
@@ -666,6 +672,8 @@ class IndeedCrawler:
                         if self._browser.current_window_handle != self._main_window:
                             self._browser.close()
                             self._browser.switch_to.window(self._main_window)
+                        if job_jk not in self._cache:
+                            self._cache_job(job_jk)
                         print('FAILED to apply to job:', job_url)
                         continue
                 job_location = result_content.find(class_=compile_regex('companyLocation'))
@@ -681,11 +689,9 @@ class IndeedCrawler:
                 self.results['Salary'].append(job_salary)
                 self.results['URL'].append(job_url)
                 if job_jk not in self._cache:
-                    self._cache.add(job_jk)
+                    self._cache_job(job_jk)
                     batch_jobs_applied_to += 1
                     self.total_jobs_applied_to += 1
-                    with open('cache.txt', 'a') as file:
-                        file.write(job_jk + '\n')
                     print(f"You've applied to {self.total_jobs_applied_to} job(s).")
                 if batch_jobs_applied_to == self._number_of_jobs:
                     stop_search = True
