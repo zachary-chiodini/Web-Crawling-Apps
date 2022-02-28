@@ -102,7 +102,11 @@ class App:
             width, row + 2, col, padx, pady,
             force_format=True, format_regex='^[a-z0-9]+@[a-z]+\.[a-z]$',
             format_message='Email format must be "username@domain.extension."')
-        self._entry_box('Phone Number', '^[0-9]{0,10}$', width, row + 2, col + 1, padx, pady)
+        self._entry_box(
+            'Phone Number', '^[0-9]{0,10}$',
+            width, row + 2, col + 1, padx, pady,
+            force_format=True, format_regex='^[0-9]{10}$',
+            format_message='Phone number must be 10 digits.')
         return None
 
     @staticmethod
