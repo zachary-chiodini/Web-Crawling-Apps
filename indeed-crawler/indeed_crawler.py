@@ -36,7 +36,8 @@ class IndeedCrawler:
             driver_path='driver',
             debug=False,
             auto_answer_questions=False,
-            manually_fill_out_questions=False
+            manually_fill_out_questions=False,
+            default_q_and_a={}
             ) -> None:
         self.results = {
             'Title': [],
@@ -52,7 +53,7 @@ class IndeedCrawler:
             'canada': 'ca.',
             'netherlands': 'nl.'
             }
-        self._q_and_a = {}
+        self._q_and_a = default_q_and_a
         self._df = DataFrame()
         self._browser = None
         self._sentence2vec = None
@@ -485,9 +486,12 @@ class IndeedCrawler:
             print('Number of jobs is zero.')
             return None
         if self._auto_answer_questions and not self._sentence2vec:
-            self._df = read_excel('questionnaire.xlsx')
-            for _, series in self._df.iterrows():
-                self._q_and_a[series['Question']] = series['Answer']
+            if self._q_and_a:
+                self._df = DataFrame(self._q_and_a.items(), columns=['Question', 'Answer'])
+            else:
+                self._df = read_excel('questionnaire.xlsx')
+                for _, series in self._df.iterrows():
+                    self._q_and_a[series['Question']] = series['Answer']
             self._load_model()
         batch_jobs_applied_to = 0
         stop_search = False
