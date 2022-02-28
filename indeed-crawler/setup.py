@@ -16,7 +16,7 @@ indeed_crawler.login(
 try:
     indeed_crawler.collect_questionnaire(
         query='',
-        country='',
+        country='united states',
         update=False
         )
 except Exception as e:
