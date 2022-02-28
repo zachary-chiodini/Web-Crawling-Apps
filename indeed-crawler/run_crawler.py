@@ -32,6 +32,7 @@ while (number_of_jobs * len(queries) * len(places)) < TOTAL_NUMBER_OF_JOBS:
 indeed_crawler = IndeedCrawler(
     number_of_jobs=number_of_jobs,
     debug=False,
+    auto_answer_questions=True,
     manually_fill_out_questions=False
     )
 
@@ -59,8 +60,7 @@ for region, country in places:
                 temp_remote=False,
                 country=country,
                 location=region,
-                radius='',
-                auto_answer_questions=True
+                radius=''
                 )
         except Exception as e:
             if DEBUG:

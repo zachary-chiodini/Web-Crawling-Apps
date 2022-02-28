@@ -35,6 +35,7 @@ class IndeedCrawler:
             headless_mode=False,
             driver_path='driver',
             debug=False,
+            auto_answer_questions=False,
             manually_fill_out_questions=False
             ) -> None:
         self.results = {
@@ -60,6 +61,7 @@ class IndeedCrawler:
         self._driver_path = driver_path
         self._main_window = ''
         self._debug = debug
+        self._auto_answer_questions = auto_answer_questions
         self._manually_fill_out_questions = manually_fill_out_questions
         self._cache = set()
         if path.exists('cache.txt'):
@@ -477,13 +479,12 @@ class IndeedCrawler:
             temp_remote: bool = False,
             country: str = '',
             location: str = '',
-            radius: str = '',
-            auto_answer_questions: bool = False
+            radius: str = ''
             ) -> None:
         if self._number_of_jobs == 0:
             print('Number of jobs is zero.')
             return None
-        if auto_answer_questions and not self._sentence2vec:
+        if self._auto_answer_questions and not self._sentence2vec:
             self._df = read_excel('questionnaire.xlsx')
             for _, series in self._df.iterrows():
                 self._q_and_a[series['Question']] = series['Answer']
@@ -634,7 +635,7 @@ class IndeedCrawler:
                         continue
                 try:
                     self._apply_to_job(
-                        job_url, answer_questions=auto_answer_questions)
+                        job_url, answer_questions=self._auto_answer_questions)
                 except (ElementClickInterceptedException,
                         ElementNotInteractableException,
                         NoSuchElementException,
