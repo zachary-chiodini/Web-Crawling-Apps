@@ -1,6 +1,6 @@
 from json import load
 from re import search
-from tkinter import Entry, Frame, Label, Scrollbar, StringVar, Text, Tk
+from tkinter import BooleanVar, Entry, Frame, IntVar, Label, Scrollbar, StringVar, Text, Tk
 from typing import Tuple, Union
 
 COOL_ROBOT_EMOJI = 'icon/cool_robot_emoji.ico'
@@ -12,7 +12,26 @@ class App:
     def __init__(self, root_window_: Tk):
         self._user_input = {}
         self._validated_input = {}
-        self._assign_instance_vars(self._user_input, self._validated_input)
+        self._q_and_a = {}
+        self._assign_instance_vars(self._user_input, self._validated_input, self._q_and_a)
+        self._crawler_login_args = {'email': StringVar(), 'password': StringVar()}
+        self._crawler_instance_args = {
+            'number_of_jobs': IntVar(),
+            'auto_answer_questions': BooleanVar(),
+            'manually_fill_out_questions': BooleanVar()
+            }
+        self._crawler_search_args = {
+            'query': StringVar(),
+            'enforce_query': BooleanVar(),
+            'job_title_negate_lst': [StringVar()],
+            'company_name_negate_lst': [StringVar()],
+            'job_type': StringVar(),
+            'min_salary': IntVar(),
+            'enforce_salary': BooleanVar(),
+            'exp_lvl': StringVar(),
+            'country': StringVar(),
+            'location': StringVar()
+        }
         self._search_started = False
         self._search_stopped = True
         self._root_frame = Frame(root_window_)
@@ -22,13 +41,14 @@ class App:
         # self._setup_log_box(10, 0, 10, 10)
 
     @staticmethod
-    def _assign_instance_vars(user_input_ref, validated_input_ref) -> None:
+    def _assign_instance_vars(user_input_ref, validated_input_ref, q_and_a_ref) -> None:
         with open('default_q_and_a.json') as json:
-            q_and_a = load(json)
-        validated_input_ref = q_and_a['Private']
-        del q_and_a['Private']
-        for question in q_and_a:
-            user_input_ref[question] = StringVar()
+            q_and_a_ref = load(json)
+        validated_input_ref = q_and_a_ref
+        del validated_input_ref['Private']
+        for input_ in validated_input_ref:
+            user_input_ref[input_] = StringVar()
+            validated_input_ref[input_] = ''
         return None
 
     @staticmethod
@@ -45,18 +65,22 @@ class App:
                     widget.config(show='*')
             return None
 
-        def display_default(*args) -> None:
+        def display_default_or_check_input(*args) -> None:
             if widget.get() == '':
                 widget.config(textvariable='')
                 widget.insert(0, default_text)
                 widget.config(fg='grey')
                 if secure:
                     widget.config(show='')
+                self._validated_input[default_text] = ''
             elif force_format and not search(format_regex, widget.get()):
                 widget.config(textvariable='')
                 widget.delete(0, 'end')
                 widget.insert(0, format_message)
                 widget.config(fg='red')
+                self._validated_input[default_text] = ''
+            else:
+                self._validated_input[default_text] = var.get()
             return None
 
         def on_window_open(*args) -> None:
@@ -72,7 +96,7 @@ class App:
 
         on_window_open()
         widget.bind('<FocusIn>', clear_default)
-        widget.bind('<FocusOut>', display_default)
+        widget.bind('<FocusOut>', display_default_or_check_input)
         return None
 
     @staticmethod
