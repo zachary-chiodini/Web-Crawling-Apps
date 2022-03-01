@@ -11,8 +11,8 @@ class App:
     
     def __init__(self, root_window_: Tk):
         self._user_input = {}
-        self._private_input = {}
-        self._assign_instance_vars(self._user_input, self._private_input)
+        self._validated_input = {}
+        self._assign_instance_vars(self._user_input, self._validated_input)
         self._search_started = False
         self._search_stopped = True
         self._root_frame = Frame(root_window_)
@@ -20,6 +20,16 @@ class App:
         self._user_form(0, 0, 10, 10, 50)
         # self._log_box = Text(self._root_frame, height=10, width=100)
         # self._setup_log_box(10, 0, 10, 10)
+
+    @staticmethod
+    def _assign_instance_vars(user_input_ref, validated_input_ref) -> None:
+        with open('default_q_and_a.json') as json:
+            q_and_a = load(json)
+        validated_input_ref = q_and_a['Private']
+        del q_and_a['Private']
+        for question in q_and_a:
+            user_input_ref[question] = StringVar()
+        return None
 
     @staticmethod
     def _display_default_text(
@@ -107,16 +117,6 @@ class App:
             width, row + 2, col + 1, padx, pady,
             force_format=True, format_regex='^[0-9]{10}$',
             format_message='Phone number must be 10 digits.')
-        return None
-
-    @staticmethod
-    def _assign_instance_vars(user_input_ref, private_input_ref) -> None:
-        with open('default_q_and_a.json') as json:
-            q_and_a = load(json)
-        private_input_ref = q_and_a['Private']
-        del q_and_a['Private']
-        for question in q_and_a:
-            user_input_ref[question] = StringVar()
         return None
 
     def _setup_log_box(self, row: int, col: int, padx: int, pady: int) -> None:
