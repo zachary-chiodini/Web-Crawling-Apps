@@ -19,7 +19,9 @@
             "Contact Phone Number": "",
             "Enter number to receive text messages": "",
             "Mobile Number": "",
-            "Provide valid phone number to allow Recruiters to contact you.": ""
+            "Provide valid phone number to allow Recruiters to contact you.": "",
+            "Phone (Mobile)": "",
+            "Phone number format must be between 6 and 15 digits, and can only contain numbers": ""
       },
       "Street Address": {
             "What is your current location?": "",
@@ -136,7 +138,6 @@
             "Do you currently or will you in the future require visa sponsorship to work in [BLANK]?": ""
       },
       "Eligibility": {
-            "Are you legally eligible to work in the [BLANK]?": "",
             "Are you legally eligible to work in [BLANK]?": "",
             "Are you legally entitled to work in [BLANK]?": "",
             "Are you legally authorized to work in [BLANK]": "",
