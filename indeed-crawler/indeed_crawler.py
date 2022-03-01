@@ -49,7 +49,7 @@ class IndeedCrawler:
         self.total_jobs_applied_to = 0
         self._map_country = {
             'canada': 'ca.',
-            'india': 'in',
+            'india': 'in.',
             'ireland': 'ie.',
             'netherlands': 'nl.',
             'united states': '',
