@@ -6,16 +6,18 @@ from pandas import DataFrame
 from helper_funs import append_df_to_excel
 from indeed_crawler import IndeedCrawler
 
-TOTAL_NUMBER_OF_JOBS = 200
+TOTAL_NUMBER_OF_JOBS = 100*5
 DEBUG = True
 
 
 queries: List[str] = [
+    'Manufacturing', 'Assembler', 'Warehouse worker', 'Woodworker',
+    'Welder', 'Packaging', 'Plant manager', 'Factory worker', 'Factor'
 ]
 
 Location, Country = str, str
 places: List[Tuple[Location, Country]] = [
-    ('remote', 'united states')
+    ('chennai', 'india')
 ]
 
 negate_jobs: List[str] = [
@@ -38,8 +40,8 @@ indeed_crawler = IndeedCrawler(
 
 indeed_crawler.setup_browser()
 indeed_crawler.login(
-    email='',
-    password=''
+    email='bhagat.manoj@outlook.com',
+    password='MY_P4$$W0RD123'
     )
 
 abort = False
@@ -53,9 +55,9 @@ for region, country in places:
                 company_name_negate_lst=negate_comps,
                 past_14_days=False,
                 job_type='',  # fulltime
-                min_salary='',
+                min_salary='35000',
                 enforce_salary=False,  # consider only jobs with salary listed
-                exp_lvl='',  # entry_level, mid_level, #senior_level
+                exp_lvl='entry_level',  # entry_level, mid_level, #senior_level
                 remote='',
                 temp_remote=False,
                 country=country,
