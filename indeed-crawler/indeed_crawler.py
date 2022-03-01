@@ -48,11 +48,12 @@ class IndeedCrawler:
             }
         self.total_jobs_applied_to = 0
         self._map_country = {
-            'united states': '',
-            'united kingdom': 'uk.',
             'canada': 'ca.',
+            'india': 'in',
+            'ireland': 'ie.',
             'netherlands': 'nl.',
-            'ireland': 'ie.'
+            'united states': '',
+            'united kingdom': 'uk.'
             }
         self._q_and_a = default_q_and_a
         self._df = DataFrame()
