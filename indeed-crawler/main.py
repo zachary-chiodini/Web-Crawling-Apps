@@ -18,7 +18,9 @@ class App:
         self._crawler_instance_args = {
             'number_of_jobs': IntVar(),
             'auto_answer_questions': BooleanVar(),
-            'manually_fill_out_questions': BooleanVar()
+            'manually_fill_out_questions': BooleanVar(),
+            'default_q_and_a': {},
+            'debug': BooleanVar()
             }
         self._crawler_search_args = {
             'query': StringVar(),

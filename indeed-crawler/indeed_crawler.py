@@ -242,7 +242,6 @@ class IndeedCrawler:
                         WebDriverException):
                     if self._debug:
                         print_exc()
-                        break
                     if self._browser.current_window_handle != self._main_window:
                         self._browser.close()
                         self._browser.switch_to.window(self._main_window)
@@ -269,7 +268,7 @@ class IndeedCrawler:
         workbook.close()
         return None
 
-    def _select_continue(self, wait=5) -> None:
+    def _select_continue(self, wait=10) -> None:
         WebDriverWait(self._browser, wait).until(
             expected_conditions.element_to_be_clickable(
                 (By.XPATH,
@@ -343,7 +342,7 @@ class IndeedCrawler:
         return answers_set
 
     def _handle_screening_questions(
-            self, answer_questions: bool, collect_q_and_a: bool, wait=5
+            self, answer_questions: bool, collect_q_and_a: bool, wait=10
             ) -> None:
         for _ in range(10):
             try:
@@ -415,7 +414,7 @@ class IndeedCrawler:
     def _apply_to_job(self, job_url: str,
                       answer_questions=False,
                       collect_q_and_a=False,
-                      wait=3) -> None:
+                      wait=10) -> None:
         self._main_window = self._browser.current_window_handle
         self._browser.execute_script('window.open()')
         tab = self._browser.window_handles[-1]
@@ -445,11 +444,11 @@ class IndeedCrawler:
                 WebDriverWait(self._browser, wait).until(
                     expected_conditions.element_to_be_clickable(
                         (By.XPATH,
-                         '//button//span[text()="Submit your application"]')
+                         '//button//span[text()[contains(.,"Submit")]]')
                     )
                 )
                 self._browser.find_element_by_xpath(
-                    '//button//span[text()="Submit your application"]').click()
+                    '//button//span[text()[contains(.,"Submit")]]').click()
             except TimeoutException:
                 pass
             WebDriverWait(self._browser, wait).until(
@@ -651,23 +650,21 @@ class IndeedCrawler:
                         WebDriverException):
                     if self._debug:
                         print_exc()
-                        stop_search = True
-                        break
                     if self._manually_fill_out_questions:
                         try:
                             WebDriverWait(self._browser, 600).until(
                                 expected_conditions.element_to_be_clickable(
                                     (By.XPATH,
-                                     '//button//span[text()="Submit your application"]')
+                                     '//button//span[text()[contains(.,"Submit")]]')
                                     )
                                 )
                             self._browser.find_element_by_xpath(
-                                '//button//span[text()="Submit your application"]'
+                                '//button//span[text()[contains(.,"Submit")]]'
                                 ).click()
-                            WebDriverWait(self._browser, 5).until(
+                            WebDriverWait(self._browser, 10).until(
                                 expected_conditions.element_to_be_clickable(
                                     (By.XPATH,
-                                     '//button//span[text()="Return to job search"]')
+                                     '//button//span[text()[contains(.,"Return")]]')
                                 )
                             )
                             self._browser.close()
