@@ -53,9 +53,8 @@ class App:
             validated_input_ref[input_] = ''
         return None
 
-    @staticmethod
     def _display_default_text(
-            var: StringVar, default_text: str, widget: Entry, secure: bool,
+            self, var: StringVar, default_text: str, widget: Entry, secure: bool,
             force_format=False, format_regex='', format_message=''
             ) -> None:
         def clear_default(*args) -> None:
@@ -143,6 +142,22 @@ class App:
             width, row + 2, col + 1, padx, pady,
             force_format=True, format_regex='^[0-9]{10}$',
             format_message='Phone number must be 10 digits.')
+        self._entry_box(
+            'Street Address',
+            '(?!.*?  )(?!.*?,,)(?!.*? ,)^[0-9A-Za-z][0-9A-Za-z ,]*$',
+            width, row + 3, col, padx, pady)
+        self._entry_box('City', '^[A-Z]{0,1}[a-z]*$', width, row + 3, col + 1, padx, pady)
+        self._entry_box('State', '^[A-Z]{0,1}[a-z]*$', width, row + 4, col, padx, pady)
+        self._entry_box('Postal Code', '^[0-9]+$', width, row + 4, col + 1, padx, pady)
+        self._entry_box('Country', '(?!.*?  )^[A-Za-z][A-Za-z ]*$', width, row + 5, col, padx, pady)
+        self._entry_box('Country Code', '^[0-9]+$', width, row + 5, col + 1, padx, pady)
+        Label(self._root_frame, text='Portfolio').grid(
+            row=row + 6, column=col, sticky='w',
+            padx=padx, pady=pady
+            )
+        self._entry_box('LinkedIn', '', width, row + 7, col, padx, pady)
+        self._entry_box('Website', '', width, row + 7, col + 1, padx, pady)
+        # skills
         return None
 
     def _setup_log_box(self, row: int, col: int, padx: int, pady: int) -> None:

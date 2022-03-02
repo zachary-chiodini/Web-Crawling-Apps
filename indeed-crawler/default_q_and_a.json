@@ -36,13 +36,19 @@
             "State/Province": "",
             "State": ""
       },
-      "Postal": {
+      "Postal Code": {
             "Postal/ZIP": "",
-            "Postal Code": ""
+            "Postal Code": "",
+            "Zip Code": "",
+            "Zip": "",
+            "Postal": ""
       },
       "Country": {
             "In what country are you currently located?": "",
             "Country": ""
+      },
+      "Country Code": {
+            "What is your country code?": ""
       },
       "LinkedIn": {
             "LinkedIn URL": "",
