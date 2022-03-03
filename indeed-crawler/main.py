@@ -1,7 +1,7 @@
 from json import load
 from re import search
 from tkinter import BooleanVar, Entry, Frame, IntVar, Label, Scrollbar, StringVar, Text, Tk
-from typing import Tuple, Union
+from typing import Dict, Tuple, Union
 
 COOL_ROBOT_EMOJI = 'icon/cool_robot_emoji.ico'
 COOL_GLASSES_EMOJI = 'icon/cool_glasses.png'
@@ -11,9 +11,16 @@ class App:
     
     def __init__(self, root_window_: Tk):
         self._user_input = {}
-        self._validated_input = {}
         self._q_and_a = {}
-        self._assign_instance_vars(self._user_input, self._validated_input, self._q_and_a)
+        self._assign_instance_vars(self._user_input, self._q_and_a)
+        self._required_input = {
+            'First Name': '', 'Last Name': '',
+            'Email Address': '', 'Phone Number': '',
+            'City': '', 'State': '', 'Country': '',
+            'Education': '', 'Login': '', 'Password': '',
+            "Job Search": '', 'Job Location': ''
+        }
+        self._user_input_ref.update(self._required_input)
         self._crawler_login_args = {'email': StringVar(), 'password': StringVar()}
         self._crawler_instance_args = {
             'number_of_jobs': IntVar(),
@@ -43,14 +50,13 @@ class App:
         # self._setup_log_box(10, 0, 10, 10)
 
     @staticmethod
-    def _assign_instance_vars(user_input_ref, validated_input_ref, q_and_a_ref) -> None:
+    def _assign_instance_vars(user_input_ref: Dict, q_and_a_ref: Dict) -> None:
         with open('default_q_and_a.json') as json:
             q_and_a_ref = load(json)
-        validated_input_ref = q_and_a_ref
-        del validated_input_ref['Private']
-        for input_ in validated_input_ref:
+        q_and_a_copy = q_and_a_ref.copy()
+        del q_and_a_copy['Private']
+        for input_ in q_and_a_copy:a
             user_input_ref[input_] = StringVar()
-            validated_input_ref[input_] = ''
         return None
 
     def _display_default_text(
@@ -73,15 +79,18 @@ class App:
                 widget.config(fg='grey')
                 if secure:
                     widget.config(show='')
-                self._validated_input[default_text] = ''
+                if default_text in self._required_input:
+                    self._required_input[default_text] = ''
             elif force_format and not search(format_regex, widget.get()):
                 widget.config(textvariable='')
                 widget.delete(0, 'end')
                 widget.insert(0, format_message)
                 widget.config(fg='red')
-                self._validated_input[default_text] = ''
+                if default_text in self._required_input:
+                    self._required_input[default_text] = ''
             else:
-                self._validated_input[default_text] = var.get()
+                if default_text in self._required_input:
+                    self._required_input[default_text] = var.get()
             return None
 
         def on_window_open(*args) -> None:
