@@ -18,7 +18,8 @@ class App:
             'Email Address': '', 'Phone Number': '',
             'City': '', 'State': '', 'Country': '',
             'Education': '', 'Login': '', 'Password': '',
-            "Job Search": '', 'Job Location': ''
+            'Job Search': '', 'Job Location': '',
+            'Skills': [], 'Experience': []
         }
         self._user_input_ref.update(self._required_input)
         self._crawler_login_args = {'email': StringVar(), 'password': StringVar()}

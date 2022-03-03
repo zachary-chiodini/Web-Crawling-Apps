@@ -6,7 +6,8 @@
             "Full Name": "",
             "Candidate Name": "",
             "What is your name?": "",
-            "Please type your full name": ""
+            "Please type your full name": "",
+            "How may we pronounce your name?": ""
       },
       "Email Address": {
             "Email": ""
@@ -34,7 +35,9 @@
       },
       "State": {
             "State/Province": "",
-            "State": ""
+            "State": "",
+      "City and State": {
+            "Where are you currently located?": ""
       },
       "Postal Code": {
             "Postal/ZIP": "",
@@ -167,6 +170,7 @@
             "On which website did you see this opening advertised?": "Indeed",
             "How did you hear about us?": "Indeed",
             "How did you hear about this opportunity?": "Indeed",
+            "How did you hear about our company?": "Indeed",
 
             "Do you want to tell us anything else about you?": "No",
 
@@ -180,6 +184,7 @@
             "Do you have any relatives who are current employees of our company?": "No",
 
             "Do you have a non-compete, non-solicitation, confidentiality or similar agreement that could impact your ability to work for us?": "No",
+            "Do you have a non-compete or similar agreement with your former employer(s) that would preclude you from working at our company?": "No",
 
             "Do you have relatives currently employed at our company": "No",
             "If you have relatives currently employed at our company, please provide their name and title.": "No relatives",
@@ -215,10 +220,13 @@
             "Please indicate your gender": "I do not wish to answer",
             "Please identify your gender.": "I choose not to disclose",
             "Sex/Gender": "I choose not to disclose",
+            "For government reporting purposes, we ask candidates to respond to the below self-identification survey. Completion of the form is entirely voluntary. Whatever your decision, it will not be considered in the hiring process or thereafter. Any information that you do provide will be recorded and maintained in a confidential file.  As set forth in BetterUp’s Equal Employment Opportunity policy, we do not discriminate on the basis of any protected group status under any applicable law.": "I do not wish to answer",
 
             "Veteran Status": "I do not wish to answer",
+            "If you believe you belong to any of the categories of protected veterans listed below, please indicate by making the appropriate selection.  As a government contractor subject to the Vietnam Era Veterans Readjustment Assistance Act (VEVRAA), we request this information in order to measure the effectiveness of the outreach and positive recruitment efforts we undertake pursuant to VEVRAA. Classification of protected categories is as follows:  A \"disabled veteran\" is one of the following: a veteran of the U.S. military, ground, naval or air service who is entitled to compensation (or who but for the receipt of military retired pay would be entitled to compensation) under laws administered by the Secretary of Veterans Affairs; or a person who was discharged or released from active duty because of a service-connected disability.  A \"recently separated veteran\" means any veteran during the three-year period beginning on the date of such veteran's discharge or release from active duty in the U.S. military, ground, naval, or air service.  An \"active duty wartime or campaign badge veteran\" means a veteran who served on active duty in the U.S. military, ground, naval or air service during a war, or in a campaign or expedition for which a campaign badge has been authorized under the laws administered by the Department of Defense.  An \"Armed forces service medal veteran\" means a veteran who, while serving on active duty in the U.S. military, ground, naval or air service, participated in a United States military operation for which an Armed Forces service medal was awarded pursuant to Executive Order 12985.  Veteran Status?": "I do not wish to answer",
 
             "Disability form selection options for the candidate": "I Don't Wish To Answer",
+            "Form CC-305 OMB Control Number 1250-0005 Expires 05/31/2023  Voluntary Self-Identification of DisabilityWhy are you being asked to complete this form? We are a federal contractor or subcontractor required by law to provide equal employment opportunity to qualified people with disabilities. We are also required to measure our progress toward having at least 7% of our workforce be individuals with disabilities. To do this, we must ask applicants and employees if they have a disability or have ever had a disability. Because a person may become disabled at any time, we ask all of our employees to update their information at least every five years.  Identifying yourself as an individual with a disability is voluntary, and we hope that you will choose to do so. Your answer will be maintained confidentially and not be seen by selecting officials or anyone else involved in making personnel decisions. Completing the form will not negatively impact you in any way, regardless of whether you have self-identified in the past. For more information about this form or the equal employment obligations of federal contractors under Section 503 of the Rehabilitation Act, visit the U.S. Department of Labor’s Office of Federal Contract Compliance Programs (OFCCP) website at www.dol.gov/ofccp. How do you know if you have a disability?  You are considered to have a disability if you have a physical or mental impairment or medical condition that substantially limits a major life activity, or if you have a history or record of such an impairment or medical condition. Disabilities include, but are not limited to:  Autism Autoimmune disorder, for example, lupus, fibromyalgia, rheumatoid arthritis, or HIV/AIDS Blind or low vision Cancer Cardiovascular or heart disease Celiac disease Cerebral palsy Deaf or hard of hearing Depression or anxiety Diabetes Epilepsy Gastrointestinal disorders, for example, Crohn's Disease, or irritable bowel syndrome Intellectual disability Missing limbs or partially missing limbs Nervous system condition for example, migraine headaches, Parkinson’s disease, or Multiple sclerosis (MS) Psychiatric condition, for example, bipolar disorder, schizophrenia, PTSD, or major depression  Disability Status?": "I don't wish to answer",
 
             "Have you ever been convicted of a felony or misdemeanor? If yes, please explain the nature of the conviction.": "No",
             "Have you ever been convicted of a felony or misdemeanor?": "No",
