@@ -201,12 +201,22 @@ class App:
             format_message='State name is invalid.')
         self._entry_box(
             'Postal Code',
-            '^[0-9]+$',
+            '^[0-9]*$',
             width, row + 7, col + 1, padx, pady,
             format_regex='^[0-9]+$',
             format_message='Invalid postal code.')
-        self._entry_box('Country', '(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]*$', width, row + 9, col, padx, pady)
-        self._entry_box('Country Code', '^[0-9]+$', width, row + 9, col + 1, padx, pady)
+        self._entry_box(
+            'Country',
+            '(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]*$',
+            width, row + 9, col, padx, pady,
+            format_regex='(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]+$',
+            format_message='Invalid country name.')
+        self._entry_box(
+            'Country Code',
+            '^[0-9]*$',
+            width, row + 9, col + 1, padx, pady,
+            format_regex='^[0-9]+$',
+            format_message='Invalid country code.')
         Label(self._root_frame, text='Portfolio')\
             .grid(row=row + 11, column=col, sticky='w', padx=padx, pady=pady)
         self._entry_box('LinkedIn', '', width, row + 12, col, padx, pady)
