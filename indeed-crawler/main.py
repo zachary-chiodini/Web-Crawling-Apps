@@ -186,11 +186,26 @@ class App:
             '(?!.*?  )(?!.*?,,)(?!.*? ,)^[0-9]*[0-9A-Za-z ,]*$',
             width, row + 5, col, padx, pady,
             format_regex='(?!.*?  )^[0-9]+ [0-9A-Za-z ]+$',
-            format_message='Invalid street address')
-        self._entry_box('City', '^[A-Z]{0,1}[a-z]*$', width, row + 5, col + 1, padx, pady)
-        self._entry_box('State', '^[A-Z]{0,1}[a-z]*$', width, row + 7, col, padx, pady)
-        self._entry_box('Postal Code', '^[0-9]+$', width, row + 7, col + 1, padx, pady)
-        self._entry_box('Country', '(?!.*?  )^[A-Za-z][A-Za-z ]*$', width, row + 9, col, padx, pady)
+            format_message='Invalid street address.')
+        self._entry_box(
+            'City',
+            '^[A-Z]{0,1}[a-z]*$',
+            width, row + 5, col + 1, padx, pady,
+            format_regex='^[A-Za-z][a-z]+$',
+            format_message='City name is invalid.')
+        self._entry_box(
+            'State',
+            '^[A-Z]{0,1}[a-z]* {0,1}[A-Z]{0-1}[a-z]*$',
+            width, row + 7, col, padx, pady,
+            format_regex='(?!.*?  )^[A-Za-z ]+$',
+            format_message='State name is invalid.')
+        self._entry_box(
+            'Postal Code',
+            '^[0-9]+$',
+            width, row + 7, col + 1, padx, pady,
+            format_regex='^[0-9]+$',
+            format_message='Invalid postal code.')
+        self._entry_box('Country', '(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]*$', width, row + 9, col, padx, pady)
         self._entry_box('Country Code', '^[0-9]+$', width, row + 9, col + 1, padx, pady)
         Label(self._root_frame, text='Portfolio')\
             .grid(row=row + 11, column=col, sticky='w', padx=padx, pady=pady)
