@@ -1,7 +1,7 @@
 from json import load
 from re import search
-from tkinter import BooleanVar, Entry, Frame, IntVar, Label, Scrollbar, StringVar, Text, Tk
-from typing import Dict, Tuple, Union
+from tkinter import BooleanVar, Button, Entry, Frame, IntVar, Label, Scrollbar, StringVar, Text, Tk
+from typing import Dict, List, Tuple, Union
 
 COOL_ROBOT_EMOJI = 'icon/cool_robot_emoji.ico'
 COOL_GLASSES_EMOJI = 'icon/cool_glasses.png'
@@ -20,7 +20,7 @@ class App:
             'Education': StringVar(), 'Indeed Login': StringVar(), 'Indeed Password': StringVar(),
             'Job Search': StringVar(), 'Job Location': StringVar(),
             'Number of Job Applications': IntVar(),
-            'Skills': StringVar(), 'Experience': IntVar()
+            'Skill': StringVar(), 'Experience': IntVar()
         }
         self._dict_difference(self._user_input, self._required_input)
         self._invalid_input = False
@@ -43,9 +43,8 @@ class App:
             'country': StringVar(),
             'location': StringVar()
         }
-        self._error_label_dict = {}
-        self._search_started = False
-        self._search_stopped = True
+        self._error_label_dict: Dict[str, Label] = {}
+        self._skill_entry_list: List[Tuple[Entry, Entry]] = []
         self._root_frame = Frame(root_window_)
         self._root_frame.pack(expand=True)
         self._user_form(0, 0, 10, 10, 50)
@@ -157,6 +156,38 @@ class App:
         self._set_force_regex(var, regex, format_message, row, col, padx)
         return widget
 
+    def _add_skill(self, width, row, col, padx, pady) -> None:
+        skill_widget = self._entry_box(
+            'Skill',
+            '(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]*$',
+            width, row, col, padx, pady,
+            format_regex='(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]+$',
+            format_message='Skill is invalid.')
+        exp_widget = self._entry_box(
+            'Experience',
+            '^[0-9]*$',
+            width, row, col, padx, pady,
+            format_regex='^[0-9]+$',
+            format_message='Experience must be in years.')
+        self._skill_entry_list.append((skill_widget, exp_widget))
+        return None
+
+    def _remove_skill(self) -> None:
+        if self._skill_entry_list:
+            skill_widget, exp_widget = self._skill_entry_list.pop(-1)
+            skill_widget.destroy()
+            exp_widget.destroy()
+        return None
+
+    def _add_remove_skill_buttons(self, width, row, col, padx, pady) -> None:
+        Button(
+            self._root_frame, text='+',
+            command=lambda *args: self._add_skill(width, row, col, padx, pady)
+            ).grid(row=row, column=col, sticky='w', padx=padx, pady=pady)
+        Button(self._root_frame, text='-', command=self._remove_skill)\
+            .grid(row=row + 1, column=col, sticky='w', padx=padx, pady=pady)
+        return None
+
     def _user_form(self, row: int, col: int, padx: int, pady: int, width: int) -> None:
         Label(self._root_frame, text='Personal Information')\
             .grid(row=row, column=col, sticky='w', padx=padx, pady=pady)
@@ -171,57 +202,70 @@ class App:
             format_regex='^[A-Za-z][a-z]+$',
             format_message='Last name is invalid.')
         self._entry_box(
+            'Current Company',
+            '(?!.*?  )^[0-9A-Za-z ]*$',
+            width, row + 3, col, padx, pady,
+            format_regex='(?!.*?  )^[0-9A-Za-z ]+$',
+            format_message='Company name is invalid.')
+        self._entry_box(
+            'Current Job Title',
+            '(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]*$',
+            width, row + 3, col + 1, padx, pady,
+            format_regex='(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]+$',
+            format_message='Job title is invalid.')
+        self._entry_box(
             'Email Address',
             '^[0-9a-z](?!.*?\.\.)(?!.*?@\.)(?!.*?\.@)[0-9a-z\.]*[0-9a-z]*@{0,1}[a-z]*\.{0,1}[a-z]*$',
-            width, row + 3, col, padx, pady,
+            width, row + 5, col, padx, pady,
             format_regex='^[a-z0-9]+@[a-z]+\.[a-z]$',
             format_message='Email format must be "username@domain.extension."')
         self._entry_box(
             'Phone Number', '^[0-9]{0,10}$',
-            width, row + 3, col + 1, padx, pady,
+            width, row + 5, col + 1, padx, pady,
             format_regex='^[0-9]{10}$',
             format_message='Phone number must be 10 digits.')
         self._entry_box(
             'Street Address',
             '(?!.*?  )(?!.*?,,)(?!.*? ,)^[0-9]*[0-9A-Za-z ,]*$',
-            width, row + 5, col, padx, pady,
+            width, row + 7, col, padx, pady,
             format_regex='(?!.*?  )^[0-9]+ [0-9A-Za-z ]+$',
             format_message='Invalid street address.')
         self._entry_box(
             'City',
             '^[A-Z]{0,1}[a-z]*$',
-            width, row + 5, col + 1, padx, pady,
+            width, row + 7, col + 1, padx, pady,
             format_regex='^[A-Za-z][a-z]+$',
             format_message='City name is invalid.')
         self._entry_box(
             'State',
             '^[A-Z]{0,1}[a-z]* {0,1}[A-Z]{0-1}[a-z]*$',
-            width, row + 7, col, padx, pady,
+            width, row + 9, col, padx, pady,
             format_regex='(?!.*?  )^[A-Za-z ]+$',
             format_message='State name is invalid.')
         self._entry_box(
             'Postal Code',
             '^[0-9]*$',
-            width, row + 7, col + 1, padx, pady,
+            width, row + 9, col + 1, padx, pady,
             format_regex='^[0-9]+$',
             format_message='Invalid postal code.')
         self._entry_box(
             'Country',
             '(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]*$',
-            width, row + 9, col, padx, pady,
+            width, row + 11, col, padx, pady,
             format_regex='(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]+$',
             format_message='Invalid country name.')
         self._entry_box(
             'Country Code',
             '^[0-9]*$',
-            width, row + 9, col + 1, padx, pady,
+            width, row + 11, col + 1, padx, pady,
             format_regex='^[0-9]+$',
             format_message='Invalid country code.')
         Label(self._root_frame, text='Portfolio')\
-            .grid(row=row + 11, column=col, sticky='w', padx=padx, pady=pady)
-        self._entry_box('LinkedIn', '', width, row + 12, col, padx, pady)
-        self._entry_box('Website', '', width, row + 12, col + 1, padx, pady)
-        # skills
+            .grid(row=row + 13, column=col, sticky='w', padx=padx, pady=pady)
+        self._entry_box('LinkedIn', '', width, row + 14, col, padx, pady)
+        self._entry_box('Website', '', width, row + 14, col + 1, padx, pady)
+        Label(self._root_frame, text='Skills/Experience') \
+            .grid(row=row + 16, column=col, sticky='w', padx=padx, pady=pady)
         return None
 
     def _setup_log_box(self, row: int, col: int, padx: int, pady: int) -> None:
