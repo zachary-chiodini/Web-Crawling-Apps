@@ -24,6 +24,12 @@
             "Phone (Mobile)": "",
             "Phone number format must be between 6 and 15 digits, and can only contain numbers": ""
       },
+      "Current Company": {
+            "Current Company": ""
+      },
+      "Current Job Title": {
+            "Current Job Title": ""
+      },
       "Street Address": {
             "What is your current location?": "",
             "Address 1": "",
@@ -35,7 +41,8 @@
       },
       "State": {
             "State/Province": "",
-            "State": ""
+            "State": "",
+            "In which state do you reside as a permanent resident?": ""
       },
       "City and State": {
             "Where are you currently located?": ""
@@ -69,9 +76,10 @@
             "What is the highest level of education you have completed?": "",
             "Highest Education Obtained": ""
       },
-      "Certifications": {
+      "Certifications/Licenses": {
             "Do you have a valid [BLANK] certification?": "",
-            "Are you certified in [BLANK]": ""
+            "Are you certified in [BLANK]": "",
+            "Do you have a valid [BLANK] License?": ""
       },
       "Clearance": {
             "Do you have a valid Secret Level or Higher Security Clearance?": ""
@@ -103,7 +111,8 @@
       "Weekends": {
             "Are you willing to work weekends?": "",
             "Are you available to work weekends (Saturday and/or Sunday)?": "",
-            "Are you willing to work a variable schedule including weekends?": ""
+            "Are you willing to work a variable schedule including weekends?": "",
+            "Can you work 1 weekend day and holidays?": ""
       },
       "Hours": {
             "How many hours per week (on average) are you available to work?": "",
@@ -190,6 +199,9 @@
             "Do you have a criminal record?": "No",
             "Check the box to confirm.": "I understand",
             "Why should you be considered for this role?": "Prefer not to answer",
+            "Why do you think you would be a good fit for this role?": "Prefer not to answer",
+            "Why are you interested in working at our company": "Prefer not to answer",
+            "Please describe your experience working in a customer-focused environment.": "Prefer not to answer",
             "Privacy Policy": "I consent",
             "Covid-19 Vaccination Acknowledgement": "Accept",
             "I understand this role requires me to be fully vaccinated for COVID-19, to provide proof of vaccination prior to beginning employment and that I will abide by this requirement.": "Yes",
