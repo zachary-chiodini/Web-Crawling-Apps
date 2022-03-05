@@ -14,15 +14,16 @@ class App:
         self._q_and_a = {}
         self._assign_instance_vars(self._user_input, self._q_and_a)
         self._required_input = {
-            'First Name': '', 'Last Name': '',
-            'Email Address': '', 'Phone Number': '',
-            'City': '', 'State': '', 'Country': '',
-            'Education': '', 'Login': '', 'Password': '',
-            'Job Search': '', 'Job Location': '',
-            'Skills': [], 'Experience': []
+            'First Name': StringVar(), 'Last Name': StringVar(),
+            'Email Address': StringVar(), 'Phone Number': StringVar(),
+            'City': StringVar(), 'State': StringVar(), 'Country': StringVar(),
+            'Education': StringVar(), 'Indeed Login': StringVar(), 'Indeed Password': StringVar(),
+            'Job Search': StringVar(), 'Job Location': StringVar(),
+            'Number of Job Applications': IntVar(),
+            'Skills': StringVar(), 'Experience': IntVar()
         }
-        self._user_input_ref.update(self._required_input)
-        self._crawler_login_args = {'email': StringVar(), 'password': StringVar()}
+        self._dict_difference(self._user_input, self._required_input)
+        self._invalid_input = False
         self._crawler_instance_args = {
             'number_of_jobs': IntVar(),
             'auto_answer_questions': BooleanVar(),
@@ -42,6 +43,7 @@ class App:
             'country': StringVar(),
             'location': StringVar()
         }
+        self._error_label_dict = {}
         self._search_started = False
         self._search_stopped = True
         self._root_frame = Frame(root_window_)
@@ -56,42 +58,53 @@ class App:
             q_and_a_ref = load(json)
         q_and_a_copy = q_and_a_ref.copy()
         del q_and_a_copy['Private']
-        for input_ in q_and_a_copy:a
+        for input_ in q_and_a_copy:
             user_input_ref[input_] = StringVar()
         return None
 
-    def _display_default_text(
+    @staticmethod
+    def _dict_difference(ref1: Dict, ref2: Dict) -> None:
+        for key in ref1.copy():
+            if key in ref2:
+                del ref1[key]
+        return None
+
+    def _error_label(self, message: str, row: int, col: int, padx: int) -> None:
+        widget = Label(self._root_frame, text=message, fg='red')
+        widget.grid(row=row + 1, column=col, sticky='w', padx=padx)
+        self._error_label_dict[message] = widget
+        return None
+
+    def _display_default_text_or_check_format(
             self, var: StringVar, default_text: str, widget: Entry, secure: bool,
-            force_format=False, format_regex='', format_message=''
+            row: int, col: int, padx: int, format_regex='', format_message=''
             ) -> None:
         def clear_default(*args) -> None:
             if (widget.get() == default_text
-                    or force_format and widget.get() == format_message):
+                    or format_message and widget.get() == format_message):
                 widget.config(textvariable=var)
                 widget.config(fg='black')
                 if secure:
                     widget.config(show='*')
+            if var.get() and format_regex and not search(format_regex, var.get()):
+                if format_message not in self._error_label_dict:
+                    self._error_label(format_message, row, col, padx)
             return None
 
-        def display_default_or_check_input(*args) -> None:
+        def display_default_or_check_format(*args) -> None:
             if widget.get() == '':
-                widget.config(textvariable='')
+                widget.config(textvariable='', fg='grey')
                 widget.insert(0, default_text)
-                widget.config(fg='grey')
                 if secure:
                     widget.config(show='')
-                if default_text in self._required_input:
-                    self._required_input[default_text] = ''
-            elif force_format and not search(format_regex, widget.get()):
-                widget.config(textvariable='')
+            elif format_regex and not search(format_regex, widget.get()):
+                if format_message in self._error_label_dict:
+                    error_widget = self._error_label_dict[format_message]
+                    error_widget.destroy()
+                    del self._error_label_dict[format_message]
+                widget.config(textvariable='', fg='red')
                 widget.delete(0, 'end')
                 widget.insert(0, format_message)
-                widget.config(fg='red')
-                if default_text in self._required_input:
-                    self._required_input[default_text] = ''
-            else:
-                if default_text in self._required_input:
-                    self._required_input[default_text] = var.get()
             return None
 
         def on_window_open(*args) -> None:
@@ -107,66 +120,82 @@ class App:
 
         on_window_open()
         widget.bind('<FocusIn>', clear_default)
-        widget.bind('<FocusOut>', display_default_or_check_input)
+        widget.bind('<FocusOut>', display_default_or_check_format)
         return None
 
-    @staticmethod
-    def _set_force_regex(var: StringVar, regex: str) -> None:
+    def _set_force_regex(
+            self, var: StringVar, regex: str, message: str,
+            row: int, col: int, padx: int
+            ) -> None:
         def force_regex(*args) -> None:
             value = var.get()
             if not search(regex, value):
-                var.set(value[:-1])
+                if message not in self._error_label_dict:
+                    self._error_label(message, row, col, padx)
+            else:
+                if message in self._error_label_dict:
+                    widget = self._error_label_dict[message]
+                    widget.destroy()
+                    del self._error_label_dict[message]
             return None
         var.trace_add('write', force_regex)
         return None
 
     def _entry_box(
             self, default_text: str, regex: str, width: int,
-            row: Union[int, Tuple[int, int]], col: int,
-            padx: int, pady: int, secure=False,
-            force_format=False, format_regex='', format_message=''
+            row: int, col: int, padx: int, pady: int, secure=False,
+            format_regex='', format_message=''
             ) -> Entry:
         widget = Entry(self._root_frame, width=width)
         widget.grid(row=row, column=col, sticky='w', padx=padx, pady=pady)
-        var = self._user_input[default_text]
-        self._display_default_text(
-            var, default_text, widget, secure, force_format, format_regex, format_message)
-        self._set_force_regex(var, regex)
+        if default_text in self._required_input:
+            var = self._required_input[default_text]
+        else:
+            var = self._user_input[default_text]
+        self._display_default_text_or_check_format(
+            var, default_text, widget, secure, row, col, padx, format_regex, format_message)
+        self._set_force_regex(var, regex, format_message, row, col, padx)
         return widget
 
     def _user_form(self, row: int, col: int, padx: int, pady: int, width: int) -> None:
-        Label(self._root_frame, text='Personal Information').grid(
-            row=row, column=col, sticky='w',
-            padx=padx, pady=pady
-            )
-        self._entry_box('First Name', '^[A-Z]{0,1}[a-z]*$', width, row + 1, col, padx, pady)
-        self._entry_box('Last Name', '^[A-Z]{0,1}[a-z]*$', width, row + 1, col + 1, padx, pady)
+        Label(self._root_frame, text='Personal Information')\
+            .grid(row=row, column=col, sticky='w', padx=padx, pady=pady)
+        self._entry_box(
+            'First Name', '^[A-Z]{0,1}[a-z]*$',
+            width, row + 1, col, padx, pady,
+            format_regex='^[A-Za-z][a-z]+$',
+            format_message='First name is invalid.')
+        self._entry_box(
+            'Last Name', '^[A-Z]{0,1}[a-z]*$',
+            width, row + 1, col + 1, padx, pady,
+            format_regex='^[A-Za-z][a-z]+$',
+            format_message='Last name is invalid.')
         self._entry_box(
             'Email Address',
             '^[0-9a-z](?!.*?\.\.)(?!.*?@\.)(?!.*?\.@)[0-9a-z\.]*[0-9a-z]*@{0,1}[a-z]*\.{0,1}[a-z]*$',
-            width, row + 2, col, padx, pady,
-            force_format=True, format_regex='^[a-z0-9]+@[a-z]+\.[a-z]$',
+            width, row + 3, col, padx, pady,
+            format_regex='^[a-z0-9]+@[a-z]+\.[a-z]$',
             format_message='Email format must be "username@domain.extension."')
         self._entry_box(
             'Phone Number', '^[0-9]{0,10}$',
-            width, row + 2, col + 1, padx, pady,
-            force_format=True, format_regex='^[0-9]{10}$',
+            width, row + 3, col + 1, padx, pady,
+            format_regex='^[0-9]{10}$',
             format_message='Phone number must be 10 digits.')
         self._entry_box(
             'Street Address',
-            '(?!.*?  )(?!.*?,,)(?!.*? ,)^[0-9A-Za-z][0-9A-Za-z ,]*$',
-            width, row + 3, col, padx, pady)
-        self._entry_box('City', '^[A-Z]{0,1}[a-z]*$', width, row + 3, col + 1, padx, pady)
-        self._entry_box('State', '^[A-Z]{0,1}[a-z]*$', width, row + 4, col, padx, pady)
-        self._entry_box('Postal Code', '^[0-9]+$', width, row + 4, col + 1, padx, pady)
-        self._entry_box('Country', '(?!.*?  )^[A-Za-z][A-Za-z ]*$', width, row + 5, col, padx, pady)
-        self._entry_box('Country Code', '^[0-9]+$', width, row + 5, col + 1, padx, pady)
-        Label(self._root_frame, text='Portfolio').grid(
-            row=row + 6, column=col, sticky='w',
-            padx=padx, pady=pady
-            )
-        self._entry_box('LinkedIn', '', width, row + 7, col, padx, pady)
-        self._entry_box('Website', '', width, row + 7, col + 1, padx, pady)
+            '(?!.*?  )(?!.*?,,)(?!.*? ,)^[0-9]*[0-9A-Za-z ,]*$',
+            width, row + 5, col, padx, pady,
+            format_regex='(?!.*?  )^[0-9]+ [0-9A-Za-z ]+$',
+            format_message='Invalid street address')
+        self._entry_box('City', '^[A-Z]{0,1}[a-z]*$', width, row + 5, col + 1, padx, pady)
+        self._entry_box('State', '^[A-Z]{0,1}[a-z]*$', width, row + 7, col, padx, pady)
+        self._entry_box('Postal Code', '^[0-9]+$', width, row + 7, col + 1, padx, pady)
+        self._entry_box('Country', '(?!.*?  )^[A-Za-z][A-Za-z ]*$', width, row + 9, col, padx, pady)
+        self._entry_box('Country Code', '^[0-9]+$', width, row + 9, col + 1, padx, pady)
+        Label(self._root_frame, text='Portfolio')\
+            .grid(row=row + 11, column=col, sticky='w', padx=padx, pady=pady)
+        self._entry_box('LinkedIn', '', width, row + 12, col, padx, pady)
+        self._entry_box('Website', '', width, row + 12, col + 1, padx, pady)
         # skills
         return None
 
@@ -186,6 +215,7 @@ if __name__ == '__main__':
     root_window = Tk()
     root_window.geometry('')
     root_window.title('Indeed Crawler')
+    root_window.bind_all("<Button-1>", lambda event: event.widget.focus_set())
     root_window.iconbitmap(COOL_ROBOT_EMOJI)
     App(root_window)
     root_window.mainloop()
