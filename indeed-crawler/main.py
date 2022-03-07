@@ -1,8 +1,11 @@
 from json import load
 from re import search
-from tkinter import BooleanVar, Button, Entry, Frame, IntVar, Label, Scrollbar, StringVar, Text, Tk
+from tkinter import (
+    BooleanVar, Button, Checkbutton, Entry, Frame,
+    IntVar, Label, Scrollbar, StringVar, Text, Tk)
 from typing import Dict, List, Tuple, Union
 
+from PIL import ImageTk, Image
 from run_crawler2 import RunCrawler
 
 COOL_ROBOT_EMOJI = 'icon/cool_robot_emoji.ico'
@@ -19,18 +22,21 @@ class App:
             'First Name': StringVar(), 'Last Name': StringVar(),
             'Email Address': StringVar(), 'Phone Number': StringVar(),
             'City': StringVar(), 'State': StringVar(), 'Country': StringVar(),
-            'Education': StringVar(), 'Indeed Login': StringVar(), 'Indeed Password': StringVar(),
-            'Job Search': StringVar(), 'Job Location': StringVar(),
-            'Number of Job Applications': IntVar()
+            'Highest Education': StringVar(),
+            'Indeed Login': StringVar(), 'Indeed Password': StringVar(),
+            'Search Job(s) (Comma Separated)': StringVar(),
+            'Search State(s)/Region(s) (Comma Separated)': StringVar(),
+            'Search Country': StringVar(),
+            'Number of Jobs': StringVar()
         }
         self._dict_difference(self._user_input, self._required_input)
         self._invalid_input = False
         self._crawler_instance_args = {
-            'number_of_jobs': IntVar(),
-            'auto_answer_questions': BooleanVar(),
-            'manually_fill_out_questions': BooleanVar(),
+            'number_of_jobs': 0,
+            'auto_answer_questions': True,
+            'manually_fill_out_questions': False,
             'default_q_and_a': {},
-            'debug': BooleanVar()
+            'debug': False
             }
         self._crawler_search_args = {
             'query': StringVar(),
@@ -94,6 +100,7 @@ class App:
             return None
 
         def display_default_or_check_format(*args) -> None:
+            print(var.get())
             if widget.get() == '':
                 widget.config(textvariable='', fg='grey')
                 widget.insert(0, default_text)
@@ -146,10 +153,10 @@ class App:
     def _entry_box(
             self, default_text: str, regex: str, width: int,
             row: int, col: int, padx: int, pady: int, secure=False,
-            format_regex='', format_message=''
+            format_regex='', format_message='', colspan=1
             ) -> Entry:
         widget = Entry(self._root_frame, width=width)
-        widget.grid(row=row, column=col, sticky='w', padx=padx, pady=pady)
+        widget.grid(row=row, column=col, columnspan=colspan, sticky='w', padx=padx, pady=pady)
         if default_text in self._required_input:
             var = self._required_input[default_text]
         else:
@@ -169,7 +176,7 @@ class App:
                 self._required_input.update({f'{title} {entry_n}': StringVar()})
                 entry_widget = self._entry_box(
                     f'{title} {entry_n}', '',
-                    width, row + 2*len(entry_list), col + 1 + i, padx, pady,)
+                    width, row + 2*len(entry_list), col + i, padx, pady,)
                 entry_widgets.append(entry_widget)
             entry_list.append(entry_widgets)
         return None
@@ -296,13 +303,88 @@ class App:
             format_message='Invalid country code.')
         self._add_and_remove_widget(
             'Skills/Experience', ['Skill', 'Experience'], self._skill_entry_list,
-            width, row, col + 2, padx, pady, 8)
+            width, row, col + 2, padx, pady, 6)
         self._add_and_remove_widget(
             'Languages', ['Language'], self._lang_entry_list,
-            width, row, col + 5, padx, pady, 8)
+            width, row, col + 5, padx, pady, 6)
         self._add_and_remove_widget(
             'Cert/Lic', ['Cert/License'], self._cert_entry_list,
-            width, row, col + 8, padx, pady, 8)
+            width, row, col + 8, padx, pady, 6)
+        self._entry_box(
+            'Desired Salary',
+            '^[0-9]*$',
+            width, row + 13, col + 2, padx, pady,
+            format_regex='^[0-9]+$',
+            format_message='Invalid salary.')
+        self._entry_box(
+            'Salary Type', '',
+            width, row + 13, col + 3, padx, pady)
+        self._entry_box(
+            'Currency', '',
+            width, row + 13, col + 5, padx, pady)
+        self._entry_box(
+            'Employment Type', '',
+            width, row + 15, col + 2, padx, pady)
+        self._entry_box(
+            'Hours per Week', '',
+            width, row + 15, col + 3, padx, pady)
+        self._entry_box(
+            'Start Date', '',
+            width, row + 15, col + 5, padx, pady)
+        self._entry_box(
+            'Interview Date & Time', '',
+            width, row + 15, col + 8, padx, pady)
+        self._user_input['18 Years or Older'] = IntVar()
+        Checkbutton(
+            self._root_frame, text='18 Years or Older',
+            variable=self._user_input['18 Years or Older'])\
+            .grid(row=row + 17, column=col, sticky='w', padx=padx, pady=pady)
+        self._user_input['Req. Sponsorship'] = IntVar()
+        Checkbutton(
+            self._root_frame, text='Req. Sponsorship',
+            variable=self._user_input['Req. Sponsorship']) \
+            .grid(row=row + 17, column=col + 1, sticky='w', padx=padx, pady=pady)
+        self._user_input['Eligible to Work'] = IntVar()
+        Checkbutton(
+            self._root_frame, text='Eligible to Work',
+            variable=self._user_input['Eligible to Work']) \
+            .grid(row=row + 17, column=col + 2, sticky='w', padx=padx, pady=pady)
+        self._user_input['Remote'] = IntVar()
+        Checkbutton(
+            self._root_frame, text='Remote',
+            variable=self._user_input['Remote']) \
+            .grid(row=row + 17, column=col + 3, sticky='w', padx=padx, pady=pady)
+        self._entry_box(
+            'Search Job(s) (Comma Separated)', '',
+            7 * width, row + 18, col, padx, pady, colspan=10)
+        self._user_input['Job(s) to Avoid (Comma Separated)'] = StringVar()
+        self._entry_box(
+            'Job(s) to Avoid (Comma Separated)', '',
+            7 * width, row + 19, col, padx, pady, colspan=10)
+        self._user_input['Companies to Avoid (Comma Separated)'] = StringVar()
+        self._entry_box(
+            'Companies to Avoid (Comma Separated)', '',
+            7 * width, row + 20, col, padx, pady, colspan=10)
+        self._entry_box(
+            'Search State(s)/Region(s) (Comma Separated)', '',
+            6 * width - padx // 2, row + 21, col, padx, pady, colspan=9)
+        self._entry_box(
+            'Search Country', '',
+            width, row + 21, col + 8, padx, pady)
+        self._entry_box(
+            'Indeed Login', '',
+            width, row + 22, col, padx, pady)
+        self._entry_box(
+            'Indeed Password', '',
+            width, row + 22, col + 1, padx, pady)
+        self._entry_box(
+            'Number of Jobs', '',
+            width, row + 22, col + 2, padx, pady)
+        cool_glasses = Button(self._root_frame, command=self._start_crawling)
+        image = ImageTk.PhotoImage(Image.open(COOL_GLASSES_EMOJI))
+        cool_glasses.image = image
+        cool_glasses.configure(image=image)
+        cool_glasses.grid(row=row + 22, column=col + 8, sticky='e', padx=padx, pady=pady)
         return None
 
     def _setup_log_box(self, row: int, col: int, padx: int, pady: int) -> None:
@@ -315,6 +397,9 @@ class App:
         self._log_box.insert('end', 'Please fill out the above information.')
         self._log_box.configure(state='disabled')
         return None
+
+    def _start_crawling(self) -> None:
+        pass
 
 
 if __name__ == '__main__':

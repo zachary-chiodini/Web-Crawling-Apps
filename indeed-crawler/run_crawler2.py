@@ -6,8 +6,6 @@ from pandas import DataFrame
 from helper_funs import append_df_to_excel
 from indeed_crawler import IndeedCrawler
 
-DEBUG = False
-
 
 class RunCrawler:
 
@@ -22,7 +20,8 @@ class RunCrawler:
             negate_jobs_list: List[str] = [],
             negate_companies_list: List[str] = [],
             auto_answer_questions=True,
-            manually_fill_out_questions=False):
+            manually_fill_out_questions=False,
+            debug=False):
         self._email = email
         self._password = password
         self._queries = queries
@@ -31,7 +30,7 @@ class RunCrawler:
         self._negate_companies_list = negate_companies_list
         self._total_number_of_jobs = total_number_of_jobs
         self._indeed_crawler = IndeedCrawler(
-            debug=DEBUG,
+            debug=debug,
             number_of_jobs=self._jobs_per_query(total_number_of_jobs),
             default_q_and_a=default_q_and_a,
             auto_answer_questions=auto_answer_questions,

@@ -120,7 +120,7 @@
             "What is your desired employment status?": "",
             "Are you looking for a full-time or a part-time position?": ""
       },
-      "Hours": {
+      "Hours per Week": {
             "How many hours per week (on average) are you available to work?": "",
             "Hours per week you are available to work?": "",
             "What is your availability": "",
@@ -132,19 +132,19 @@
             "Date available to begin work": "",
             "What is your projected start date?": ""
       },
-      "Interview Date": {
+      "Interview Date & Time": {
             "Please list 2-3 dates and time ranges that you could do an interview.": ""
       },
-      "Of Legal Age": {
+      "18 Years or Older": {
             "Are you over the age of 18?": "",
             "Are you 18 years of age or older?": ""
       },
-      "Sponsorship": {
+      "Req. Sponsorship": {
             "Do you currently require sponsorship to work in [BLANK]?": "",
             "Will you now or in the future require sponsorship for employment visa status in [BLANK]?": "",
             "Do you currently or will you in the future require visa sponsorship to work in [BLANK]?": ""
       },
-      "Eligibility": {
+      "Eligible to Work": {
             "Are you legally eligible to work in [BLANK]?": "",
             "Are you legally entitled to work in [BLANK]?": "",
             "Are you legally authorized to work in [BLANK]": "",
