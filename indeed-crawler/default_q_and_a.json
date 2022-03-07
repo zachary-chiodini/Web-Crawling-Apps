@@ -84,30 +84,35 @@
       "Skills Other": {
             "Do you have at least one year of experience in [BLANK]?": ""
       },
-      "Education": {
+      "Highest Education": {
             "What is the highest level of education you have completed?": "",
             "Highest Education Obtained": ""
+      },
+      "Clearance": {
+            "Do you have a valid Secret Level or Higher Security Clearance?": "",
+            "Do you have an active security clearance?": ""
+      },
+      "Valid Driver's Licence": {
+            "Do you possess a valid drivers license and have a safe driving record?": "",
+            "Do you have a valid Driver's License?": "",
+            "Do you have the following license or certification: Driver's License?": ""
       },
       "Certifications/Licenses": {
             "Do you have a valid [BLANK] certification?": "",
             "Are you certified in [BLANK]": "",
             "Do you have a valid [BLANK] License?": ""
       },
-      "Clearance": {
-            "Do you have a valid Secret Level or Higher Security Clearance?": "",
-            "Do you have an active security clearance?": ""
-      },
       "Language": {
             "Do you speak [BLANK]?": ""
       },
-      "Salary": {
+      "Desired Salary": {
             "What are you salary expectations for this role?": "",
             "What are your salary expectations?": "",
             "What is your desired salary?": "",
             "Please enter the amount": "",
             "What are your compensation expectations for this position?": ""
       },
-      "Pay Type": {
+      "Salary Type": {
             "Desired Pay": ""
       },
       "Currency": {
@@ -142,11 +147,6 @@
       },
       "Interview Date": {
             "Please list 2-3 dates and time ranges that you could do an interview.": ""
-      },
-      "Licence": {
-            "Do you possess a valid drivers license and have a safe driving record?": "",
-            "Do you have a valid Driver's License?": "",
-            "Do you have the following license or certification: Driver's License?": ""
       },
       "Transportation": {
             "Will you be able to reliably commute to or relocate to the job site?": "",

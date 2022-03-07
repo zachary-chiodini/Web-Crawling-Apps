@@ -11,10 +11,12 @@ DEBUG = False
 
 
 queries: List[str] = [
+    'Junior Scrum Master', 'Scrum Master', 'Entry Level Scrum Master'
 ]
 
 Location, Country = str, str
 places: List[Tuple[Location, Country]] = [
+    ('remote', 'united states')
 ]
 
 negate_jobs: List[str] = [
@@ -37,8 +39,8 @@ indeed_crawler = IndeedCrawler(
 
 indeed_crawler.setup_browser()
 indeed_crawler.login(
-    email='',
-    password=''
+    email='timothy.gallagher6@outlook.com',
+    password='MY_P4$$W0RD123'
     )
 
 abort = False
@@ -57,7 +59,7 @@ while not abort:
                     min_salary='',
                     enforce_salary=False,  # consider only jobs with salary listed
                     exp_lvl='',  # entry_level, mid_level, #senior_level
-                    remote='',
+                    remote=False,
                     temp_remote=False,
                     country=country,
                     location=region,

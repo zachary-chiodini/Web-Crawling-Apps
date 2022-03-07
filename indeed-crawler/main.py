@@ -3,6 +3,8 @@ from re import search
 from tkinter import BooleanVar, Button, Entry, Frame, IntVar, Label, Scrollbar, StringVar, Text, Tk
 from typing import Dict, List, Tuple, Union
 
+from run_crawler2 import RunCrawler
+
 COOL_ROBOT_EMOJI = 'icon/cool_robot_emoji.ico'
 COOL_GLASSES_EMOJI = 'icon/cool_glasses.png'
 
@@ -19,8 +21,7 @@ class App:
             'City': StringVar(), 'State': StringVar(), 'Country': StringVar(),
             'Education': StringVar(), 'Indeed Login': StringVar(), 'Indeed Password': StringVar(),
             'Job Search': StringVar(), 'Job Location': StringVar(),
-            'Number of Job Applications': IntVar(),
-            'Skill': StringVar(), 'Experience': IntVar()
+            'Number of Job Applications': IntVar()
         }
         self._dict_difference(self._user_input, self._required_input)
         self._invalid_input = False
@@ -47,7 +48,7 @@ class App:
         self._skill_entry_list: List[Tuple[Entry, Entry]] = []
         self._root_frame = Frame(root_window_)
         self._root_frame.pack(expand=True)
-        self._user_form(0, 0, 10, 10, 50)
+        self._user_form(0, 0, 10, 10, 20)
         # self._log_box = Text(self._root_frame, height=10, width=100)
         # self._setup_log_box(10, 0, 10, 10)
 
@@ -156,36 +157,56 @@ class App:
         self._set_force_regex(var, regex, format_message, row, col, padx)
         return widget
 
-    def _add_skill(self, width, row, col, padx, pady) -> None:
-        skill_widget = self._entry_box(
-            'Skill',
-            '(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]*$',
-            width, row, col, padx, pady,
-            format_regex='(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]+$',
-            format_message='Skill is invalid.')
-        exp_widget = self._entry_box(
-            'Experience',
-            '^[0-9]*$',
-            width, row, col, padx, pady,
-            format_regex='^[0-9]+$',
-            format_message='Experience must be in years.')
-        self._skill_entry_list.append((skill_widget, exp_widget))
+    def _add_skill(self, width: int, row: int, col: int, padx: int, pady: int) -> None:
+        if len(self._skill_entry_list) < 5:
+            skill_n = len(self._skill_entry_list) + 1
+            self._required_input.update({f'Skill {skill_n}': StringVar(),
+                                         f'Experience {skill_n}': StringVar()})
+            skill_widget = self._entry_box(
+                f'Skill {skill_n}',
+                '(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]*$',
+                width, row + 2*len(self._skill_entry_list), col + 1, padx, pady,
+                format_regex='(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]+$',
+                format_message=f'Skill {skill_n} is invalid.')
+            exp_widget = self._entry_box(
+                f'Experience {skill_n}',
+                '^[0-9]*$',
+                width, row + 2*len(self._skill_entry_list), col + 2, padx, pady,
+                format_regex='^[0-9]+$',
+                format_message=f'Experience {skill_n} must be in years.')
+            self._skill_entry_list.append((skill_widget, exp_widget))
         return None
 
     def _remove_skill(self) -> None:
-        if self._skill_entry_list:
+        if len(self._skill_entry_list) > 1:
             skill_widget, exp_widget = self._skill_entry_list.pop(-1)
             skill_widget.destroy()
             exp_widget.destroy()
         return None
 
-    def _add_remove_skill_buttons(self, width, row, col, padx, pady) -> None:
+    def _add_and_remove_skill_buttons(
+            self, skills_and_exp_frame: Frame,
+            width: int, row: int, col: int, padx: int, pady: int
+            ) -> None:
         Button(
-            self._root_frame, text='+',
-            command=lambda *args: self._add_skill(width, row, col, padx, pady)
-            ).grid(row=row, column=col, sticky='w', padx=padx, pady=pady)
-        Button(self._root_frame, text='-', command=self._remove_skill)\
-            .grid(row=row + 1, column=col, sticky='w', padx=padx, pady=pady)
+            skills_and_exp_frame, text='+', width=2,
+            command=lambda *args: self._add_skill(width, row + 1, col, padx, pady)
+            ).grid(row=row, column=col + 1, sticky='w', padx=0, pady=pady)
+        Button(skills_and_exp_frame, text='-', width=2,
+               command=self._remove_skill
+               ).grid(row=row, column=col + 2, sticky='w', padx=padx, pady=pady)
+        self._add_skill(width, row + 1, col, padx, pady)
+        return None
+
+    def _skills_and_experience_widget(
+            self, width: int, row: int, col: int, padx: int, pady: int
+            ) -> None:
+        skills_and_exp_frame = Frame(self._root_frame)
+        skills_and_exp_frame.grid(row=row, column=col, columnspan=3, sticky='w')
+        Label(skills_and_exp_frame, text='Skills/Experience') \
+            .grid(row=row, column=col, sticky='w', padx=padx, pady=pady)
+        self._add_and_remove_skill_buttons(
+            skills_and_exp_frame, width, row, col, padx, pady)
         return None
 
     def _user_form(self, row: int, col: int, padx: int, pady: int, width: int) -> None:
@@ -215,10 +236,10 @@ class App:
             format_message='Job title is invalid.')
         self._entry_box(
             'Email Address',
-            '^[0-9a-z](?!.*?\.\.)(?!.*?@\.)(?!.*?\.@)[0-9a-z\.]*[0-9a-z]*@{0,1}[a-z]*\.{0,1}[a-z]*$',
+            '(?!.*?\.\.)(?!.*?@\.)(?!.*?\.@)^[0-9a-z]{0,1}[0-9a-z\.]*[0-9a-z]*@{0,1}[a-z]*\.{0,1}[a-z]*$',
             width, row + 5, col, padx, pady,
             format_regex='^[a-z0-9]+@[a-z]+\.[a-z]$',
-            format_message='Email format must be "username@domain.extension."')
+            format_message='Invalid email address.')
         self._entry_box(
             'Phone Number', '^[0-9]{0,10}$',
             width, row + 5, col + 1, padx, pady,
@@ -260,12 +281,23 @@ class App:
             width, row + 11, col + 1, padx, pady,
             format_regex='^[0-9]+$',
             format_message='Invalid country code.')
+        self._entry_box(
+            'Highest Education',
+            "(?!.*?  )(?!.*?'')^[A-Za-z]{0,1}[A-Za-z ']*$",
+            width, row + 13, col, padx, pady,
+            format_regex="(?!.*?  )(?!.*?'')^[A-Za-z]{0,1}[A-Za-z ']+$",
+            format_message='Invalid country code.')
+        self._entry_box(
+            'Clearance',
+            '(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]*$',
+            width, row + 13, col + 1, padx, pady,
+            format_regex='(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]+$',
+            format_message='Invalid country code.')
         Label(self._root_frame, text='Portfolio')\
-            .grid(row=row + 13, column=col, sticky='w', padx=padx, pady=pady)
-        self._entry_box('LinkedIn', '', width, row + 14, col, padx, pady)
-        self._entry_box('Website', '', width, row + 14, col + 1, padx, pady)
-        Label(self._root_frame, text='Skills/Experience') \
-            .grid(row=row + 16, column=col, sticky='w', padx=padx, pady=pady)
+            .grid(row=row + 15, column=col, sticky='w', padx=padx, pady=pady)
+        self._entry_box('LinkedIn', '', width, row + 16, col, padx, pady)
+        self._entry_box('Website', '', width, row + 16, col + 1, padx, pady)
+        self._skills_and_experience_widget(width, row, col + 2, padx, pady)
         return None
 
     def _setup_log_box(self, row: int, col: int, padx: int, pady: int) -> None:
