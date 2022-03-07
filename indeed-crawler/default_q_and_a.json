@@ -48,7 +48,8 @@
       "State": {
             "State/Province": "",
             "State": "",
-            "In which state do you reside as a permanent resident?": ""
+            "In which state do you reside as a permanent resident?": "",
+            "In which state do you reside?": ""
       },
       "City and State": {
             "Where are you currently located?": ""
@@ -66,7 +67,8 @@
             "Country": ""
       },
       "Country Code": {
-            "What is your country code?": ""
+            "What is your country code?": "",
+            "Country code": ""
       },
       "LinkedIn": {
             "LinkedIn URL": "",
@@ -91,11 +93,6 @@
       "Clearance": {
             "Do you have a valid Secret Level or Higher Security Clearance?": "",
             "Do you have an active security clearance?": ""
-      },
-      "Valid Driver's Licence": {
-            "Do you possess a valid drivers license and have a safe driving record?": "",
-            "Do you have a valid Driver's License?": "",
-            "Do you have the following license or certification: Driver's License?": ""
       },
       "Certifications/Licenses": {
             "Do you have a valid [BLANK] certification?": "",
@@ -123,16 +120,6 @@
             "What is your desired employment status?": "",
             "Are you looking for a full-time or a part-time position?": ""
       },
-      "Overtime": {
-            "Are you willing to work overtime?": "",
-            "If required, will you work overtime?": ""
-      },
-      "Weekends": {
-            "Are you willing to work weekends?": "",
-            "Are you available to work weekends (Saturday and/or Sunday)?": "",
-            "Are you willing to work a variable schedule including weekends?": "",
-            "Can you work 1 weekend day and holidays?": ""
-      },
       "Hours": {
             "How many hours per week (on average) are you available to work?": "",
             "Hours per week you are available to work?": "",
@@ -147,14 +134,6 @@
       },
       "Interview Date": {
             "Please list 2-3 dates and time ranges that you could do an interview.": ""
-      },
-      "Transportation": {
-            "Will you be able to reliably commute to or relocate to the job site?": "",
-            "Do you have your own transportation?": "",
-            "Do you have a reliable means of transportation?": ""
-      },
-      "Travel": {
-            "What percentage of the time are you willing to travel for work?": ""
       },
       "Of Legal Age": {
             "Are you over the age of 18?": "",
@@ -242,6 +221,20 @@
             "By completing this application, I give this employer the permission to validate some of my answers with the appropriate authorities/institutions.": "I agree",
             "This is an employer-written question. You can report inappropriate questions to Indeed through the \"Report Job\" link at the bottom of the job description.": "Prefer not to answer",
             "I certify that all of the information furnished on this application and during the application process is true, complete and correct to the best of my knowledge. I understand that any misrepresentation or omission of facts called for may result in refusal to hire or, if hired, may result in my dismissal at any time regardless of when the false answer or omissions are discovered.": "Yes",
-            "I recognize that this employment application is not an offer of employment. I agree that if I am hired by the Company, I will be an at-will employee, meaning that either the Company or I may end the employment relationship at any time with or without cause or notice.": "Yes"
+            "I recognize that this employment application is not an offer of employment. I agree that if I am hired by the Company, I will be an at-will employee, meaning that either the Company or I may end the employment relationship at any time with or without cause or notice.": "Yes",
+            "Valid Driver's Licence": "Yes",
+            "Do you possess a valid drivers license and have a safe driving record?": "Yes",
+            "Do you have a valid Driver's License?": "Yes",
+            "Do you have the following license or certification: Driver's License?": "Yes",
+            "Are you willing to work overtime?": "Yes",
+            "If required, will you work overtime?": "Yes",
+            "Are you willing to work weekends?": "Yes",
+            "Are you available to work weekends (Saturday and/or Sunday)?": "Yes",
+            "Are you willing to work a variable schedule including weekends?": "Yes",
+            "Can you work 1 weekend day and holidays?": "Yes",
+            "Will you be able to reliably commute to or relocate to the job site?": "Yes",
+            "Do you have your own transportation?": "Yes",
+            "Do you have a reliable means of transportation?": "Yes",
+            "What percentage of the time are you willing to travel for work?": "100%"
       }
 }
