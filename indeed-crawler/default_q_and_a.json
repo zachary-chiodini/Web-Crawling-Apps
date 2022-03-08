@@ -16,7 +16,8 @@
             "How may we pronounce your name?": ""
       },
       "Email Address": {
-            "Email": ""
+            "Email": "",
+            "Email Address": ""
       },
       "Phone Number": {
             "Phone Number": "",
@@ -40,7 +41,8 @@
             "What is your current location?": "",
             "Address 1": "",
             "Address 2": "",
-            "Address": ""
+            "Address": "",
+            "Home Address": ""
       },
       "City": {
             "City": ""
@@ -130,7 +132,8 @@
             "Date Available": "",
             "Projected start date": "",
             "Date available to begin work": "",
-            "What is your projected start date?": ""
+            "What is your projected start date?": "",
+            "When are you available to start in this role?": ""
       },
       "Interview Date & Time": {
             "Please list 2-3 dates and time ranges that you could do an interview.": ""
@@ -202,6 +205,7 @@
             "I understand this role requires me to be fully vaccinated for COVID-19, to provide proof of vaccination prior to beginning employment and that I will abide by this requirement.": "Yes",
             "Are you fully vaccinated against or willing to undergo weekly testing for COVID-19?": "Yes",
             "Please describe your ethnicity": "I do not wish to answer",
+            "Please describe your gender": "I do not wish to answer",
             "Race/Ethnicity": "Decline To Self Identify",
             "Please identify your ethnicity. Are you Hispanic or Latino?": "I choose not to disclose",
             "Ethnic Background": "I choose not to disclose",
@@ -235,6 +239,10 @@
             "Will you be able to reliably commute to or relocate to the job site?": "Yes",
             "Do you have your own transportation?": "Yes",
             "Do you have a reliable means of transportation?": "Yes",
-            "What percentage of the time are you willing to travel for work?": "100%"
+            "What percentage of the time are you willing to travel for work?": "100%",
+            "We may use SMS during the hiring process. Do you give us permission to text you at the mobile number provided? Message and data rates may apply. Reply 'STOP' at any time if you no longer wish to receive text messages regarding this job.": "Yes",
+            "How did you find out about this role?": "Indeed",
+            "Have you ever been terminated from or asked to leave any previous position?": "No",
+            "If extended a job offer, are you willing to submit to a detailed background check and drug screen?": "Yes"
       }
 }

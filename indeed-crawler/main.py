@@ -39,16 +39,16 @@ class App:
             'debug': False
             }
         self._crawler_search_args = {
-            'query': StringVar(),
-            'enforce_query': BooleanVar(),
-            'job_title_negate_lst': [StringVar()],
-            'company_name_negate_lst': [StringVar()],
-            'job_type': StringVar(),
-            'min_salary': IntVar(),
-            'enforce_salary': BooleanVar(),
-            'exp_lvl': StringVar(),
-            'country': StringVar(),
-            'location': StringVar()
+            'query': '',
+            'enforce_query': False,
+            'job_title_negate_lst': [],
+            'company_name_negate_lst': [],
+            'job_type': '',
+            'min_salary': '',
+            'enforce_salary': False,
+            'exp_lvl': '',
+            'country': '',
+            'location': ''
         }
         self._error_label_dict: Dict[str, Label] = {}
         self._skill_entry_list: List[List[Entry]] = []
@@ -57,8 +57,8 @@ class App:
         self._root_frame = Frame(root_window_)
         self._root_frame.pack(expand=True)
         self._user_form(0, 0, 10, 10, 20)
-        # self._log_box = Text(self._root_frame, height=10, width=100)
-        # self._setup_log_box(10, 0, 10, 10)
+        #self._log_box = Text(self._root_frame, height=10, width=100)
+        #self._setup_log_box(10, 0, 10, 10)
 
     @staticmethod
     def _assign_instance_vars(user_input_ref: Dict, q_and_a_ref: Dict) -> None:
