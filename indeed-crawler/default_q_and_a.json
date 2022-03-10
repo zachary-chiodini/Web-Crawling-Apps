@@ -38,7 +38,6 @@
             "Current Job Title": ""
       },
       "Street Address": {
-            "What is your current location?": "",
             "Address 1": "",
             "Address 2": "",
             "Address": "",
@@ -53,8 +52,9 @@
             "In which state do you reside as a permanent resident?": "",
             "In which state do you reside?": ""
       },
-      "City and State": {
-            "Where are you currently located?": ""
+      "Full Address": {
+            "Where are you currently located?": "",
+            "What is your current location?": ""
       },
       "Postal Code": {
             "Postal/ZIP": "",
@@ -86,7 +86,8 @@
             "How many years of [BLANK] experience do you have?": ""
       },
       "Skills Other": {
-            "Do you have at least one year of experience in [BLANK]?": ""
+            "Do you have at least one year of experience in [BLANK]?": "",
+            "Do you have experience working with [BLANK]?": ""
       },
       "Highest Education": {
             "What is the highest level of education you have completed?": "",
@@ -145,7 +146,8 @@
       "Req. Sponsorship": {
             "Do you currently require sponsorship to work in [BLANK]?": "",
             "Will you now or in the future require sponsorship for employment visa status in [BLANK]?": "",
-            "Do you currently or will you in the future require visa sponsorship to work in [BLANK]?": ""
+            "Do you currently or will you in the future require visa sponsorship to work in [BLANK]?": "",
+            "Do you need sponsorship?": ""
       },
       "Eligible to Work": {
             "Are you legally eligible to work in [BLANK]?": "",
@@ -243,6 +245,16 @@
             "We may use SMS during the hiring process. Do you give us permission to text you at the mobile number provided? Message and data rates may apply. Reply 'STOP' at any time if you no longer wish to receive text messages regarding this job.": "Yes",
             "How did you find out about this role?": "Indeed",
             "Have you ever been terminated from or asked to leave any previous position?": "No",
-            "If extended a job offer, are you willing to submit to a detailed background check and drug screen?": "Yes"
+            "If extended a job offer, are you willing to submit to a detailed background check and drug screen?": "Yes",
+            "Please feel free to add anything else you'd like us to know about your candidacy below.": "Prefer not to answer",
+            "Do you have any relatives or friends who work at the company?": "No",
+            "Have you worked for this Company before?": "No",
+            "Will our posted salary range for this role meet your salary expectations?": "Yes",
+            "If Referral selected (Employee or Non employee), How do you know this person?": "Not referred",
+            "Have you ever directly or indirectly (through a third party staffing agency) worked for the company?": "No",
+            "Would you be willing to accept a travel assignment?": "Yes",
+            "Are you willing/able to relocate?": "Yes",
+            "To the terms and conditions above?": "Yes",
+            "Are you willing to submit to a criminal background check and drug test?": "Yes"
       }
 }
