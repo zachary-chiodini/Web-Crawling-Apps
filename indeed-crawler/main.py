@@ -468,7 +468,7 @@ class App:
                     question = question.replace('[BLANK]', cert_name)
                     answer = self._required_input[f'Cert/Lic {i}'].get()
                     if not answer:
-                        answer = 'No certification'
+                        answer = 'No'
                     input_q_and_a[question] = answer
                 del q_and_a_copy['Certifications/Licenses']
         search_country = self._required_input['Search Country'].get()
