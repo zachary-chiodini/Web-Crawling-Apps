@@ -456,16 +456,19 @@ class App:
                 del q_and_a_copy['Skills']
             if f'Language {i}' in self._required_input:
                 language_name = self._required_input[f'Language {i}'].get()
+                if not language_name:
+                    language_name = 'English'
                 for question in self._q_and_a['Language']:
                     question = question.replace('[BLANK]', language_name)
-                    answer = self._required_input[f'Language {i}'].get()
-                    input_q_and_a[question] = answer
+                    input_q_and_a[question] = 'Yes'
                 del q_and_a_copy['Language']
             if f'Cert/Lic {i}' in self._required_input:
                 cert_name = self._required_input[f'Cert/Lic {i}'].get()
                 for question in self._q_and_a['Certifications/Licenses']:
                     question = question.replace('[BLANK]', cert_name)
                     answer = self._required_input[f'Cert/Lic {i}'].get()
+                    if not answer:
+                        answer = 'No certification'
                     input_q_and_a[question] = answer
                 del q_and_a_copy['Certifications/Licenses']
         search_country = self._required_input['Search Country'].get()
