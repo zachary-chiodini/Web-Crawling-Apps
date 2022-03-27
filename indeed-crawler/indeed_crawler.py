@@ -1,7 +1,8 @@
 from os import path
 from re import compile as compile_regex, findall, search
 from time import sleep
-from traceback import print_exc
+from tkinter import Text
+from traceback import format_exc
 from typing import Callable, List, Optional, Set
 
 from bs4 import BeautifulSoup
@@ -37,7 +38,8 @@ class IndeedCrawler:
             debug=False,
             auto_answer_questions=False,
             manually_fill_out_questions=False,
-            default_q_and_a={}
+            default_q_and_a={},
+            log_box: Optional[Text] = None
             ) -> None:
         self.results = {
             'Title': [],
@@ -56,6 +58,7 @@ class IndeedCrawler:
             'united kingdom': 'uk.'
             }
         self._q_and_a = default_q_and_a
+        self._log_box = log_box
         self._df = DataFrame()
         self._browser = None
         self._sentence2vec = None
@@ -74,6 +77,16 @@ class IndeedCrawler:
         else:
             with open('cache.txt', 'w') as file:
                 pass
+
+    def log(self, message: str) -> None:
+        if self._log_box:
+            self.log_box.configure(state='normal')
+            self.log_box.delete(1.0, 'end')
+            self.log_box.insert('end', message)
+            self.log_box.configure(state='disabled')
+        else:
+            print(message)
+        return None
 
     def _setup_real_browser(self) -> None:
         kwargs = {
@@ -133,8 +146,7 @@ class IndeedCrawler:
                     )
             except (NoSuchWindowException, TimeoutException):
                 # A captcha was likely encountered.
-                print('The captcha and/or two-step verification must be done manually.'
-                      'Afterward, you must manually sign in.')
+                self._log('The captcha and/or two-step verification must be done manually. Afterward, you must manually sign in.')
                 WebDriverWait(self._browser, 600).until(
                     lambda driver: ('https://secure.indeed.com/settings' in driver.current_url
                                     or 'https://my.indeed.com/resume?from=login' in driver.current_url)
@@ -153,8 +165,7 @@ class IndeedCrawler:
                 )
         except (NoSuchWindowException, TimeoutException):
             # A captcha was likely encountered.
-            print('The captcha and/or two-step verification must be done manually.'
-                  'Afterward, you must manually sign in.')
+            self._log('The captcha and/or two-step verification must be done manually. Afterward, you must manually sign in.')
             WebDriverWait(self._browser, 600).until(
                 lambda driver: ('https://secure.indeed.com/settings' in driver.current_url
                                 or 'https://my.indeed.com/resume?from=login' in driver.current_url)
@@ -162,7 +173,7 @@ class IndeedCrawler:
         return None
 
     def _load_model(self) -> None:
-        print('Loading fasttext pretrained sentence/document embedding model ...')
+        self._log('Loading fasttext pretrained sentence/document embedding model. This may take a few minutes.')
         model = load_model('fasttext-model/cc.en.300.bin')
         self._sentence2vec: Callable[[NDArray[str]], NDArray[float32]] \
             = vectorize(model.get_sentence_vector, otypes=[float32], signature='()->(n)')
@@ -239,9 +250,9 @@ class IndeedCrawler:
                         NoSuchWindowException,
                         StaleElementReferenceException,
                         TimeoutException,
-                        WebDriverException):
+                        WebDriverException) as exception:
                     if self._debug:
-                        print_exc()
+                        self._log(str(exception))
                     if self._browser.current_window_handle != self._main_window:
                         self._browser.close()
                         self._browser.switch_to.window(self._main_window)
@@ -420,7 +431,7 @@ class IndeedCrawler:
         tab = self._browser.window_handles[-1]
         self._browser.switch_to.window(tab)
         self._browser.get(job_url)
-        WebDriverWait(self._browser, 600).until(
+        WebDriverWait(self._browser, wait).until(
             expected_conditions.element_to_be_clickable(
                 (By.XPATH, '//*[@id="indeedApplyButton"]')
                 )
@@ -484,7 +495,7 @@ class IndeedCrawler:
             radius: str = ''
             ) -> None:
         if self._number_of_jobs == 0:
-            print('Number of jobs is zero.')
+            self._log('Number of jobs is zero.')
             return None
         if self._auto_answer_questions and not self._sentence2vec:
             if self._q_and_a:
@@ -542,6 +553,7 @@ class IndeedCrawler:
                     self._browser.page_source).group()
             except AttributeError:
                 if infinite_loop:
+                    self._log('Infinite loop encountered.')
                     break
                 # captcha
                 current_url = self._browser.current_url
@@ -647,9 +659,9 @@ class IndeedCrawler:
                         NoSuchWindowException,
                         StaleElementReferenceException,
                         TimeoutException,
-                        WebDriverException):
+                        WebDriverException) as exception:
                     if self._debug:
-                        print_exc()
+                        self._log(str(exception))
                     if self._manually_fill_out_questions:
                         try:
                             WebDriverWait(self._browser, 600).until(
@@ -678,7 +690,7 @@ class IndeedCrawler:
                             self._browser.switch_to.window(self._main_window)
                         if job_jk not in self._cache:
                             self._cache_job(job_jk)
-                        print('FAILED to apply to job:', job_url)
+                        self._log(f'FAILED to apply to job: {job_url}')
                         continue
                 job_location = result_content.find(class_=compile_regex('companyLocation'))
                 if company_name:
@@ -696,7 +708,7 @@ class IndeedCrawler:
                     self._cache_job(job_jk)
                     batch_jobs_applied_to += 1
                     self.total_jobs_applied_to += 1
-                    print(f"You've applied to {self.total_jobs_applied_to} job(s).")
+                    self._log(f"You've applied to {self.total_jobs_applied_to} job(s).")
                 if batch_jobs_applied_to == self._number_of_jobs:
                     stop_search = True
                     break

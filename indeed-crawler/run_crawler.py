@@ -6,7 +6,7 @@ from pandas import DataFrame
 from helper_funs import append_df_to_excel
 from indeed_crawler import IndeedCrawler
 
-TOTAL_NUMBER_OF_JOBS = 50
+TOTAL_NUMBER_OF_JOBS = 10
 DEBUG = False
 
 

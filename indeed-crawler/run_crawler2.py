@@ -1,10 +1,13 @@
+from tkinter import Text
 from traceback import print_exc
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from pandas import DataFrame
 
 from helper_funs import append_df_to_excel
 from indeed_crawler import IndeedCrawler
+
+DEBUG = False
 
 
 class RunCrawler:
@@ -21,21 +24,40 @@ class RunCrawler:
             negate_companies_list: List[str] = [],
             auto_answer_questions=True,
             manually_fill_out_questions=False,
-            debug=False):
+            debug=False,
+            log_box: Optional[Text] = None):
         self._email = email
         self._password = password
         self._queries = queries
         self._places = places
-        self._negate_jobs_list = negate_jobs_list
-        self._negate_companies_list = negate_companies_list
-        self._total_number_of_jobs = total_number_of_jobs
+        self._log_box = log_box
+        self._negate_jobs_list = self._list_input_validation(negate_jobs_list)
+        self._negate_companies_list = self._list_input_validation(negate_companies_list)
+        self._total_number_of_jobs = int(total_number_of_jobs)
         self._indeed_crawler = IndeedCrawler(
             debug=debug,
-            number_of_jobs=self._jobs_per_query(total_number_of_jobs),
+            number_of_jobs=self._jobs_per_query(int(total_number_of_jobs)),
             default_q_and_a=default_q_and_a,
             auto_answer_questions=auto_answer_questions,
-            manually_fill_out_questions=manually_fill_out_questions
+            manually_fill_out_questions=manually_fill_out_questions,
+            log_box=self._log_box
             )
+
+    def log(self, message: str) -> None:
+        if self._log_box:
+            self.log_box.configure(state='normal')
+            self.log_box.delete(1.0, 'end')
+            self.log_box.insert('end', message)
+            self.log_box.configure(state='disabled')
+        else:
+            print(message)
+        return None
+
+    @staticmethod
+    def _list_input_validation(list_: List[str]):
+        if len(list_) == 1 and list_[0] == '':
+            return []
+        return list_
 
     def _jobs_per_query(self, total_number_of_jobs: int) -> int:
         jobs_per_query = int(total_number_of_jobs / (len(self._queries) * len(self._places)))
@@ -73,7 +95,7 @@ class RunCrawler:
                         if DEBUG:
                             print_exc()
                         else:
-                            print(str(e))
+                            self._log(str(e))
                     finally:
                         dataframe = DataFrame(data=indeed_crawler.results)
                         if not dataframe.empty:
