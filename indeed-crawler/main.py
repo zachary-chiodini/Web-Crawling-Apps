@@ -1,6 +1,7 @@
 from datetime import date
 from json import load
 from re import search
+from threading import Thread
 from tkinter import (
     BooleanVar, Button, Checkbutton, Entry, Frame,
     IntVar, Label, Scrollbar, StringVar, Text, Tk)
@@ -12,7 +13,7 @@ from helper_funs import center
 from run_crawler2 import RunCrawler
 from selfdestruct import SelfDestruct
 
-EXP_MONTH = '1'
+EXP_MONTH = '12'
 EXP_DAY = '12'
 EXP_YEAR = '2022'
 PROGRAM_EXPIRATION_DATE = date(int(EXP_YEAR), int(EXP_MONTH), int(EXP_DAY))
@@ -602,7 +603,8 @@ class App:
             default_q_and_a=input_q_and_a,
             log_box=self._log_box
         )
-        run_crawler.start()
+        new_thread = Thread(target=run_crawler.start)
+        new_thread.start()
         return None
 
 
