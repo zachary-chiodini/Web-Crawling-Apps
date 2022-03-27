@@ -87,6 +87,7 @@ class App:
         del q_and_a_copy['Private']
         for input_ in q_and_a_copy:
             user_input_ref[input_] = StringVar()
+        user_input_ref['Salary Type'].set('Annually')
         return None
 
     def _error_label(self, message: str, row: int, col: int, padx: int) -> None:
@@ -166,7 +167,7 @@ class App:
             self, default_text: str, regex: str, width: int,
             row: int, col: int, padx: int, pady: int, secure=False,
             format_regex='', format_message='', colspan=1, required=False,
-            **kwargs
+            disable=False, **kwargs
             ) -> Entry:
         widget = Entry(self._root_frame, width=width)
         widget.grid(row=row, column=col, columnspan=colspan, sticky='w', padx=padx, pady=pady, **kwargs)
@@ -183,6 +184,8 @@ class App:
         self._set_force_regex(var, regex, format_message, row, col, padx)
         if required:
             widget.config({'background': 'yellow'})
+        if disable:
+            widget.configure(state='disabled')
         return widget
 
     def _add_entry(
@@ -351,7 +354,7 @@ class App:
             format_message='Invalid salary.')
         self._entry_box(
             'Salary Type', '',
-            width, row + 7, col + 3, padx, pady)
+            width, row + 7, col + 3, padx, pady, disable=True)
         self._entry_box(
             'Currency', '',
             width, row + 7, col + 5, padx, pady)
