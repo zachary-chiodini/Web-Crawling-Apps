@@ -12,7 +12,7 @@ from helper_funs import center
 from run_crawler2 import RunCrawler
 from selfdestruct import SelfDestruct
 
-EXP_MONTH = '12'
+EXP_MONTH = '1'
 EXP_DAY = '12'
 EXP_YEAR = '2022'
 PROGRAM_EXPIRATION_DATE = date(int(EXP_YEAR), int(EXP_MONTH), int(EXP_DAY))
@@ -610,7 +610,7 @@ if __name__ == '__main__':
     current_date = date.today()
     if current_date >= PROGRAM_EXPIRATION_DATE:
         self_destruct = SelfDestruct('Indeed Crawler')
-        self_destruct.open_window('EXPIRATION DATE SUCCEEDED')
+        self_destruct.open_window('EXPIRATION DATE EXCEEDED')
     else:
         root_window = Tk()
         root_window.geometry('880x490')
