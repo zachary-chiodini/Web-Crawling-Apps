@@ -3,6 +3,6 @@ cache.txt
 questionnaire.xlsx
 submissions.xlsx
 account-details.txt
-main.spec
+job-crawler.spec
 build/*
 dist/*
