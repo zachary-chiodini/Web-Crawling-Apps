@@ -78,12 +78,11 @@ class IndeedCrawler:
             with open('cache.txt', 'w') as file:
                 pass
 
-    def log(self, message: str) -> None:
+    def _log(self, message: str) -> None:
         if self._log_box:
-            self.log_box.configure(state='normal')
-            self.log_box.delete(1.0, 'end')
-            self.log_box.insert('end', message)
-            self.log_box.configure(state='disabled')
+            self._log_box.configure(state='normal')
+            self._log_box.insert('end', f'\n{message}')
+            self._log_box.configure(state='disabled')
         else:
             print(message)
         return None

@@ -13,8 +13,8 @@ from helper_funs import center
 from run_crawler2 import RunCrawler
 from selfdestruct import SelfDestruct
 
-EXP_MONTH = '12'
-EXP_DAY = '12'
+EXP_MONTH = '03'
+EXP_DAY = '31'
 EXP_YEAR = '2022'
 PROGRAM_EXPIRATION_DATE = date(int(EXP_YEAR), int(EXP_MONTH), int(EXP_DAY))
 
@@ -35,10 +35,10 @@ class App:
             'Highest Education': StringVar(),
             'Indeed Login': StringVar(), 'Indeed Password': StringVar(),
             'Search Job(s) (Comma Separated)': StringVar(),
-            'Search State(s)/Region(s) (Comma Separated)': StringVar(),
             'Search Country': StringVar(),
             'Number of Jobs': StringVar()
         }
+        self._user_input['Search State(s)/Region(s) (Comma Separated)'] = StringVar()
         for var in self._required_input.values():
             var.trace_add('write', self._enable_or_disable_start_button)
         self._dict_difference(self._user_input, self._required_input)
@@ -406,7 +406,7 @@ class App:
             width + 73, row + 17, col + 2, padx, pady, colspan=7)
         self._entry_box(
             'Search State(s)/Region(s) (Comma Separated)', '',
-            width + 73, row + 21, col + 2, padx, pady, colspan=7, required=True)
+            width + 73, row + 21, col + 2, padx, pady, colspan=7)
         self._entry_box(
             'Search Country', '',
             width, row + 21, col + 1, padx, pady, required=True)
@@ -591,8 +591,8 @@ class App:
                 for query in self._required_input['Search Job(s) (Comma Separated)'].get().split(',')
             ],
             places=[
-                (location.strip(), self._required_input['Search Country'].get())
-                for location in self._required_input['Search State(s)/Region(s) (Comma Separated)'].get().split(',')
+                (location.strip(), self._required_input['Search Country'].get().lower().replace(' america', '').replace(' of america', ''))
+                for location in self._user_input['Search State(s)/Region(s) (Comma Separated)'].get().split(',')
             ],
             negate_jobs_list=[
                 negate_job.strip() for negate_job in self._user_input['Job(s) to Avoid (Comma Separated)'].get().split(',')

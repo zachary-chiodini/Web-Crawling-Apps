@@ -43,12 +43,11 @@ class RunCrawler:
             log_box=self._log_box
             )
 
-    def log(self, message: str) -> None:
+    def _log(self, message: str) -> None:
         if self._log_box:
-            self.log_box.configure(state='normal')
-            self.log_box.delete(1.0, 'end')
-            self.log_box.insert('end', message)
-            self.log_box.configure(state='disabled')
+            self._log_box.configure(state='normal')
+            self._log_box.insert('end', f'\n{message}')
+            self._log_box.configure(state='disabled')
         else:
             print(message)
         return None
@@ -97,13 +96,13 @@ class RunCrawler:
                         else:
                             self._log(str(e))
                     finally:
-                        dataframe = DataFrame(data=indeed_crawler.results)
+                        dataframe = DataFrame(data=self._indeed_crawler.results)
                         if not dataframe.empty:
                             append_df_to_excel(dataframe, 'submissions.xlsx',
                                                sheet_name='jobs', index=False)
-                            indeed_crawler.reset_results()
+                            self._indeed_crawler.reset_results()
             if (self._indeed_crawler.total_jobs_applied_to >= self._total_number_of_jobs
                     or self._indeed_crawler.total_jobs_applied_to == last_job_count):
                 abort = True
-            last_job_count = indeed_crawler.total_jobs_applied_to
+            last_job_count = self._indeed_crawler.total_jobs_applied_to
         return None
