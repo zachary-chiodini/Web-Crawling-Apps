@@ -3,6 +3,5 @@ cache.txt
 questionnaire.xlsx
 submissions.xlsx
 account-details.txt
-job-crawler.spec
+*.spec
 build/*
-dist/*
