@@ -1,15 +1,16 @@
 from datetime import date
 from json import load
-from os import path
+from os import chdir, mkdir, path
 from re import search
 from threading import Thread
 from tkinter import (
     BooleanVar, Button, Checkbutton, Entry, Frame,
     IntVar, Label, Scrollbar, StringVar, Text, Tk)
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List
 
 from fasttext.util import download_model
 from PIL import ImageTk, Image
+from tkterminal import Terminal
 
 from helper_funs import center
 from run_crawler2 import RunCrawler
@@ -425,6 +426,8 @@ class App:
         self._start_button.image = image
         self._start_button.configure(image=image)
         self._start_button.grid(row=row + 24, column=col + 8, sticky='e', padx=padx, pady=pady)
+        Button(self._root_frame, text='Reset Cache', command=self._reset_cache)\
+            .grid(row=row + 24, column=col + 5, columnspan=2, sticky='e', padx=padx, pady=pady)
         return None
 
     def _setup_log_box(self, row: int, col: int, padx: int, pady: int, colspan: int) -> None:
@@ -444,6 +447,13 @@ class App:
             self._start_button.configure(state='normal')
         else:
             self._start_button.configure(state='disable')
+        return None
+
+    @staticmethod
+    def _reset_cache(*args) -> None:
+        if path.exists('cache.txt'):
+            with open('cache.txt', 'w') as cache:
+                cache.truncate()
         return None
 
     def _start_crawling(self) -> None:

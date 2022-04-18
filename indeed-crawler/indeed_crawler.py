@@ -1,8 +1,6 @@
 from os import path
 from re import compile as compile_regex, findall, search
-from time import sleep
 from tkinter import Text
-from traceback import format_exc
 from typing import Callable, List, Optional, Set
 
 from bs4 import BeautifulSoup
@@ -173,7 +171,7 @@ class IndeedCrawler:
 
     def _load_model(self) -> None:
         self._log('Loading fasttext pretrained sentence/document embedding model. This may take a few minutes.')
-        model = load_model('fasttext-model/cc.en.300.bin')
+        model = load_model('fasttext-model/cc.en.100.bin')
         self._sentence2vec: Callable[[NDArray[str]], NDArray[float32]] \
             = vectorize(model.get_sentence_vector, otypes=[float32], signature='()->(n)')
         return None
