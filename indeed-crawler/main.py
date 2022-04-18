@@ -1,5 +1,6 @@
 from datetime import date
 from json import load
+from os import path
 from re import search
 from threading import Thread
 from tkinter import (
@@ -7,14 +8,15 @@ from tkinter import (
     IntVar, Label, Scrollbar, StringVar, Text, Tk)
 from typing import Dict, List, Tuple, Union
 
+from fasttext.util import download_model
 from PIL import ImageTk, Image
 
 from helper_funs import center
 from run_crawler2 import RunCrawler
 from selfdestruct import SelfDestruct
 
-EXP_MONTH = '03'
-EXP_DAY = '31'
+EXP_MONTH = '5'
+EXP_DAY = '9'
 EXP_YEAR = '2022'
 PROGRAM_EXPIRATION_DATE = date(int(EXP_YEAR), int(EXP_MONTH), int(EXP_DAY))
 
@@ -274,7 +276,7 @@ class App:
             'Email Address',
             '(?!.*?\.\.)(?!.*?@\.)(?!.*?\.@)^[0-9a-z]{0,1}[0-9a-z\.]*[0-9a-z]*@{0,1}[a-z]*\.{0,1}[a-z]*$',
             width, row + 5, col, padx, pady,
-            format_regex='^[a-z0-9]+@[a-z]+\.[a-z]+$',
+            format_regex='^[a-z0-9/.]+@[a-z]+\.[a-z]+$',
             format_message='Invalid email address.',
             required=True)
         self._entry_box(
@@ -457,7 +459,8 @@ class App:
                 for question in self._q_and_a['Skills Other']:
                     question = question.replace('[BLANK]', skill_name)
                     input_q_and_a[question] = 'Yes'
-                del q_and_a_copy['Skills']
+                if 'Skills' in q_and_a_copy:
+                    del q_and_a_copy['Skills']
             if f'Language {i}' in self._required_input:
                 language_name = self._required_input[f'Language {i}'].get()
                 if not language_name:
@@ -465,7 +468,8 @@ class App:
                 for question in self._q_and_a['Language']:
                     question = question.replace('[BLANK]', language_name)
                     input_q_and_a[question] = 'Yes'
-                del q_and_a_copy['Language']
+                if 'Language' in q_and_a_copy:
+                    del q_and_a_copy['Language']
             if f'Cert/Lic {i}' in self._required_input:
                 cert_name = self._required_input[f'Cert/Lic {i}'].get()
                 for question in self._q_and_a['Certifications/Licenses']:
@@ -474,7 +478,8 @@ class App:
                     if not answer:
                         answer = 'No'
                     input_q_and_a[question] = answer
-                del q_and_a_copy['Certifications/Licenses']
+                if 'Certifications/Licenses' in q_and_a_copy:
+                    del q_and_a_copy['Certifications/Licenses']
         search_country = self._required_input['Search Country'].get()
         if self._user_input['Req. Sponsorship'].get():
             answer = 'Yes'
@@ -600,6 +605,7 @@ class App:
             negate_companies_list=[
                 negate_comp.strip() for negate_comp in self._user_input['Companies to Avoid (Comma Separated)'].get().split(',')
             ],
+            min_salary=self._user_input['Desired Salary'].get(),
             default_q_and_a=input_q_and_a,
             log_box=self._log_box
         )
@@ -618,7 +624,7 @@ if __name__ == '__main__':
         root_window.geometry('880x490')
         root_window.title('Indeed Crawler')
         root_window.bind_all("<Button-1>", lambda event: event.widget.focus_set())
-        root_window.iconbitmap(COOL_ROBOT_EMOJI)
         center(root_window)
+        root_window.iconbitmap(COOL_ROBOT_EMOJI)
         App(root_window)
         root_window.mainloop()

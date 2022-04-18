@@ -1,3 +1,4 @@
+from time import time
 from tkinter import Text
 from traceback import print_exc
 from typing import Dict, List, Optional, Tuple
@@ -22,6 +23,7 @@ class RunCrawler:
             default_q_and_a: Dict[str, str],
             negate_jobs_list: List[str] = [],
             negate_companies_list: List[str] = [],
+            min_salary='',
             auto_answer_questions=True,
             manually_fill_out_questions=False,
             debug=False,
@@ -33,6 +35,7 @@ class RunCrawler:
         self._log_box = log_box
         self._negate_jobs_list = self._list_input_validation(negate_jobs_list)
         self._negate_companies_list = self._list_input_validation(negate_companies_list)
+        self._min_salary = min_salary
         self._total_number_of_jobs = int(total_number_of_jobs)
         self._indeed_crawler = IndeedCrawler(
             debug=debug,
@@ -65,6 +68,7 @@ class RunCrawler:
         return jobs_per_query
 
     def start(self) -> None:
+        start = time()
         self._indeed_crawler.setup_browser()
         self._indeed_crawler.login(email=self._email, password=self._password)
 
@@ -81,9 +85,9 @@ class RunCrawler:
                             company_name_negate_lst=self._negate_companies_list,
                             past_14_days=False,
                             job_type='',  # fulltime
-                            min_salary='',
+                            min_salary=self._min_salary,
                             enforce_salary=False,  # consider only jobs with salary listed
-                            exp_lvl='',  # entry_level, mid_level, #senior_level
+                            exp_lvl='',  # entry_level, mid_level, senior_level
                             remote=False,
                             temp_remote=False,
                             country=country,
@@ -105,4 +109,13 @@ class RunCrawler:
                     or self._indeed_crawler.total_jobs_applied_to == last_job_count):
                 abort = True
             last_job_count = self._indeed_crawler.total_jobs_applied_to
+        total_seconds = int(time() - start)
+        seconds = int(total_seconds % 60)
+        remaining_minutes = (total_seconds - seconds) / 60
+        minutes = int(remaining_minutes % 60)
+        remaining_hours = (remaining_minutes - minutes) / 60
+        hours = int(remaining_hours % 24)
+        days = int((remaining_hours - hours) / 24)
+        self._log('Job search has terminated.')
+        self._log(f'Time elapsed: {days:02}:{hours:02}:{minutes:02}:{seconds:02}')
         return None

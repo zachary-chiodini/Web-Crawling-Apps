@@ -4,4 +4,8 @@ questionnaire.xlsx
 submissions.xlsx
 account-details.txt
 *.spec
-build/*
+build
+dist/fasttext-model/cc.en.300.bin
+dist/job-crawler-*
+dist/submissions.xlsx
+dist/cache.txt
