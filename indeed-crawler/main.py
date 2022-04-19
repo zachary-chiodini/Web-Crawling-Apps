@@ -8,9 +8,9 @@ from tkinter import (
     IntVar, Label, OptionMenu, Scrollbar, StringVar, Text, Tk)
 from typing import Dict, List
 
-from fasttext.util import download_model
+# from fasttext.util import download_model
 from PIL import ImageTk, Image
-from tkterminal import Terminal
+# from tkterminal import Terminal
 
 from helper_funs import center
 from indeed_crawler import IndeedCrawler
