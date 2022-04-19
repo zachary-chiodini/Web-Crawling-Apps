@@ -1,11 +1,11 @@
 from datetime import date
 from json import load
-from os import chdir, mkdir, path
+from os import path
 from re import search
 from threading import Thread
 from tkinter import (
     BooleanVar, Button, Checkbutton, Entry, Frame,
-    IntVar, Label, Scrollbar, StringVar, Text, Tk)
+    IntVar, Label, OptionMenu, Scrollbar, StringVar, Text, Tk)
 from typing import Dict, List
 
 from fasttext.util import download_model
@@ -13,6 +13,7 @@ from PIL import ImageTk, Image
 from tkterminal import Terminal
 
 from helper_funs import center
+from indeed_crawler import IndeedCrawler
 from run_crawler2 import RunCrawler
 from selfdestruct import SelfDestruct
 
@@ -410,9 +411,18 @@ class App:
         self._entry_box(
             'Search State(s)/Region(s) (Comma Separated)', '',
             width + 73, row + 21, col + 2, padx, pady, colspan=7)
-        self._entry_box(
-            'Search Country', '',
-            width, row + 21, col + 1, padx, pady, required=True)
+        search_country_var = StringVar()
+        search_country_var.set('Search Country')
+        search_country = OptionMenu(
+            self._root_frame,
+            search_country_var,
+            *IndeedCrawler()._map_country.keys(),
+            command=lambda *args: self._required_input['Search Country'].set(search_country_var.get()))
+        search_country_var.trace_add(
+            'write', lambda *args: search_country.config(fg='black', activeforeground='black'))
+        search_country.grid(row=row + 21, column=col + 1, sticky='nswe')
+        search_country.config(background='yellow', activebackground='yellow',
+             activeforeground='grey', fg='grey', relief='sunken', borderwidth=1)
         self._entry_box(
             'Indeed Login', '',
             width, row + 17, col, padx, pady, required=True)
