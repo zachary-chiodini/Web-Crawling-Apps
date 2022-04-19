@@ -1,6 +1,6 @@
 import PyInstaller.__main__
 
-VERSION = 'beta-1.0'
+VERSION = 'beta-1.1'
 
 PyInstaller.__main__.run([
     'main.py',
