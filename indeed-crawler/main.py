@@ -1,6 +1,7 @@
 from datetime import date
 from json import load
 from os import path
+from PIL import ImageTk, Image
 from re import search
 from threading import Thread
 from tkinter import (
@@ -8,13 +9,9 @@ from tkinter import (
     IntVar, Label, OptionMenu, Scrollbar, StringVar, Text, Tk)
 from typing import Dict, List
 
-# from fasttext.util import download_model
-from PIL import ImageTk, Image
-# from tkterminal import Terminal
-
 from helper_funs import center
 from indeed_crawler import IndeedCrawler
-from run_crawler2 import RunCrawler
+from run_crawler import RunCrawler
 from selfdestruct import SelfDestruct
 
 EXP_MONTH = '5'
