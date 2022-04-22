@@ -294,16 +294,16 @@ class App:
             format_message='Invalid street address.')
         self._entry_box(
             'City',
-            '^[A-Z]{0,1}[a-z]*$',
+            '(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]*$',
             width, row + 9, col + 1, padx, pady,
-            format_regex='^[A-Za-z][a-z]+$',
+            format_regex='(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]+$',
             format_message='City is invalid.',
             required=True)
         self._entry_box(
             'State',
             '^[A-Z]{0,1}[a-z]* {0,1}[A-Z]{0,1}[a-z]*$',
             width, row + 11, col, padx, pady,
-            format_regex='(?!.*?  )^[A-Za-z ]+$',
+            format_regex='(?!.*?  )^[A-Za-z ]+[A-Za-z]$',
             format_message='State is invalid.',
             required=True)
         self._entry_box(
