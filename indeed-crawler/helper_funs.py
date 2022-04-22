@@ -1,4 +1,4 @@
-from os import path
+from os import environ, path
 from tkinter import Tk
 
 from openpyxl import load_workbook
@@ -9,14 +9,15 @@ def append_df_to_excel(
         df: DataFrame, filename: str, sheet_name='Sheet1',
         **to_excel_kwargs
         ) -> None:
-    if not path.exists(filename):
+    file_path = path.join(environ['USERPROFILE'], 'Desktop', filename)
+    if not path.exists(file_path):
         df.to_excel(
-            filename,
+            file_path,
             sheet_name=sheet_name,
             **to_excel_kwargs)
         return None
-    writer = ExcelWriter(filename, engine='openpyxl', mode='a')
-    writer.book = load_workbook(filename)
+    writer = ExcelWriter(file_path, engine='openpyxl', mode='a')
+    writer.book = load_workbook(file_path)
     start_row = writer.book[sheet_name].max_row
     writer.sheets = {ws.title: ws for ws in writer.book.worksheets}
     df.to_excel(writer, sheet_name, startrow=start_row,

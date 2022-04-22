@@ -86,7 +86,7 @@ class RunCrawler:
                             past_14_days=False,
                             job_type='',  # fulltime
                             min_salary=self._min_salary,
-                            enforce_salary=False,  # consider only jobs with salary listed
+                            enforce_salary=bool(self._min_salary),  # consider only jobs with salary listed
                             exp_lvl='',  # entry_level, mid_level, senior_level
                             remote=False,
                             temp_remote=False,
