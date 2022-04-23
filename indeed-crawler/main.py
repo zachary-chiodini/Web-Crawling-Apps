@@ -72,8 +72,8 @@ class App:
         self._start_button = Button(self._root_frame, command=self._start_crawling)
         self._start_button.configure(state='disable')
         self._user_form(0, 0, 5, 5, 20)
-        self._log_box = Text(self._root_frame, height=5, width=103)
-        self._setup_log_box(22, 0, 5, 5, 12)
+        self._log_box = Text(self._root_frame, height=5, width=98)
+        self._setup_log_box(row=22, col=0, padx=5, pady=5, colspan=6)
 
     @staticmethod
     def _dict_difference(ref1: Dict, ref2: Dict) -> None:
@@ -172,7 +172,7 @@ class App:
             disable=False, **kwargs
             ) -> Entry:
         widget = Entry(self._root_frame, width=width)
-        widget.grid(row=row, column=col, columnspan=colspan, sticky='w', padx=padx, pady=pady, **kwargs)
+        widget.grid(row=row, column=col, columnspan=colspan, padx=padx, pady=pady, **kwargs)
         if default_text in self._required_input:
             var = self._required_input[default_text]
             var.trace_add('write', self._enable_or_disable_start_button)
@@ -238,7 +238,7 @@ class App:
         add_and_remove_frame = Frame(self._root_frame)
         add_and_remove_frame.grid(row=row, column=col, columnspan=3, sticky='w')
         Label(add_and_remove_frame, text=text) \
-            .grid(row=row, column=col, sticky='w', padx=padx, pady=pady)
+            .grid(row=row, column=col, sticky='w', padx=0, pady=pady)
         self._add_and_remove_buttons(
             add_and_remove_frame, entry_titles, entry_list,
             width, row, col, padx, pady, max_entries, required)
@@ -344,10 +344,10 @@ class App:
             width, row, col + 2, padx, pady, 3, required=True)
         self._add_and_remove_widget(
             'Languages', ['Language'], self._lang_entry_list,
-            width, row, col + 5, padx, pady, 3)
+            width, row, col + 4, padx, pady, 3)
         self._add_and_remove_widget(
             'Cert/Lic', ['Cert/License'], self._cert_entry_list,
-            width, row, col + 8, padx, pady, 3)
+            width, row, col + 5, padx, pady, 3)
         self._entry_box(
             'Desired Salary',
             '^[0-9]*$',
@@ -359,7 +359,7 @@ class App:
             width, row + 7, col + 3, padx, pady, disable=True)
         self._entry_box(
             'Currency', '',
-            width, row + 7, col + 5, padx, pady)
+            width, row + 7, col + 4, padx, pady)
         self._entry_box(
             'Employment Type', '',
             width, row + 9, col + 2, padx, pady)
@@ -368,10 +368,10 @@ class App:
             width, row + 9, col + 3, padx, pady)
         self._entry_box(
             'Start Date', '',
-            width, row + 9, col + 5, padx, pady)
+            width, row + 9, col + 4, padx, pady)
         self._entry_box(
             'Interview Date & Time', '',
-            width, row + 9, col + 8, padx, pady)
+            width, row + 9, col + 5, padx, pady)
         self._user_input['18 Years or Older'] = IntVar()
         self._user_input['18 Years or Older'].set(1)
         Checkbutton(
@@ -388,38 +388,41 @@ class App:
         Checkbutton(
             self._root_frame, text='Eligible to Work',
             variable=self._user_input['Eligible to Work']) \
-            .grid(row=row + 11, column=col + 5, sticky='w', padx=padx, pady=pady)
+            .grid(row=row + 11, column=col + 4, sticky='w', padx=padx, pady=pady)
         self._user_input['Remote'] = BooleanVar()
         Checkbutton(
             self._root_frame, text='Remote',
             variable=self._user_input['Remote']) \
-            .grid(row=row + 11, column=col + 8, sticky='w', padx=padx, pady=pady)
+            .grid(row=row + 11, column=col + 5, sticky='w', padx=padx, pady=pady)
         self._entry_box(
             'Search Job(s) (Comma Separated)', '',
-            width + 73, row + 13, col + 2, padx, pady, colspan=7, required=True)
+            width, row + 13, col + 2, padx, pady, colspan=4, sticky='we', required=True)
         self._user_input['Job(s) to Avoid (Comma Separated)'] = StringVar()
         self._entry_box(
             'Job(s) to Avoid (Comma Separated)', '',
-            width + 73, row + 15, col + 2, padx, pady, colspan=7)
+            width, row + 15, col + 2, padx, pady, colspan=4, sticky='we')
         self._user_input['Companies to Avoid (Comma Separated)'] = StringVar()
         self._entry_box(
             'Companies to Avoid (Comma Separated)', '',
-            width + 73, row + 17, col + 2, padx, pady, colspan=7)
+            width, row + 17, col + 2, padx, pady, colspan=4, sticky='we')
         self._entry_box(
             'Search State(s)/Region(s) (Comma Separated)', '',
-            width + 73, row + 21, col + 2, padx, pady, colspan=7)
+            width, row + 21, col + 2, padx, pady, colspan=4, sticky='we')
         search_country_var = StringVar()
-        search_country_var.set('Search Country')
+        search_country_var.set('Search Country       ▼')
         search_country = OptionMenu(
             self._root_frame,
             search_country_var,
-            *IndeedCrawler()._map_country.keys(),
+            *list(map(lambda s: s.title(), IndeedCrawler()._map_country.keys())),
             command=lambda *args: self._required_input['Search Country'].set(search_country_var.get()))
         search_country_var.trace_add(
             'write', lambda *args: search_country.config(fg='black', activeforeground='black'))
-        search_country.grid(row=row + 21, column=col + 1, sticky='nswe')
-        search_country.config(background='yellow', activebackground='yellow',
-             activeforeground='grey', fg='grey', relief='sunken', borderwidth=1)
+        search_country.grid(row=row + 21, column=col + 1)
+        print(search_country.config().keys())
+        search_country.config(
+            background='yellow', activebackground='yellow', cursor='hand2', anchor='w',
+            direction='below', activeforeground='grey', fg='grey', relief='sunken',
+            borderwidth=1, width=19, pady=2, indicatoron=False)
         self._entry_box(
             'Indeed Login', '',
             width, row + 17, col, padx, pady, required=True)
@@ -432,9 +435,9 @@ class App:
         image = ImageTk.PhotoImage(Image.open(COOL_GLASSES_EMOJI))
         self._start_button.image = image
         self._start_button.configure(image=image)
-        self._start_button.grid(row=row + 24, column=col + 8, sticky='e', padx=padx, pady=pady)
+        self._start_button.grid(row=row + 24, column=col + 5, sticky='e', padx=padx, pady=pady)
         Button(self._root_frame, text='Reset Cache', command=self._reset_cache)\
-            .grid(row=row + 24, column=col + 5, columnspan=2, sticky='e', padx=padx, pady=pady)
+            .grid(row=row + 24, column=col + 4, columnspan=2, padx=padx, pady=pady)
         return None
 
     def _setup_log_box(self, row: int, col: int, padx: int, pady: int, colspan: int) -> None:
@@ -638,7 +641,7 @@ if __name__ == '__main__':
         self_destruct.open_window('EXPIRATION DATE EXCEEDED')
     else:
         root_window = Tk()
-        root_window.geometry('880x490')
+        root_window.geometry('820x490')
         root_window.title('Indeed Crawler')
         root_window.bind_all("<Button-1>", lambda event: event.widget.focus_set())
         center(root_window)
