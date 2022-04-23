@@ -418,7 +418,6 @@ class App:
         search_country_var.trace_add(
             'write', lambda *args: search_country.config(fg='black', activeforeground='black'))
         search_country.grid(row=row + 21, column=col + 1)
-        print(search_country.config().keys())
         search_country.config(
             background='yellow', activebackground='yellow', cursor='hand2', anchor='w',
             direction='below', activeforeground='grey', fg='grey', relief='sunken',
