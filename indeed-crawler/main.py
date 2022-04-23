@@ -248,28 +248,28 @@ class App:
         Label(self._root_frame, text='Requirements Document')\
             .grid(row=row, column=col, columnspan=2, sticky='w', padx=padx, pady=pady)
         self._entry_box(
-            'First Name', '^[A-Z]{0,1}[a-z]*$',
+            'First Name', '^[A-Za-z]*$',
             width, row + 1, col, padx, pady,
-            format_regex='^[A-Za-z][a-z]+$',
+            format_regex='^[A-Za-z]+$',
             format_message='First name is invalid.',
             required=True)
         self._entry_box(
-            'Last Name', '^[A-Z]{0,1}[a-z]*$',
+            'Last Name', '^[A-Za-z]*$',
             width, row + 1, col + 1, padx, pady,
-            format_regex='^[A-Za-z][a-z]+$',
+            format_regex='^[A-Za-z]+$',
             format_message='Last name is invalid.',
             required=True)
         self._entry_box(
             'Current Company',
-            '(?!.*?  )^[0-9A-Za-z ]*$',
+            "(?!.*?  )(?!.*?\.\.)(?!.*?'')(?!.*? \.)(?!.*? ')(?!.*?\.')(?!.*?'\.)^[0-9A-Za-z \.']*$",
             width, row + 3, col, padx, pady,
-            format_regex='(?!.*?  )^[0-9A-Za-z ]+$',
-            format_message='Company name is invalid.')
+            format_regex="(?!.*?  )(?!.*?\.\.)(?!.*?'')(?!.*? \.)(?!.*? ')(?!.*?\.')(?!.*?'\.)^[0-9A-Za-z][0-9A-Za-z \.']+[0-9A-Za-z]$",
+            format_message='Company is invalid.')
         self._entry_box(
             'Current Job Title',
-            '(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]*$',
+            "(?!.*?  )(?!.*?\.\.)(?!.*?'')(?!.*? \.)(?!.*? ')(?!.*?\.')(?!.*?'\.)^[0-9A-Za-z \.']*$",
             width, row + 3, col + 1, padx, pady,
-            format_regex='(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]+$',
+            format_regex="(?!.*?  )(?!.*?\.\.)(?!.*?'')(?!.*? \.)(?!.*? ')(?!.*?\.')(?!.*?'\.)^[0-9A-Za-z][0-9A-Za-z \.']+[0-9A-Za-z]$",
             format_message='Job title is invalid.')
         self._entry_box(
             'Email Address',
@@ -290,20 +290,20 @@ class App:
             'Street Address',
             '(?!.*?  )(?!.*?,,)(?!.*? ,)^[0-9]*[0-9A-Za-z ,]*$',
             width, row + 9, col, padx, pady,
-            format_regex='(?!.*?  )^[0-9]+ [0-9A-Za-z ]+$',
+            format_regex='(?!.*?  )(?!.*?,,)(?!.*? ,)^[0-9]+ [0-9A-Za-z ]+[A-Za-z]$',
             format_message='Invalid street address.')
         self._entry_box(
             'City',
-            '(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]*$',
+            '(?!.*?  )^[A-Za-z]*[A-Za-z ]*$',
             width, row + 9, col + 1, padx, pady,
-            format_regex='(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]+$',
+            format_regex='(?!.*?  )^[A-Za-z][A-Za-z ]+[A-Za-z]$',
             format_message='City is invalid.',
             required=True)
         self._entry_box(
             'State',
-            '^[A-Z]{0,1}[a-z]* {0,1}[A-Z]{0,1}[a-z]*$',
+            '(?!.*?  )^[A-Za-z]*[A-Za-z ]*$',
             width, row + 11, col, padx, pady,
-            format_regex='(?!.*?  )^[A-Za-z ]+[A-Za-z]$',
+            format_regex='(?!.*?  )^[A-Za-z][A-Za-z ]+[A-Za-z]$',
             format_message='State is invalid.',
             required=True)
         self._entry_box(
@@ -315,9 +315,9 @@ class App:
             required=True)
         self._entry_box(
             'Country',
-            '(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]*$',
+            '(?!.*?  )^[A-Za-z]*[A-Za-z ]*$',
             width, row + 13, col, padx, pady,
-            format_regex='(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]+$',
+            format_regex='(?!.*?  )^[A-Za-z][A-Za-z ]+[A-Za-z]$',
             format_message='Invalid country.',
             required=True)
         self._entry_box(
@@ -330,14 +330,14 @@ class App:
             'Highest Education',
             "(?!.*?  )(?!.*?'')^[A-Za-z]{0,1}[A-Za-z ']*$",
             width, row + 15, col, padx, pady,
-            format_regex="(?!.*?  )(?!.*?'')^[A-Za-z]{0,1}[A-Za-z ']+$",
+            format_regex="(?!.*?  )(?!.*?'')^[A-Za-z]{0,1}[A-Za-z ']+[A-Za-z]$",
             format_message='Invalid education',
             required=True)
         self._entry_box(
             'Clearance',
             '(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]*$',
             width, row + 15, col + 1, padx, pady,
-            format_regex='(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]+$',
+            format_regex='(?!.*?  )^[A-Za-z]{0,1}[A-Za-z ]+[A-Za-z]$',
             format_message='Invalid clearance.')
         self._add_and_remove_widget(
             'Skills/Experience', ['Skill', 'Experience'], self._skill_entry_list,
