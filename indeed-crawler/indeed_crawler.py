@@ -1,5 +1,6 @@
 from os import path
 from re import compile as compile_regex, findall, search
+from time import sleep
 from tkinter import Text
 from typing import Callable, List, Optional, Set
 
@@ -91,8 +92,6 @@ class IndeedCrawler:
             'service_log_path': 'NUL'
             }
         self._browser = Firefox(**kwargs)
-        self._browser.execute_script(
-            "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
         return None
 
     def _setup_headless_browser(self) -> None:
@@ -542,6 +541,11 @@ class IndeedCrawler:
                 radius='&radius=' * bool(radius) + radius
                 )
             )
+        sleep(3)
+        for i in range(1, 11):
+            self._browser.execute_script(f'window.scrollTo(0, ({i} * document.body.scrollHeight) / 10);')
+            sleep(1)
+        self._browser.execute_script('window.scrollTo(document.body.scrollHeight,0);')
         infinite_loop = False
         while True:
             try:
