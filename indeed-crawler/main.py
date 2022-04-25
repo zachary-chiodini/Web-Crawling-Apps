@@ -615,7 +615,7 @@ class App:
                 for query in self._required_input['Search Job(s) (Comma Separated)'].get().split(',')
             ],
             places=[
-                (location.strip(), self._required_input['Search Country'].get().lower().replace(' america', '').replace(' of america', ''))
+                (location.strip(), self._required_input['Search Country'].get().lower())
                 for location in self._user_input['Search State(s)/Region(s) (Comma Separated)'].get().split(',')
             ],
             negate_jobs_list=[
