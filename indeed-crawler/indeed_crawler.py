@@ -541,19 +541,23 @@ class IndeedCrawler:
                 radius='&radius=' * bool(radius) + radius
                 )
             )
-        sleep(3)
+        '''
+        sleep(10)
         for i in range(1, 11):
             self._browser.execute_script(f'window.scrollTo(0, ({i} * document.body.scrollHeight) / 10);')
             sleep(1)
         self._browser.execute_script('window.scrollTo(document.body.scrollHeight,0);')
-        infinite_loop = False
+        sleep(9)
+        '''
+        stop_infinite_loop = False
         while True:
+            sleep(10)
             try:
                 mobtk = search(
                     '(?<=data-mobtk=").+?(?=")',
                     self._browser.page_source).group()
             except AttributeError:
-                if infinite_loop:
+                if stop_infinite_loop:
                     self._log('Infinite loop encountered.')
                     break
                 # captcha
@@ -561,14 +565,16 @@ class IndeedCrawler:
                 WebDriverWait(self._browser, 600).until(
                     lambda driver: driver.current_url != current_url
                 )
-                infinite_loop = True
+                stop_infinite_loop = True
                 continue
             self._main_window = self._browser.current_window_handle
             soup_list = BeautifulSoup(
                 self._browser.page_source, 'lxml')\
                 .findAll('a', {'data-mobtk': mobtk})
+            print('SOUP_LIST:', soup_list)
             for tag in soup_list:
                 quick_apply = tag.find('span', {'class': 'ialbl iaTextBlack'})
+                print('QUICK APPLY:', quick_apply)
                 if not quick_apply:
                     continue
                 job_jk = search('(?<=data-jk=").+?(?=")', str(tag)).group()
