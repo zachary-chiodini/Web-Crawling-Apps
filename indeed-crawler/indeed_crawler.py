@@ -592,6 +592,8 @@ class IndeedCrawler:
                     job_title = search('(?<=title=").+?(?=")', str(job_title))
                     if job_title:
                         job_title = job_title.group()
+                        if 'new' == job_title[:3]:
+                            job_title = job_title[3:]
                 if not job_title and enforce_query:
                     continue
                 if job_title and enforce_query:
@@ -603,7 +605,7 @@ class IndeedCrawler:
                 if job_title_negate_lst and job_title:
                     negate_word_found = False
                     for word in job_title_negate_lst:
-                        if word in job_title.lower():
+                        if word.lower() in job_title.lower():
                             negate_word_found = True
                             break
                     if negate_word_found:
@@ -656,7 +658,7 @@ class IndeedCrawler:
                     company_name_text = company_name.get_text().lower()
                     negate_word_found = False
                     for word in company_name_negate_lst:
-                        if word in company_name_text:
+                        if word.lower() in company_name_text:
                             negate_word_found = True
                             break
                     if negate_word_found:
