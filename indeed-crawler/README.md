@@ -1,3 +1,5 @@
+Unfortunately, the Geckodriver does not work on Mac OS.
+
 Run "python build.py" in the indeed-crawler directory to compile the program. Afterwards, the indeed-crawler/dist/driver, indeed-crawler/dist/fasttext-model, and indeed-crawler/dist/icon folders, and the indeed-crawler/dist/default_q_and_a.json file must be copied and pasted to the indeed-crawler/dist/job-crawler-beta directory. The resuting indeed-crawler/dist/job-crawler-beta/job-crawler-beta.exe is equiped with a graphical user interface.
 
 The program uses Selenium to access the job search website and a word embedding model to answer screening questions, based on the default_q_and_a json file and what the user enters into the Requirements Document on the graphical user interface. The user must have a job search account and their resume uploaded to the account before running the program to begin applying to jobs. 
