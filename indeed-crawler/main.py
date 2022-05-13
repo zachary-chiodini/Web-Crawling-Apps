@@ -14,9 +14,9 @@ from indeed_crawler import IndeedCrawler
 from run_crawler import RunCrawler
 from selfdestruct import SelfDestruct
 
-EXP_MONTH = '5'
-EXP_DAY = '9'
-EXP_YEAR = '2022'
+EXP_MONTH = '1'
+EXP_DAY = '1'
+EXP_YEAR = '2023'
 PROGRAM_EXPIRATION_DATE = date(int(EXP_YEAR), int(EXP_MONTH), int(EXP_DAY))
 
 COOL_ROBOT_EMOJI = 'icon/cool_robot_emoji.ico'

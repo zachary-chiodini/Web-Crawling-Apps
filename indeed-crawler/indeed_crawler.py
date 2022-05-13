@@ -568,13 +568,17 @@ class IndeedCrawler:
                 stop_infinite_loop = True
                 continue
             self._main_window = self._browser.current_window_handle
+            ''''
             soup_list = BeautifulSoup(
                 self._browser.page_source, 'lxml')\
                 .findAll('a', {'data-mobtk': mobtk})
-            print('SOUP_LIST:', soup_list)
+            '''
+            soup_list = BeautifulSoup(
+                self._browser.page_source, 'lxml')\
+                .find('ul', {'class': 'jobsearch-ResultsList'})\
+                .findAll('li')
             for tag in soup_list:
                 quick_apply = tag.find('span', {'class': 'ialbl iaTextBlack'})
-                print('QUICK APPLY:', quick_apply)
                 if not quick_apply:
                     continue
                 job_jk = search('(?<=data-jk=").+?(?=")', str(tag)).group()
