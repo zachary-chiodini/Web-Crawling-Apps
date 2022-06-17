@@ -1,6 +1,6 @@
 from datetime import date
 from json import load
-from os import path
+from os import environ, path
 from PIL import ImageTk, Image
 from re import search
 from threading import Thread
@@ -460,8 +460,9 @@ class App:
 
     @staticmethod
     def _reset_cache(*args) -> None:
-        if path.exists('cache.txt'):
-            with open('cache.txt', 'w') as cache:
+        file_path = path.join(environ['USERPROFILE'], 'Desktop', 'cache.txt')
+        if path.exists(file_path):
+            with open(file_path, 'w') as cache:
                 cache.truncate()
         return None
 
