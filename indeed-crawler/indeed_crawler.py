@@ -1,4 +1,4 @@
-from os import path
+from os import environ, path
 from re import compile as compile_regex, findall, search
 from time import sleep
 from tkinter import Text
@@ -469,8 +469,9 @@ class IndeedCrawler:
         return None
 
     def _cache_job(self, job_jk: str) -> None:
+        file_path = path.join(environ['USERPROFILE'], 'Desktop', 'cache.txt')
         self._cache.add(job_jk)
-        with open('cache.txt', 'a') as file:
+        with open(file_path, 'a') as file:
             file.write(job_jk + '\n')
         return None
 
