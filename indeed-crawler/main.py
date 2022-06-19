@@ -397,9 +397,9 @@ class App:
         self._entry_box(
             'Search Job(s) (Comma Separated)', '',
             width, row + 13, col + 2, padx, pady, colspan=4, sticky='we', required=True)
-        self._user_input['Job(s) to Avoid (Comma Separated)'] = StringVar()
+        self._user_input['Word(s) or Phrase(s) to Avoid (Comma Separated)'] = StringVar()
         self._entry_box(
-            'Job(s) to Avoid (Comma Separated)', '',
+            'Word(s) or Phrase(s) to Avoid (Comma Separated)', '',
             width, row + 15, col + 2, padx, pady, colspan=4, sticky='we')
         self._user_input['Companies to Avoid (Comma Separated)'] = StringVar()
         self._entry_box(
@@ -620,7 +620,7 @@ class App:
                 for location in self._user_input['Search State(s)/Region(s) (Comma Separated)'].get().split(',')
             ],
             negate_jobs_list=[
-                negate_job.strip() for negate_job in self._user_input['Job(s) to Avoid (Comma Separated)'].get().split(',')
+                negate_job.strip() for negate_job in self._user_input['Word(s) or Phrase(s) to Avoid (Comma Separated)'].get().split(',')
             ],
             negate_companies_list=[
                 negate_comp.strip() for negate_comp in self._user_input['Companies to Avoid (Comma Separated)'].get().split(',')
