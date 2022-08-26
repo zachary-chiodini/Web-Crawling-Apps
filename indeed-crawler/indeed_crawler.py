@@ -7,7 +7,7 @@ from typing import Callable, List, Optional, Set
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 from fasttext import load_model
-from numpy import apply_along_axis, argmin, array, char, float32, ndarray, vectorize
+from numpy import apply_along_axis, argmin, array, char, float32, vectorize
 from numpy.typing import NDArray
 from pandas import DataFrame, read_excel
 from scipy.spatial import distance
@@ -339,7 +339,7 @@ class IndeedCrawler:
         return None
 
     @staticmethod
-    def _get_answers_set(labels: List[str]) -> Set[str]:
+    def _get_answers_set(labels: List[Tag]) -> Set[str]:
         answers_set = set()
         for answer_found in labels:
             if answer_found:
@@ -545,14 +545,6 @@ class IndeedCrawler:
                 radius='&radius=' * bool(radius) + radius
                 )
             )
-        '''
-        sleep(10)
-        for i in range(1, 11):
-            self._browser.execute_script(f'window.scrollTo(0, ({i} * document.body.scrollHeight) / 10);')
-            sleep(1)
-        self._browser.execute_script('window.scrollTo(document.body.scrollHeight,0);')
-        sleep(9)
-        '''
         stop_infinite_loop = False
         while True:
             sleep(10)
