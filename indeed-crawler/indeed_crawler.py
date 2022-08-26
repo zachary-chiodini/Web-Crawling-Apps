@@ -406,6 +406,9 @@ class IndeedCrawler:
             .find('span', text=compile_regex('Last'))
         if not resume_div:
             resume_div = BeautifulSoup(self._browser.page_source, 'lxml') \
+                .find('span', text=compile_regex('Uploaded'))
+        if not resume_div:
+            resume_div = BeautifulSoup(self._browser.page_source, 'lxml') \
                 .find('span', text=compile_regex('resume'))
         if resume_div:
             resume_div = resume_div.find_parent('div', {'id': compile_regex('resume')})
