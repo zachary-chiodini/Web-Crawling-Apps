@@ -1,1 +1,0 @@
-Place fasttext pretrained model cc.en.300.bin here.
