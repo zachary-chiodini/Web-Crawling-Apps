@@ -5,7 +5,4 @@ submissions.xlsx
 account-details.txt
 *.spec
 build
-dist/fasttext-model/cc.en.100.bin
 dist/job-crawler-*
-dist/submissions.xlsx
-dist/cache.txt
