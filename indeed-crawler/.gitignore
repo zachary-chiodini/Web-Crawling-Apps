@@ -6,3 +6,5 @@ account-details.txt
 *.spec
 build
 dist/job-crawler-*
+venv
+__pycache__
