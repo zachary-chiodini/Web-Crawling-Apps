@@ -1,4 +1,5 @@
 fasttext-model/cc.en.100.bin
+fasttext-model/cc.en.300.bin
 cache.txt
 questionnaire.xlsx
 submissions.xlsx
