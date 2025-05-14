@@ -7,6 +7,7 @@ fasttext-model/cc.en.100.bin
 fasttext-model/cc.en.300.bin
 questionnaire.xlsx
 saved_input.txt
+saved_input2.txt
 submissions.xlsx
 *.spec
 venv
