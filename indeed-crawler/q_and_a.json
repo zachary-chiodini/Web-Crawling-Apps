@@ -98,12 +98,12 @@
             "Do you have a valid Secret Level or Higher Security Clearance?": "",
             "Do you have an active security clearance?": ""
       },
-      "Certifications/Licenses": {
+      "Certs/Licenses": {
             "Do you have a valid [BLANK] certification?": "",
             "Are you certified in [BLANK]": "",
             "Do you have a valid [BLANK] License?": ""
       },
-      "Language": {
+      "Languages": {
             "Do you speak [BLANK]?": ""
       },
       "Desired Salary": {
