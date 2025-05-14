@@ -252,13 +252,10 @@ class App:
             for question in self._q_and_a[field]:
                 input_q_and_a[question.replace('[BLANK]', self._user_input['Search Country'].get())] = answer
 
-        answer = ' '.join([self._user_input['First Name'].get(), self._user_input['Last Name'].get()])
-        for question in self._q_and_a['Full Name']:
-            input_q_and_a[question] = answer
-
-        answer = ', '.join([self._required_input['City'].get(), self._required_input['State'].get()])
-        for question in self._q_and_a['Full Address']:
-            input_q_and_a[question] = answer
+        for label, tuple_ in {'Full Name': ('First Name', 'Last Name'), 'Full Address': ('City', 'State')}:
+            answer = ' '.join([self._user_input[tuple_[0]].get(), self._user_input[tuple_[1]].get()])
+            for question in self._q_and_a[label]:
+                input_q_and_a[question] = answer
 
         for question, answer in self._q_and_a['Private'].items():
             input_q_and_a[question] = answer
