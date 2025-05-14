@@ -18,7 +18,8 @@ from self_destruct import SelfDestruct
 
 class App:
     version = '2.0-Beta'
-    _input_file = 'saved_input.txt'
+    _save_file = 'saved_input.txt'
+    _save_file2 = 'saved_input2.txt'
     _required_input = {
         'First Name', 'Last Name', 'Email Address', 'Phone Number',
         'City', 'State', 'Country', 'Highest Education',
@@ -41,8 +42,9 @@ class App:
             'Employment Type': 'Fulltime',
             'Hours per Week': '40',
             'Start Date': date.today().strftime('%m/%d/%y'),
-            'Interview Date & Time': 'Anytime'
+            'Interview Date & Time': 'Anytime',
         }
+        self._widget_labels = {key: field for field, dict_ in self._widget_entries.items() for key in dict_.keys()}
         self._user_input = OrderedDict({
             'First Name': {'Variable': StringVar(), 'Entity': Entry},
             'Email Address': {'Variable': StringVar(), 'Entity': Entry},
@@ -85,10 +87,14 @@ class App:
         })
         with open('q_and_a.json') as f:
             self._q_and_a = load(f)
-        if path.exists(self._input_file):
-            with open(self._input_file) as f:
+        if path.exists(self._save_file):
+            with open(self._save_file) as f:
                 for field, value in load(f).items():
                     self._user_input[field]['Variable'].set(value)
+            with open(self._save_file2) as f:
+                for field, dict_ in load(f).items():
+                    for label, entry_list in dict_.items():
+                        self._widget_entries[field][label] = entry_list
         self._log_box: Text
         self._root_frame = Frame(root_window_)
         self._root_frame.pack(expand=True)
@@ -98,7 +104,7 @@ class App:
 
     def _entry_box(
             self, root_frame: Frame, default_text: str, width: int, row: int, col: int,
-            padx: int, pady: int, sticky: str, colspan=1, secure=False, regex = '') -> Entry:
+            padx: int, pady: int, sticky: str, colspan=1, value='', secure=False, regex = '') -> Entry:
         def bind_clear_default(*args) -> None:
             if (entry.get() == default_text) or (entry.get() == 'INVALID'):
                 entry.config(textvariable=var)
@@ -120,14 +126,15 @@ class App:
         if default_text in self._user_input:
             var = self._user_input[default_text]['Variable']
         else:
-            var = StringVar()
+            var = StringVar(value=value)
         entry = Entry(root_frame, textvariable=var, width=width)
         entry.grid(row=row, column=col, columnspan=colspan, padx=padx, pady=pady, sticky=sticky)
-        entry.config(textvariable='')
-        entry.insert(0, default_text)
-        entry.config(fg='grey')
         entry.bind('<FocusIn>', bind_clear_default)
         entry.bind('<FocusOut>', bind_on_focus_out)
+        if not var.get():
+            entry.config(textvariable='')
+            entry.insert(0, default_text)
+            entry.config(fg='grey')
         if default_text in self._required_input:
             var.trace_add('write', self._toggle_start_button)
             entry.config({'background': 'yellow'})
@@ -135,10 +142,18 @@ class App:
 
     def _add_entry(self, root_frame: Frame, field: str, width: int,
             row: int, col: int, padx: int, pady: int, sticky: str) -> None:
-        for i, (label, list_) in enumerate(self._widget_entries[field].items()):
-            entry = self._entry_box(root_frame, f"{label} {len(list_) + 1}",
-                width, row + len(list_), col + i, padx, pady, sticky)
-            list_.append(entry)
+        # Detects saved user input.
+        if any(entry is str for entry_list in self._widget_entries[field].values() for entry in entry_list):
+            for i, (label, entry_list) in enumerate(self._widget_entries[field].items()):
+                for j, value in enumerate(entry_list.copy()):
+                    entry = self._entry_box(root_frame, f"{label} {j + 1}",
+                        width, row + j, col + i, padx, pady, sticky, value)
+                    entry_list[j] = entry
+        else:
+            for i, (label, entry_list) in enumerate(self._widget_entries[field].items()):
+                entry = self._entry_box(root_frame, f"{label} {len(entry_list) + 1}",
+                    width, row + len(entry_list), col + i, padx, pady, sticky)
+                entry_list.append(entry)
         return None
 
     def _remove_entry(self, field: str) -> None:
@@ -189,8 +204,25 @@ class App:
         return None
 
     def _save_user_input(self) -> None:
-        with open(path.join(path.dirname(__file__), self._input_file), 'w') as f:
+        with open(path.join(path.dirname(__file__), self._save_file), 'w') as f:
             dump({field: dict_['Variable'].get() for field, dict_ in self._user_input.items()}, f)
+        with open(path.join(path.dirname(__file__), self._save_file2), 'w') as f:
+            dump({field: {label: set(map(lambda entry: entry.get(), entry_list))}
+                  for field, dict_ in self._widget_entries.items()
+                  for label, entry_list in dict_.items()}, f)
+        return None
+
+    def _clear_user_input(self) -> None:
+        for field, dict_ in self._user_input.items():
+            if field in self._default_input:
+                dict_['Variable'].set(self._default_input[field])
+            else:
+                dict_['Variable'].set('')
+        for field, dict_ in self._widget_entries.items():
+            for entry_list in dict_.values():
+                for i in range(len(entry_list - 1)):
+                    entry_list[i].destroy()
+                entry_list = entry_list[0].set('')
         return None
 
     def _setup_log_box(self, row: int, col: int, padx: int, pady: int, width: str, colspan: int) -> None:
@@ -207,7 +239,18 @@ class App:
         return None
 
     def _toggle_start_button(self, *args) -> None:
-        if all(self._user_input[field]['Variable'].get() for field in self._required_input):
+        bool_ = True
+        for field in self._required_input:
+            if not bool_:
+                break
+            if field in self._widget_labels:
+                for entity in self._widget_entries[self._widget_labels[field]][field]:
+                    if not entity.get():
+                        bool_ *= False
+                        break
+            else:
+                bool_ *= bool(self._user_input[field]['Variable'].get())
+        if bool_:
             self._start_button.configure(state='normal')
         else:
             self._start_button.configure(state='disable')
@@ -226,24 +269,24 @@ class App:
         for skill, experience in zip(self._widget_entries['Skills/Experience']['Skill'],
                 self._widget_entries['Skills/Experience']['Experience']):
             for question in self._q_and_a['Skills']:
-                input_q_and_a[question.replace('[BLANK]', entry.get())] = experience
+                input_q_and_a[question.replace('[BLANK]', skill.get())] = experience.get()
             for question in self._q_and_a['Skills Other']:
-                input_q_and_a[question.replace('[BLANK]', entry.get())] = 'yes'
-    
+                input_q_and_a[question.replace('[BLANK]', skill.get())] = 'yes'
+
         for _, entry_list in self._widget_entries['Languages'].items():
             for question in self._input_q_and_a['Languages']:
                 if not entry_list:
                     input_q_and_a[question.replace('[BLANK]', 'English')] = 'yes'
                 for entry in entry_list:
                     input_q_and_a[question.replace('[BLANK]', entry.get())] = 'yes'
-    
+
         for _, entry_list in self._widget_entries['Certs/Licenses'].items():
             for question in self._input_q_and_a['Certs/Licenses']:
                 if not entry_list:
                     input_q_and_a[question] = 'no'
                 for entry in entry_list:
                     input_q_and_a[question.replace('[BLANK]', entry.get())] = 'yes'
-    
+
         for field in ['Req. Sponsorship', 'Eligible to Work', '18 Years or Older']:
             if self._user_input[field].get():
                 answer = 'yes'
