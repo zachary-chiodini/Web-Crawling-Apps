@@ -1,11 +1,12 @@
+__pycache__
+account-details.txt
+build
+cache.txt
+dist/job-crawler-*
 fasttext-model/cc.en.100.bin
 fasttext-model/cc.en.300.bin
-cache.txt
 questionnaire.xlsx
+saved_input.txt
 submissions.xlsx
-account-details.txt
 *.spec
-build
-dist/job-crawler-*
 venv
-__pycache__
