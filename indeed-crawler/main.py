@@ -101,14 +101,14 @@ class App:
     def _entry_box(
             self, root_frame: Frame, default_text: str, width: int, row: int, col: int,
             padx: int, pady: int, sticky: str, colspan=1, regex = '', secure=False, value='') -> Entry:
-        def clear_default(*args) -> None:
+        def bind_clear_default(*args) -> None:
             if (entry.get() == default_text) or (entry.get() == 'INVALID'):
                 entry.config(textvariable=var)
                 entry.config(fg='black')
                 if secure:
                     entry.config(show='*')
             return None
-        def show_default(*args) -> None:
+        def bind_show_default(*args) -> None:
             if not entry.get():
                 entry.config(textvariable='', fg='grey')
                 entry.insert(0, default_text)
@@ -119,6 +119,12 @@ class App:
                 entry.delete(0, 'end')
                 entry.insert(0, 'INVALID')
             return None
+        def trace_show_default(*args) -> None:
+            if not entry.get() and root_frame.focus_get() != entry:
+                entry.config(textvariable='', fg='grey')
+                entry.insert(0, default_text)
+                if secure:
+                    entry.config(show='')
         if default_text in self._user_input:
             var = self._user_input[default_text]['Variable']
         else:
@@ -126,9 +132,9 @@ class App:
             self._user_input[default_text] = {'Variable': var, 'Entity': Entry}
         entry = Entry(root_frame, textvariable=var, width=width)
         entry.grid(row=row, column=col, columnspan=colspan, padx=padx, pady=pady, sticky=sticky)
-        #var.trace_add("write", show_default)
-        entry.bind('<FocusIn>', clear_default)
-        entry.bind('<FocusOut>', show_default)
+        var.trace_add("write", trace_show_default)
+        entry.bind('<FocusIn>', bind_clear_default)
+        entry.bind('<FocusOut>', bind_show_default)
         if not var.get():
             entry.config(textvariable='')
             entry.insert(0, default_text)
