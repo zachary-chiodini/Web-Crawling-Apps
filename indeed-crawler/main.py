@@ -5,13 +5,10 @@ from os import environ, path
 from PIL import ImageTk, Image
 from re import search
 from threading import Thread
-from tkinter import (
-    BooleanVar, Button, Checkbutton, Entry, Frame,
+from tkinter import (Button, Checkbutton, Entry, Frame,
     IntVar, Label, OptionMenu, Scrollbar, StringVar, Text, Tk)
-from typing import Dict, List
 
 from helper_funs import center
-from indeed_crawler import IndeedCrawler
 from run_crawler import RunCrawler
 from self_destruct import SelfDestruct
 
@@ -32,6 +29,7 @@ class App:
         'Languages': {'Language': []}
     }
     def __init__(self, root_window_: Tk):
+        self._start = True
         self._default_input = {
             'Clearance': 'No Clearance',
             'Country Code': '1',
@@ -44,7 +42,6 @@ class App:
             'Start Date': date.today().strftime('%m/%d/%y'),
             'Interview Date & Time': 'Anytime',
         }
-        self._widget_labels = {key: field for field, dict_ in self._widget_entries.items() for key in dict_.keys()}
         self._user_input = OrderedDict({
             'First Name': {'Variable': StringVar(), 'Entity': Entry},
             'Email Address': {'Variable': StringVar(), 'Entity': Entry},
@@ -89,22 +86,21 @@ class App:
             self._q_and_a = load(f)
         if path.exists(self._save_file):
             with open(self._save_file) as f:
-                for field, value in load(f).items():
-                    self._user_input[field]['Variable'].set(value)
-            with open(self._save_file2) as f:
                 for field, dict_ in load(f).items():
                     for label, entry_list in dict_.items():
                         self._widget_entries[field][label] = entry_list
+            with open(self._save_file2) as f:
+                for field, value in load(f).items():
+                    self._user_input[field]['Variable'].set(value)
         self._log_box: Text
         self._root_frame = Frame(root_window_)
         self._root_frame.pack(expand=True)
         self._start_button = Button(self._root_frame, command=self._start_crawling)
-        self._start_button.configure(state='disable')
         self._user_form(0, 0, 13, 7, 25, 'nesw')
 
     def _entry_box(
             self, root_frame: Frame, default_text: str, width: int, row: int, col: int,
-            padx: int, pady: int, sticky: str, colspan=1, value='', secure=False, regex = '') -> Entry:
+            padx: int, pady: int, sticky: str, colspan=1, regex = '', secure=False, value='') -> Entry:
         def bind_clear_default(*args) -> None:
             if (entry.get() == default_text) or (entry.get() == 'INVALID'):
                 entry.config(textvariable=var)
@@ -127,6 +123,7 @@ class App:
             var = self._user_input[default_text]['Variable']
         else:
             var = StringVar(value=value)
+            self._user_input[default_text] = {'Variable': var}
         entry = Entry(root_frame, textvariable=var, width=width)
         entry.grid(row=row, column=col, columnspan=colspan, padx=padx, pady=pady, sticky=sticky)
         entry.bind('<FocusIn>', bind_clear_default)
@@ -142,13 +139,14 @@ class App:
 
     def _add_entry(self, root_frame: Frame, field: str, width: int,
             row: int, col: int, padx: int, pady: int, sticky: str) -> None:
-        # Detects saved user input.
-        if any(entry is str for entry_list in self._widget_entries[field].values() for entry in entry_list):
+        # Detects and processes saved user input.
+        if self._start and any(self._widget_entries[field].values()):
             for i, (label, entry_list) in enumerate(self._widget_entries[field].items()):
                 for j, value in enumerate(entry_list.copy()):
                     entry = self._entry_box(root_frame, f"{label} {j + 1}",
-                        width, row + j, col + i, padx, pady, sticky, value)
+                        width, row + j, col + i, padx, pady, sticky, value=value)
                     entry_list[j] = entry
+            self._start = False
         else:
             for i, (label, entry_list) in enumerate(self._widget_entries[field].items()):
                 entry = self._entry_box(root_frame, f"{label} {len(entry_list) + 1}",
@@ -157,8 +155,9 @@ class App:
         return None
 
     def _remove_entry(self, field: str) -> None:
-        for _, list_ in self._widget_entries[field].items():
+        for label, list_ in self._widget_entries[field].items():
             if len(list_) > 1:
+                del self._user_input[f"{label} {len(list_)}"]
                 list_.pop(-1).destroy()
         return None
 
@@ -180,7 +179,7 @@ class App:
         add_frame.grid(row=row, column=col, padx=padx, pady=pady, sticky=sticky)
         Label(add_frame, text='Requirements Document').grid(row=0, column=0, sticky='w')
         no_rows = 8
-        for i, field in enumerate(self._user_input):
+        for i, field in enumerate(self._user_input.copy()):
             col_i, row_i = i // no_rows, i % no_rows + 1
             if self._user_input[field]['Entity'] is Entry: 
                 self._entry_box(add_frame, field, width, row_i, col_i, padx, pady, sticky)
@@ -201,24 +200,38 @@ class App:
         add_frame.grid(row=row + 3, column=col, padx=padx, pady=pady, sticky='w')
         Button(add_frame, text='Reset Cache', command=self._reset_cache).grid(row=0, column=0, padx=(0, padx))
         Button(add_frame, text='Save Input', command=self._save_user_input).grid(row=0, column=1)
+        self._toggle_start_button()
         return None
 
     def _save_user_input(self) -> None:
+        user_input = self._user_input.copy()
+        save_input = {}
+        for field, dict_ in self._widget_entries.items():
+            label_dict = {}
+            for i, (label, entry_list) in enumerate(dict_.items()):
+                label_dict[label] = []
+                for j in range(len(entry_list)):
+                    val_label = f"{label} {j + 1}"
+                    value = user_input[val_label]['Variable'].get()
+                    if value:
+                        label_dict[label].append(value)
+                    del user_input[val_label]
+            # All labels within a widget field must have a value.
+            if len(label_dict) == i + 1:
+                save_input[field] = label_dict
         with open(path.join(path.dirname(__file__), self._save_file), 'w') as f:
-            dump({field: dict_['Variable'].get() for field, dict_ in self._user_input.items()}, f)
+            dump(save_input, f)
         with open(path.join(path.dirname(__file__), self._save_file2), 'w') as f:
-            dump({field: {label: set(map(lambda entry: entry.get(), entry_list))}
-                  for field, dict_ in self._widget_entries.items()
-                  for label, entry_list in dict_.items()}, f)
+            dump({field: dict_['Variable'].get() for field, dict_ in user_input.items()}, f)
         return None
 
     def _clear_user_input(self) -> None:
-        for field, dict_ in self._user_input.items():
-            if field in self._default_input:
-                dict_['Variable'].set(self._default_input[field])
-            else:
+        for dict_ in self._user_input.values():
+            if dict_['Variable'] is StringVar:
                 dict_['Variable'].set('')
-        for field, dict_ in self._widget_entries.items():
+            else:
+                dict_['Variable'].set(0)
+        for dict_ in self._widget_entries.values():
             for entry_list in dict_.values():
                 for i in range(len(entry_list - 1)):
                     entry_list[i].destroy()
@@ -239,18 +252,8 @@ class App:
         return None
 
     def _toggle_start_button(self, *args) -> None:
-        bool_ = True
-        for field in self._required_input:
-            if not bool_:
-                break
-            if field in self._widget_labels:
-                for entity in self._widget_entries[self._widget_labels[field]][field]:
-                    if not entity.get():
-                        bool_ *= False
-                        break
-            else:
-                bool_ *= bool(self._user_input[field]['Variable'].get())
-        if bool_:
+        if all(self._user_input[field]['Variable'].get() for field in self._required_input if field in self._user_input)\
+            & all(entry_list[0].get() for entry_list in self._widget_entries['Skills/Experience'].values()):
             self._start_button.configure(state='normal')
         else:
             self._start_button.configure(state='disable')
@@ -319,17 +322,15 @@ class App:
             password=self._user_input['Indeed Password'].get(),
             total_number_of_jobs=self._user_input['Number of Jobs'].get(),
             queries=[query.strip() for query in self._user_input['Search Job(s) (Comma Separated)'].get().split(',')],
-            places=[
-                (location.strip(), self._user_input['Search Country'].get().lower())
-                for location in self._user_input['Search State(s)/Region(s) (Comma Separated)'].get().split(',')],
+            places=[(location.strip(), self._user_input['Search Country'].get().lower())
+                    for location in self._user_input['Search State(s)/Region(s) (Comma Separated)'].get().split(',')],
             negate_jobs_list=[
                 word.strip() for word in self._user_input['Word(s) or Phrase(s) to Avoid (Comma Separated)'].get().split(',')],
             negate_companies_list=[
                 word.strip() for word in self._user_input['Companies to Avoid (Comma Separated)'].get().split(',')],
             min_salary=self._user_input['Desired Salary'].get(),
             default_q_and_a=input_q_and_a,
-            log_box=self._log_box
-        )
+            log_box=self._log_box)
         new_thread = Thread(target=run_crawler.start)
         new_thread.start()
         return None
