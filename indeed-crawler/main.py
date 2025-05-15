@@ -108,7 +108,7 @@ class App:
                 if secure:
                     entry.config(show='*')
             return None
-        def bind_on_focus_out(*args) -> None:
+        def bind_show_default(*args) -> None:
             if not entry.get():
                 entry.config(textvariable='', fg='grey')
                 entry.insert(0, default_text)
@@ -123,11 +123,12 @@ class App:
             var = self._user_input[default_text]['Variable']
         else:
             var = StringVar(value=value)
-            self._user_input[default_text] = {'Variable': var}
+            self._user_input[default_text] = {'Variable': var, 'Entity': Entry}
+        var.trace_add("write", bind_show_default)
         entry = Entry(root_frame, textvariable=var, width=width)
         entry.grid(row=row, column=col, columnspan=colspan, padx=padx, pady=pady, sticky=sticky)
         entry.bind('<FocusIn>', bind_clear_default)
-        entry.bind('<FocusOut>', bind_on_focus_out)
+        entry.bind('<FocusOut>', bind_show_default)
         if not var.get():
             entry.config(textvariable='')
             entry.insert(0, default_text)
@@ -199,7 +200,8 @@ class App:
         add_frame = Frame(self._root_frame)
         add_frame.grid(row=row + 3, column=col, padx=padx, pady=pady, sticky='w')
         Button(add_frame, text='Reset Cache', command=self._reset_cache).grid(row=0, column=0, padx=(0, padx))
-        Button(add_frame, text='Save Input', command=self._save_user_input).grid(row=0, column=1)
+        Button(add_frame, text='Save Input', command=self._save_user_input).grid(row=0, column=1, padx=(0, padx))
+        Button(add_frame, text='Clear Input', command=self._clear_user_input).grid(row=0, column=2)
         self._toggle_start_button()
         return None
 
@@ -227,15 +229,18 @@ class App:
 
     def _clear_user_input(self) -> None:
         for dict_ in self._user_input.values():
-            if dict_['Variable'] is StringVar:
-                dict_['Variable'].set('')
-            else:
+            if dict_['Entity'] is Checkbutton:
                 dict_['Variable'].set(0)
+            else:
+                dict_['Variable'].set('')
         for dict_ in self._widget_entries.values():
-            for entry_list in dict_.values():
-                for i in range(len(entry_list - 1)):
+            for label, entry_list in dict_.items():
+                n = len(entry_list)
+                for i in range(n - 1, -1):
                     entry_list[i].destroy()
-                entry_list = entry_list[0].set('')
+                    del self._user_input[f"{label} {i + 1}"]
+                entry_list = entry_list[0]
+                self._user_input[f"{label} {n}"]['Variable'].set('')
         return None
 
     def _setup_log_box(self, row: int, col: int, padx: int, pady: int, width: str, colspan: int) -> None:
