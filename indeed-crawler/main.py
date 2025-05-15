@@ -101,14 +101,14 @@ class App:
     def _entry_box(
             self, root_frame: Frame, default_text: str, width: int, row: int, col: int,
             padx: int, pady: int, sticky: str, colspan=1, regex = '', secure=False, value='') -> Entry:
-        def bind_clear_default(*args) -> None:
+        def clear_default(*args) -> None:
             if (entry.get() == default_text) or (entry.get() == 'INVALID'):
                 entry.config(textvariable=var)
                 entry.config(fg='black')
                 if secure:
                     entry.config(show='*')
             return None
-        def bind_show_default(*args) -> None:
+        def show_default(*args) -> None:
             if not entry.get():
                 entry.config(textvariable='', fg='grey')
                 entry.insert(0, default_text)
@@ -124,15 +124,17 @@ class App:
         else:
             var = StringVar(value=value)
             self._user_input[default_text] = {'Variable': var, 'Entity': Entry}
-        var.trace_add("write", bind_show_default)
         entry = Entry(root_frame, textvariable=var, width=width)
         entry.grid(row=row, column=col, columnspan=colspan, padx=padx, pady=pady, sticky=sticky)
-        entry.bind('<FocusIn>', bind_clear_default)
-        entry.bind('<FocusOut>', bind_show_default)
+        #var.trace_add("write", show_default)
+        entry.bind('<FocusIn>', clear_default)
+        entry.bind('<FocusOut>', show_default)
         if not var.get():
             entry.config(textvariable='')
             entry.insert(0, default_text)
             entry.config(fg='grey')
+        elif secure:
+            entry.config(show='*')
         if default_text in self._required_input:
             var.trace_add('write', self._toggle_start_button)
             entry.config({'background': 'yellow'})
@@ -182,8 +184,9 @@ class App:
         no_rows = 8
         for i, field in enumerate(self._user_input.copy()):
             col_i, row_i = i // no_rows, i % no_rows + 1
-            if self._user_input[field]['Entity'] is Entry: 
-                self._entry_box(add_frame, field, width, row_i, col_i, padx, pady, sticky)
+            if self._user_input[field]['Entity'] is Entry:
+                self._entry_box(add_frame, field, width, row_i, col_i,
+                    padx, pady, sticky, secure=field == 'Indeed Password')
             elif self._user_input[field]['Entity'] is Button:
                 self._widget(add_frame, field, width, row_i, col_i, padx, pady, sticky)
             elif self._user_input[field]['Entity'] is Checkbutton:
