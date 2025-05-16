@@ -180,29 +180,31 @@ class App:
                 input_q_and_a[question.replace('[BLANK]', skill.get())] = 'yes'
 
         for _, entry_list in self._widget_entries['Languages'].items():
-            for question in self._input_q_and_a['Languages']:
+            for question in self._q_and_a['Languages']:
                 if not entry_list:
                     input_q_and_a[question.replace('[BLANK]', 'English')] = 'yes'
                 for entry in entry_list:
                     input_q_and_a[question.replace('[BLANK]', entry.get())] = 'yes'
 
         for _, entry_list in self._widget_entries['Certs/Licenses'].items():
-            for question in self._input_q_and_a['Certs/Licenses']:
+            for question in self._q_and_a['Certs/Licenses']:
                 if not entry_list:
                     input_q_and_a[question] = 'no'
                 for entry in entry_list:
                     input_q_and_a[question.replace('[BLANK]', entry.get())] = 'yes'
 
         for field in ['Req. Sponsorship', 'Eligible to Work', '18 Years or Older']:
-            if self._user_input[field].get():
+            if self._user_input[field]['Variable'].get():
                 answer = 'yes'
             else:
                 answer = 'no'
             for question in self._q_and_a[field]:
-                input_q_and_a[question.replace('[BLANK]', self._user_input['Search Country'].get())] = answer
+                input_q_and_a[question.replace('[BLANK]',
+                    self._user_input['Search Country']['Variable'].get())] = answer
 
-        for label, tuple_ in {'Full Name': ('First Name', 'Last Name'), 'Full Address': ('City', 'State')}:
-            answer = ' '.join([self._user_input[tuple_[0]].get(), self._user_input[tuple_[1]].get()])
+        for label, tuple_ in {'Full Name': ('First Name', 'Last Name'), 'Full Address': ('City', 'State')}.items():
+            answer = ' '.join([self._user_input[tuple_[0]]['Variable'].get(),
+                self._user_input[tuple_[1]]['Variable'].get()])
             for question in self._q_and_a[label]:
                 input_q_and_a[question] = answer
 
@@ -210,9 +212,9 @@ class App:
             input_q_and_a[question] = answer
 
         for field in self._q_and_a:
-            if field in input_q_and_a:
+            if (field in input_q_and_a) or (field not in self._user_input):
                 continue
-            answer = self._user_input[field].get()
+            answer = self._user_input[field]['Variable'].get()
             if (not answer) and (field in self._default_input):
                 answer = self._default_input[field]
             else:
@@ -221,17 +223,17 @@ class App:
                 input_q_and_a[question] = answer
 
         run_crawler = RunCrawler(
-            email=self._user_input['Indeed Login'].get(),
-            password=self._user_input['Indeed Password'].get(),
-            total_number_of_jobs=self._user_input['Number of Jobs'].get(),
-            queries=[query.strip() for query in self._user_input['Search Job(s) (Comma Separated)'].get().split(',')],
-            places=[(location.strip(), self._user_input['Search Country'].get().lower())
-                    for location in self._user_input['Search State(s)/Region(s) (Comma Separated)'].get().split(',')],
+            email=self._user_input['Indeed Login']['Variable'].get(),
+            password=self._user_input['Indeed Password']['Variable'].get(),
+            total_number_of_jobs=self._user_input['Number of Jobs']['Variable'].get(),
+            queries=[query.strip() for query in self._user_input['Search Job(s) (Comma Separated)']['Variable'].get().split(',')],
+            places=[(location.strip(), self._user_input['Search Country']['Variable'].get().lower())
+                    for location in self._user_input['Search State(s)/Region(s) (Comma Separated)']['Variable'].get().split(',')],
             negate_jobs_list=[
-                word.strip() for word in self._user_input['Word(s) or Phrase(s) to Avoid (Comma Separated)'].get().split(',')],
+                word.strip() for word in self._user_input['Word(s) or Phrase(s) to Avoid (Comma Separated)']['Variable'].get().split(',')],
             negate_companies_list=[
-                word.strip() for word in self._user_input['Companies to Avoid (Comma Separated)'].get().split(',')],
-            min_salary=self._user_input['Desired Salary'].get(),
+                word.strip() for word in self._user_input['Companies to Avoid (Comma Separated)']['Variable'].get().split(',')],
+            min_salary=self._user_input['Desired Salary']['Variable'].get(),
             default_q_and_a=input_q_and_a,
             log_box=self.log_box)
         new_thread = Thread(target=run_crawler.start)
