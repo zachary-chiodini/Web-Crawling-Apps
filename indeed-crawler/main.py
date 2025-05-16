@@ -7,6 +7,7 @@ from re import search
 from threading import Thread
 from tkinter import (Button, Checkbutton, Entry, Frame,
     IntVar, Label, OptionMenu, Scrollbar, StringVar, Text, Tk)
+from typing import List
 
 from helper_funs import center
 from run_crawler import RunCrawler
@@ -33,54 +34,51 @@ class App:
         self._default_input = {
             'Clearance': 'No Clearance',
             'Country Code': '1',
+            'Hours per Week': '40',
             'LinkedIn': 'No Website',
             'Website': 'No Website',
-            'Salary Type': 'Annual',
-            'Currency': 'USD',
-            'Employment Type': 'Fulltime',
-            'Hours per Week': '40',
             'Start Date': date.today().strftime('%m/%d/%y'),
             'Interview Date & Time': 'Anytime',
         }
         self._user_input = OrderedDict({
-            'First Name': {'Variable': StringVar(), 'Entity': Entry},
-            'Email Address': {'Variable': StringVar(), 'Entity': Entry},
-            'Current Job Title': {'Variable': StringVar(), 'Entity': Entry},
-            'Current Company': {'Variable': StringVar(), 'Entity': Entry},
-            'City': {'Variable': StringVar(), 'Entity': Entry},
-            'State': {'Variable': StringVar(), 'Entity': Entry},
-            'Country': {'Variable': StringVar(), 'Entity': Entry},
-            'Search Country': {'Variable': StringVar(value='United States'), 'Entity': ['United States']},
-            'Last Name': {'Variable': StringVar(), 'Entity': Entry},
-            'Phone Number': {'Variable': StringVar(), 'Entity': Entry},
-            'Highest Education': {'Variable': StringVar(), 'Entity': Entry},
-            'Country Code': {'Variable': StringVar(), 'Entity': Entry},
-            'Street Address': {'Variable': StringVar(), 'Entity': Entry},
-            'Postal Code': {'Variable': StringVar(), 'Entity': Entry},
-            'Clearance': {'Variable': StringVar(), 'Entity': Entry},
-            'Languages': {'Variable': StringVar(), 'Entity': Button},
-            'Indeed Login': {'Variable': StringVar(), 'Entity': Entry},
-            'Website': {'Variable': StringVar(), 'Entity': Entry},
-            'Employment Type': {'Variable': StringVar(), 'Entity': Entry},
-            'Hours per Week': {'Variable': StringVar(), 'Entity': Entry},
-            'Search State(s)/Region(s) (Comma Separated)': {'Variable': StringVar(), 'Entity': Entry},
-            'Word(s) or Phrase(s) to Avoid (Comma Separated)': {'Variable': StringVar(), 'Entity': Entry},
-            'Companies to Avoid (Comma Separated)': {'Variable': StringVar(), 'Entity': Entry},
-            'Certs/Licenses': {'Variable': StringVar(), 'Entity': Button},
-            'Indeed Password': {'Variable': StringVar(), 'Entity': Entry},
-            'LinkedIn': {'Variable': StringVar(), 'Entity': Entry},
-            'Desired Salary': {'Variable': StringVar(), 'Entity': Entry},
-            'Salary Type': {'Variable': StringVar(), 'Entity': Entry},
-            'Currency': {'Variable': StringVar(), 'Entity': Entry},
-            'Number of Jobs': {'Variable': StringVar(), 'Entity': Entry},
-            'Search Job(s) (Comma Separated)': {'Variable': StringVar(), 'Entity': Entry},
-            'Skills/Experience': {'Variable': StringVar(), 'Entity': Button},
-            'Start Date': {'Variable': StringVar(), 'Entity': Entry},
-            'Interview Date & Time': {'Variable': StringVar(), 'Entity': Entry},
-            '18 Years or Older': {'Variable': IntVar(value=1), 'Entity': Checkbutton},
-            'Req. Sponsorship': {'Variable': IntVar(value=0), 'Entity': Checkbutton},
-            'Eligible to Work': {'Variable': IntVar(value=1), 'Entity': Checkbutton},
-            'Remote': {'Variable': IntVar(value=0), 'Entity': Checkbutton}
+            'First Name': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^[A-Za-z]*$'},
+            'Email Address': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^[a-z0-9/.]+@[a-z]+\.[a-z]+$'},
+            'Current Job Title': {'Variable': StringVar(), 'Entity': Entry, 'Regex': ''},
+            'Current Company': {'Variable': StringVar(), 'Entity': Entry, 'Regex': ''},
+            'City': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '(?!.*?  )^[A-Za-z][A-Za-z ]+[A-Za-z]$'},
+            'State': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '(?!.*?  )^[A-Za-z][A-Za-z ]+[A-Za-z]$'},
+            'Country': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '(?!.*?  )^[A-Za-z][A-Za-z ]+[A-Za-z]$'},
+            'Search Country': {'Variable': StringVar(value='United States'), 'Entity': ['United States'], 'Regex': ''},
+            'Last Name': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^[A-Za-z]*$'},
+            'Phone Number': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^[0-9]{0,10}$'},
+            'Highest Education': {'Variable': StringVar(), 'Entity': Entry, 'Regex': ''},
+            'Country Code': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^[0-9]+$'},
+            'Street Address': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^[0-9-]+ [0-9A-Za-z .,-]+[A-Za-z0-9]$'},
+            'Postal Code': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^[0-9]+$'},
+            'Clearance': {'Variable': StringVar(), 'Entity': Entry, 'Regex': ''},
+            'Languages': {'Variable': StringVar(), 'Entity': Button, 'Regex': ['']},
+            'Indeed Login': {'Variable': StringVar(), 'Entity': Entry, 'Regex': ''},
+            'Website': {'Variable': StringVar(), 'Entity': Entry, 'Regex': ''},
+            'Employment Type': {'Variable': StringVar(value='Fulltime'), 'Entity': ['Fulltime', 'Parttime'], 'Regex': ''},
+            'Hours per Week': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^[0-9]+$'},
+            'Search State(s)/Region(s) (Comma Separated)': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^.*?(,.*?)*$'},
+            'Word(s) or Phrase(s) to Avoid (Comma Separated)': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^.*?(,.*?)*$'},
+            'Companies to Avoid (Comma Separated)': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^.*?(,.*?)*$'},
+            'Certs/Licenses': {'Variable': StringVar(), 'Entity': Button, 'Regex': ['']},
+            'Indeed Password': {'Variable': StringVar(), 'Entity': Entry, 'Regex': ''},
+            'LinkedIn': {'Variable': StringVar(), 'Entity': Entry, 'Regex': ''},
+            'Desired Salary': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^[0-9]+$'},
+            'Salary Type': {'Variable': StringVar(value='Annual'), 'Entity': ['Annual', 'Hourly'], 'Regex': ''},
+            'Currency': {'Variable': StringVar(value='USD'), 'Entity': ['USD'], 'Regex': ''},
+            'Number of Jobs': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^[0-9]+$'},
+            'Search Job(s) (Comma Separated)': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^.*?(,.*?)*$'},
+            'Skills/Experience': {'Variable': StringVar(), 'Entity': Button, 'Regex': ['', '^[0-9]+$']},
+            'Start Date': {'Variable': StringVar(), 'Entity': Entry, 'Regex': ''},
+            'Interview Date & Time': {'Variable': StringVar(), 'Entity': Entry, 'Regex': ''},
+            '18 Years or Older': {'Variable': IntVar(value=1), 'Entity': Checkbutton, 'Regex': ''},
+            'Req. Sponsorship': {'Variable': IntVar(value=0), 'Entity': Checkbutton, 'Regex': ''},
+            'Eligible to Work': {'Variable': IntVar(value=1), 'Entity': Checkbutton, 'Regex': ''},
+            'Remote': {'Variable': IntVar(value=0), 'Entity': Checkbutton, 'Regex': ''}
         })
         with open('q_and_a.json') as f:
             self._q_and_a = load(f)
@@ -147,19 +145,19 @@ class App:
         return entry
 
     def _add_entry(self, root_frame: Frame, field: str, width: int,
-            row: int, col: int, padx: int, pady: int, sticky: str) -> None:
+            row: int, col: int, padx: int, pady: int, sticky: str, regex: List[str]) -> None:
         # Detects and processes saved user input.
         if self._start and any(self._widget_entries[field].values()):
             for i, (label, entry_list) in enumerate(self._widget_entries[field].items()):
                 for j, value in enumerate(entry_list.copy()):
                     entry = self._entry_box(root_frame, f"{label} {j + 1}",
-                        width, row + j, col + i, padx, pady, sticky, value=value)
+                        width, row + j, col + i, padx, pady, sticky, regex=regex[i], value=value)
                     entry_list[j] = entry
             self._start = False
         else:
             for i, (label, entry_list) in enumerate(self._widget_entries[field].items()):
                 entry = self._entry_box(root_frame, f"{label} {len(entry_list) + 1}",
-                    width, row + len(entry_list), col + i, padx, pady, sticky)
+                    width, row + len(entry_list), col + i, padx, pady, sticky, regex=regex[i])
                 entry_list.append(entry)
         return None
 
@@ -171,16 +169,28 @@ class App:
         return None
 
     def _widget(self, root_frame: Frame, field: str, width: int,
-            row: int, col: int, padx: int, pady: int, sticky) -> None:
+            row: int, col: int, padx: int, pady: int, sticky: str, regex: List[str]) -> None:
         add_frame = Frame(root_frame)
         add_frame.grid(row=row, column=col, padx=padx, pady=pady, sticky=sticky)
         Label(add_frame, text=field).grid(row=0, column=0, sticky='w')
         Button(add_frame, text='+', width=2,
-            command=lambda *args: self._add_entry(root_frame, field, width, row + 1, col, padx, pady, sticky))\
-            .grid(row=0, column=1, sticky='e')
+            command=lambda *args: self._add_entry(root_frame, field, width, row + 1, col,
+                padx, pady, sticky, regex)).grid(row=0, column=1, sticky='e')
         Button(add_frame, text='-', width=2,
             command=lambda *args: self._remove_entry(field)).grid(row=0, column=2, sticky='e')
-        self._add_entry(root_frame, field, width, row + 1, col, padx, pady, sticky)
+        self._add_entry(root_frame, field, width, row + 1, col, padx, pady, sticky, regex)
+        return None
+
+    def _option_menu(self, root_frame: Frame, field: str,
+            row: int, col: int, padx: int, pady: int, sticky: str) -> None:
+        def on_select(value: str) -> None:
+            selected_var.set(value)
+            display_var.set(field)
+            return None
+        display_var = StringVar(value=field)
+        selected_var = self._user_input[field]['Variable']
+        OptionMenu(root_frame, display_var, *self._user_input[field]['Entity'],
+            command=on_select).grid(row=row, column=col, padx=padx, pady=pady, sticky='w')
         return None
 
     def _user_form(self, row: int, col: int, padx: int, pady: int, width: int, sticky) -> None:
@@ -191,16 +201,16 @@ class App:
         for i, field in enumerate(self._user_input.copy()):
             col_i, row_i = i // no_rows, i % no_rows + 1
             if self._user_input[field]['Entity'] is Entry:
-                self._entry_box(add_frame, field, width, row_i, col_i,
-                    padx, pady, sticky, secure=field == 'Indeed Password')
+                self._entry_box(add_frame, field, width, row_i, col_i, padx, pady, sticky,
+                    regex=self._user_input[field]['Regex'], secure=field == 'Indeed Password')
             elif self._user_input[field]['Entity'] is Button:
-                self._widget(add_frame, field, width, row_i, col_i, padx, pady, sticky)
+                self._widget(add_frame, field, width, row_i, col_i, padx, pady, sticky,
+                    regex=self._user_input[field]['Regex'])
             elif self._user_input[field]['Entity'] is Checkbutton:
                 Checkbutton(add_frame, text=field, variable=self._user_input[field]['Variable'])\
                 .grid(row=row_i, column=col_i, sticky='w', padx=padx, pady=pady)
             elif type(self._user_input[field]['Entity']) is list:
-                OptionMenu(add_frame, self._user_input[field]['Variable'], *self._user_input[field]['Entity'])\
-                .grid(row=row_i, column=col + col_i, sticky=sticky, padx=padx, pady=pady)
+                self._option_menu(add_frame, field, row_i, col_i, padx, pady, sticky)
         self._setup_log_box(row + 2, col, padx, 0, width, col_i + 1)
         image = ImageTk.PhotoImage(Image.open('icon/cool_glasses.png'))
         self._start_button.image = image
@@ -358,7 +368,7 @@ if __name__ == '__main__':
         self_destruct.open_window('EXPIRATION DATE EXCEEDED')
     else:
         root_window = Tk()
-        root_window.geometry('960x600')
+        root_window.geometry('960x620')
         root_window.title('Indeed Crawler')
         root_window.bind_all("<Button-1>", lambda event: event.widget.focus_set())
         center(root_window)
