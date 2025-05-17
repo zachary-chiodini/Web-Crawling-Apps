@@ -7,7 +7,7 @@ from re import search
 from threading import Thread
 from tkinter import (Button, Checkbutton, Entry, Frame,
     IntVar, Label, OptionMenu, Scrollbar, StringVar, Text, Tk)
-from typing import List
+from typing import Dict, List
 
 from helper_funs import center
 from run_crawler import RunCrawler
@@ -170,58 +170,7 @@ class App:
         return None
 
     def start_crawling(self) -> None:
-        """Processes data from user input before crawling."""
-        input_q_and_a = {}
-        for skill, experience in zip(self._widget_entries['Skills/Experience']['Skill'],
-                self._widget_entries['Skills/Experience']['Experience']):
-            for question in self._q_and_a['Skills']:
-                input_q_and_a[question.replace('[BLANK]', skill.get())] = experience.get()
-            for question in self._q_and_a['Skills Other']:
-                input_q_and_a[question.replace('[BLANK]', skill.get())] = 'yes'
-
-        for _, entry_list in self._widget_entries['Languages'].items():
-            for question in self._q_and_a['Languages']:
-                if not entry_list:
-                    input_q_and_a[question.replace('[BLANK]', 'English')] = 'yes'
-                for entry in entry_list:
-                    input_q_and_a[question.replace('[BLANK]', entry.get())] = 'yes'
-
-        for _, entry_list in self._widget_entries['Certs/Licenses'].items():
-            for question in self._q_and_a['Certs/Licenses']:
-                if not entry_list:
-                    input_q_and_a[question] = 'no'
-                for entry in entry_list:
-                    input_q_and_a[question.replace('[BLANK]', entry.get())] = 'yes'
-
-        for field in ['Req. Sponsorship', 'Eligible to Work', '18 Years or Older']:
-            if self._user_input[field]['Variable'].get():
-                answer = 'yes'
-            else:
-                answer = 'no'
-            for question in self._q_and_a[field]:
-                input_q_and_a[question.replace('[BLANK]',
-                    self._user_input['Search Country']['Variable'].get())] = answer
-
-        for label, tuple_ in {'Full Name': ('First Name', 'Last Name'), 'Full Address': ('City', 'State')}.items():
-            answer = ' '.join([self._user_input[tuple_[0]]['Variable'].get(),
-                self._user_input[tuple_[1]]['Variable'].get()])
-            for question in self._q_and_a[label]:
-                input_q_and_a[question] = answer
-
-        for question, answer in self._q_and_a['Private'].items():
-            input_q_and_a[question] = answer
-
-        for field in self._q_and_a:
-            if (field in input_q_and_a) or (field not in self._user_input):
-                continue
-            answer = self._user_input[field]['Variable'].get()
-            if (not answer) and (field in self._default_input):
-                answer = self._default_input[field]
-            else:
-                answer = 'Prefer not to say'
-            for question in self._q_and_a[field]:
-                input_q_and_a[question] = answer
-
+        input_q_and_a = self._process_user_input()
         run_crawler = RunCrawler(
             email=self._user_input['Indeed Login']['Variable'].get(),
             password=self._user_input['Indeed Password']['Variable'].get(),
@@ -234,7 +183,7 @@ class App:
             negate_companies_list=[
                 word.strip() for word in self._user_input['Companies to Avoid (Comma Separated)']['Variable'].get().split(',')],
             min_salary=self._user_input['Desired Salary']['Variable'].get(),
-            default_q_and_a=input_q_and_a,
+            q_and_a=input_q_and_a,
             log_box=self.log_box)
         new_thread = Thread(target=run_crawler.start)
         new_thread.start()
@@ -316,6 +265,59 @@ class App:
                 entry_list = entry_list[0]
                 self._user_input[f"{label} {n}"]['Variable'].set('')
         return None
+
+    def _process_user_input(self) -> Dict:
+        input_q_and_a = {}
+        for skill, experience in zip(self._widget_entries['Skills/Experience']['Skill'],
+                self._widget_entries['Skills/Experience']['Experience']):
+            for question in self._q_and_a['Skills']:
+                input_q_and_a[question.replace('[BLANK]', skill.get())] = experience.get()
+            for question in self._q_and_a['Skills Other']:
+                input_q_and_a[question.replace('[BLANK]', skill.get())] = 'yes'
+
+        for _, entry_list in self._widget_entries['Languages'].items():
+            for question in self._q_and_a['Languages']:
+                if not entry_list:
+                    input_q_and_a[question.replace('[BLANK]', 'English')] = 'yes'
+                for entry in entry_list:
+                    input_q_and_a[question.replace('[BLANK]', entry.get())] = 'yes'
+
+        for _, entry_list in self._widget_entries['Certs/Licenses'].items():
+            for question in self._q_and_a['Certs/Licenses']:
+                if not entry_list:
+                    input_q_and_a[question] = 'no'
+                for entry in entry_list:
+                    input_q_and_a[question.replace('[BLANK]', entry.get())] = 'yes'
+
+        for field in ['Req. Sponsorship', 'Eligible to Work', '18 Years or Older']:
+            if self._user_input[field]['Variable'].get():
+                answer = 'yes'
+            else:
+                answer = 'no'
+            for question in self._q_and_a[field]:
+                input_q_and_a[question.replace('[BLANK]',
+                    self._user_input['Search Country']['Variable'].get())] = answer
+
+        for label, tuple_ in {'Full Name': ('First Name', 'Last Name'), 'Full Address': ('City', 'State')}.items():
+            answer = ' '.join([self._user_input[tuple_[0]]['Variable'].get(),
+                self._user_input[tuple_[1]]['Variable'].get()])
+            for question in self._q_and_a[label]:
+                input_q_and_a[question] = answer
+
+        for question, answer in self._q_and_a['Private'].items():
+            input_q_and_a[question] = answer
+
+        for field in self._q_and_a:
+            if (field in input_q_and_a) or (field not in self._user_input):
+                continue
+            answer = self._user_input[field]['Variable'].get()
+            if (not answer) and (field in self._default_input):
+                answer = self._default_input[field]
+            else:
+                answer = 'Prefer not to say'
+            for question in self._q_and_a[field]:
+                input_q_and_a[question] = answer
+        return input_q_and_a
 
     def _remove_entry(self, field: str) -> None:
         for label, list_ in self._widget_entries[field].items():
