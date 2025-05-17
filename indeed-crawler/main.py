@@ -15,7 +15,8 @@ from self_destruct import SelfDestruct
 
 
 class App:
-    version = '2.0-Beta'
+    version = '3.0-Beta'
+    _debug = False
     _save_file = 'saved_input.txt'
     _save_file2 = 'saved_input2.txt'
     _required_input = {
@@ -184,7 +185,8 @@ class App:
                 word.strip() for word in self._user_input['Companies to Avoid (Comma Separated)']['Variable'].get().split(',')],
             min_salary=self._user_input['Desired Salary']['Variable'].get(),
             q_and_a=input_q_and_a,
-            log_box=self.log_box)
+            log_box=self.log_box,
+            debug=self._debug)
         new_thread = Thread(target=run_crawler.start)
         new_thread.start()
         return None
