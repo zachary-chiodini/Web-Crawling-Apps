@@ -3,7 +3,7 @@ from re import compile as compile_regex, search
 from time import sleep
 from tkinter import Text
 from traceback import print_exc
-from typing import Callable, Dict, List, Optional, Set, Union
+from typing import Callable, List, Optional, Set, Union
 
 from bs4 import BeautifulSoup
 from bs4.element import Tag
@@ -31,36 +31,23 @@ class IndeedCrawler:
 
     def __init__(self, number_of_jobs=0, debug=False, auto_answer_questions=False,
             manually_fill_out_questions=False, q_and_a={}, log_box: Optional[Text] = None) -> None:
-        self.results = {
-            'Title': [],
-            'Company': [],
-            'Location': [],
-            'Salary': [],
-            'URL': []
-            }
+        self.results = {'Title': [], 'Company': [], 'Location': [], 'Salary': [], 'URL': []}
         self.total_jobs_applied_to = 0
-        self._map_country = {
-            'canada': 'ca.',
-            'france': 'fr.',
-            'india': 'in.',
-            'ireland': 'ie.',
-            'netherlands': 'nl.',
-            'united states': '',
-            'united kingdom': 'uk.'
-            }
-        self._q_and_a = q_and_a
-        self._log_box = log_box
-        self._df = DataFrame()
-        self._browser: Chrome
-        # Sentence to vector model must be loaded from fasttext binary.
-        self._sentence2vec: Callable[[NDArray[str_]], NDArray[float32]] = None
-        self._number_of_jobs = number_of_jobs
-        self._main_window = ''
-        self._debug = debug
         self._auto_answer_questions = auto_answer_questions
-        self._manually_fill_out_questions = manually_fill_out_questions
+        self._browser: Chrome
         self._cache = set()
         self._cache_file_name = 'cache.txt'
+        self._debug = debug
+        self._df = DataFrame()
+        self._log_box = log_box
+        self._main_window = ''
+        self._manually_fill_out_questions = manually_fill_out_questions
+        self._map_country = {'canada': 'ca.', 'france': 'fr.', 'india': 'in.', 'ireland': 'ie.',
+            'netherlands': 'nl.', 'united states': '', 'united kingdom': 'uk.'}
+        self._number_of_jobs = number_of_jobs
+        self._q_and_a = q_and_a
+        # Sentence to vector model must be loaded from fasttext binary.
+        self._sentence2vec: Callable[[NDArray[str_]], NDArray[float32]] = None
         if path.exists(self._cache_file_name):
             with open(self._cache_file_name) as f:
                 for line in f:
