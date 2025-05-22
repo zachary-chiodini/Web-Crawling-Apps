@@ -169,16 +169,16 @@ class IndeedCrawler:
         self._log('Model loaded successfully.')
         return None
 
-    def _cosine_distances(self, v: NDArray[str_], s: str) -> NDArray[float32]:
+    def _cosine_distance(self, v: NDArray[str_], s: str) -> NDArray[float32]:
         return apply_along_axis(distance.cosine, 1, self._sentence2vec(v), self._sentence2vec(s))
 
     def _get_answer(self, question_found: str, answers_found: NDArray[str_]) -> str:
-        self._df['Cosine Distance'] = self._cosine_distances(
+        self._df['Cosine Distance'] = self._cosine_distance(
             self._df['Question'], question_found)
         answer_stored = str(self._df.loc[self._df['Cosine Distance'].idxmin(), 'Answer'])
         if answers_found.size:
             answers_found = char.replace(answers_found, '\n', '')
-            return answers_found[argmin(self._cosine_distances(answers_found, answer_stored))]
+            return answers_found[argmin(self._cosine_distance(answers_found, answer_stored))]
         return answer_stored
 
     def _select_continue(self) -> None:
