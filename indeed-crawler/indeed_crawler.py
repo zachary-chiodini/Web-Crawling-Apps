@@ -59,7 +59,7 @@ class IndeedCrawler:
             self._df = read_excel('questionnaire.xlsx')
             for _, series in self._df.iterrows():
                 self._q_and_a[series['Question']] = {series['Answer']}
-            self._load_w2v_model()
+            self._load_s2v_model()
         self._browser.get(f'https://{self._map_country[country]}indeed.com/jobs?q={query}')
         try:
             mobtk = search(
@@ -159,13 +159,10 @@ class IndeedCrawler:
         self._browser.get('https://secure.indeed.com/account/login')
         # Automated login is no longer possible on indeed.com.
         self._log('You must manually sign in. After signing in, navigate to your profile page.')
-        WebDriverWait(self._browser, 600).until(
-            lambda driver: ('https://profile.indeed.com/' in driver.current_url
-                            or 'https://my.indeed.com/resume?from=login' in driver.current_url)
-            )
+        WebDriverWait(self._browser, 600).until(lambda driver: 'https://profile.indeed.com/' in driver.current_url)
         return None
 
-    def _load_w2v_model(self) -> None:
+    def _load_s2v_model(self) -> None:
         self._log('Loading fasttext pretrained sentence/document embedding model. This may take a few minutes.')
         model = load_model('fasttext-model/cc.en.300.bin')
         self._sentence2vec = vectorize(model.get_sentence_vector, otypes=[float32], signature='()->(n)')
@@ -409,7 +406,7 @@ class IndeedCrawler:
                 self._df = read_excel('questionnaire.xlsx')
                 for _, series in self._df.iterrows():
                     self._q_and_a[series['Question']] = series['Answer']
-            self._load_w2v_model()
+            self._load_s2v_model()
         if remote or temp_remote:
             # This block probably needs rewriting.
             self._browser.get(
