@@ -171,7 +171,10 @@ class App:
         return None
 
     def start_crawling(self) -> None:
-        input_q_and_a = self._process_user_input()
+        recast_input = {}
+        for field, dict_ in self._user_input.items():
+            recast_input[field] = dict_['Variable'].get()
+        input_q_and_a = self._input_q_and_a().update(recast_input)
         run_crawler = RunCrawler(
             email=self._user_input['Indeed Login']['Variable'].get(),
             password=self._user_input['Indeed Password']['Variable'].get(),
@@ -268,7 +271,7 @@ class App:
                 self._user_input[f"{label} {n}"]['Variable'].set('')
         return None
 
-    def _process_user_input(self) -> Dict:
+    def _input_q_and_a(self) -> Dict:
         input_q_and_a = {}
         for skill, experience in zip(self._widget_entries['Skills/Experience']['Skill'],
                 self._widget_entries['Skills/Experience']['Experience']):
