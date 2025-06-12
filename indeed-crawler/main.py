@@ -48,7 +48,6 @@ def expiration_window(title: str, message: str) -> None:
 
 
 class App:
-    version = '3.0-Beta'
     _debug = True
     _save_file = 'saved_input.bin'
     _save_file2 = 'saved_input2.bin'
