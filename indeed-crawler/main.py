@@ -8,7 +8,7 @@ from re import search
 from threading import Thread
 from tkinter import (Button, Checkbutton, Entry, Frame,
     IntVar, Label, OptionMenu, Scrollbar, StringVar, Text, Tk)
-from typing import Dict, List
+from typing import Dict, List, Set
 from webbrowser import open_new
 
 from indeed_crawler import IndeedCrawler
@@ -204,23 +204,29 @@ class App:
         return None
 
     def start_crawling(self) -> None:
+        def get_clean_set_from(comma_delimited_str: str) -> Set[str]:
+            clean_set = set()
+            for val in comma_delimited_str.split(','):
+                val = val.strip()
+                if val:
+                    clean_set.add(val)
+            return clean_set
         recast_input = {}
         for field, dict_ in self._user_input.items():
             recast_input[field] = dict_['Variable'].get()
         input_q_and_a = self._input_q_and_a()
         input_q_and_a.update(recast_input)
-        queries = [query.strip() for query in self._user_input['Search Job(s) (Comma Separated)']['Variable'].get().split(',')]
-        regions = [(location.strip(), self._user_input['Search Country']['Variable'].get().lower())
-            for location in self._user_input['Search State(s)/Region(s) (Comma Separated)']['Variable'].get().split(',')]
-        jobs_negate_list = [
-            word.strip() for word in self._user_input['Word(s) or Phrase(s) to Avoid (Comma Separated)']['Variable'].get().split(',')
-            if word.strip()]
-        company_negate_list = [
-            word.strip() for word in self._user_input['Companies to Avoid (Comma Separated)']['Variable'].get().split(',')
-            if word.strip()]
+        queries = get_clean_set_from(self._user_input['Search Job(s) (Comma Separated)']['Variable'].get())
+        regions = set()
+        for location in self._user_input['Search State(s)/Region(s) (Comma Separated)']['Variable'].get().split(','):
+            regions.add((location.strip(), self._user_input['Search Country']['Variable'].get().lower()))
+        jobs_negate_set = get_clean_set_from(
+            self._user_input['Word(s) or Phrase(s) to Avoid (Comma Separated)']['Variable'].get())
+        company_negate_set = get_clean_set_from(
+            self._user_input['Companies to Avoid (Comma Separated)']['Variable'].get())
         total_number_of_jobs = self._user_input['Number of Jobs']['Variable'].get()
         indeed_crawler = IndeedCrawler(total_number_of_jobs, self._debug, input_q_and_a, self._log_box)
-        new_thread = Thread(target=indeed_crawler.start_crawling, args=(company_negate_list, jobs_negate_list, queries, regions))
+        new_thread = Thread(target=indeed_crawler.start_crawling, args=(list(company_negate_set), list(jobs_negate_set), queries, regions))
         new_thread.start()
         return None
 
@@ -310,14 +316,14 @@ class App:
             for question in self._q_and_a['Skills Other']:
                 input_q_and_a[question.replace('[BLANK]', skill.get())] = 'yes'
 
-        for _, entry_list in self._widget_entries['Languages'].items():
+        for entry_list in self._widget_entries['Languages'].values():
             for question in self._q_and_a['Languages']:
                 if not entry_list:
                     input_q_and_a[question.replace('[BLANK]', 'English')] = 'yes'
                 for entry in entry_list:
                     input_q_and_a[question.replace('[BLANK]', entry.get())] = 'yes'
 
-        for _, entry_list in self._widget_entries['Certs/Licenses'].items():
+        for entry_list in self._widget_entries['Certs/Licenses'].values():
             for question in self._q_and_a['Certs/Licenses']:
                 if not entry_list:
                     input_q_and_a[question] = 'no'
@@ -330,12 +336,12 @@ class App:
             else:
                 answer = 'no'
             for question in self._q_and_a[field]:
-                input_q_and_a[question.replace('[BLANK]',
-                    self._user_input['Search Country']['Variable'].get())] = answer
+                input_q_and_a[
+                    question.replace('[BLANK]', self._user_input['Search Country']['Variable'].get())] = answer
 
         for label, tuple_ in {'Full Name': ('First Name', 'Last Name'), 'Full Address': ('City', 'State')}.items():
-            answer = ' '.join([self._user_input[tuple_[0]]['Variable'].get(),
-                self._user_input[tuple_[1]]['Variable'].get()])
+            answer = ' '.join(
+                [self._user_input[tuple_[0]]['Variable'].get(), self._user_input[tuple_[1]]['Variable'].get()])
             for question in self._q_and_a[label]:
                 input_q_and_a[question] = answer
 
