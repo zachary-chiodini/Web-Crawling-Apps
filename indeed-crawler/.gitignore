@@ -5,6 +5,7 @@ cache.txt
 dist/job-crawler-*
 fasttext-model/cc.en.100.bin
 fasttext-model/cc.en.300.bin
+html.txt
 questionnaire.xlsx
 saved_input.bin
 saved_input2.bin
