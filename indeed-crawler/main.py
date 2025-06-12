@@ -223,7 +223,7 @@ class App:
             self._user_input['Word(s) or Phrase(s) to Avoid (Comma Separated)']['Variable'].get())
         company_negate_set = get_clean_set_from(
             self._user_input['Companies to Avoid (Comma Separated)']['Variable'].get())
-        total_number_of_jobs = self._user_input['Number of Jobs']['Variable'].get()
+        total_number_of_jobs = int(self._user_input['Number of Jobs']['Variable'].get())
         indeed_crawler = IndeedCrawler(total_number_of_jobs, self._debug, input_q_and_a, self._log_box)
         new_thread = Thread(target=indeed_crawler.start_crawling, args=(list(company_negate_set), list(jobs_negate_set), queries, regions))
         new_thread.start()
