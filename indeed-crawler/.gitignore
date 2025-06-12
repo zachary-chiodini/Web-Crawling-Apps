@@ -6,8 +6,8 @@ dist/job-crawler-*
 fasttext-model/cc.en.100.bin
 fasttext-model/cc.en.300.bin
 questionnaire.xlsx
-saved_input.txt
-saved_input2.txt
+saved_input.bin
+saved_input2.bin
 submissions.xlsx
 *.spec
 venv

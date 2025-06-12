@@ -1,24 +1,57 @@
 from collections import OrderedDict
 from datetime import date
-from json import dump, load
-from os import environ, path
+from json import load as load_json
+from os import path
+from pickle import dump as dump_bin, load as load_bin
 from PIL import ImageTk, Image
 from re import search
 from threading import Thread
 from tkinter import (Button, Checkbutton, Entry, Frame,
     IntVar, Label, OptionMenu, Scrollbar, StringVar, Text, Tk)
 from typing import Dict, List
+from webbrowser import open_new
 
-from helper_funs import center
-from run_crawler import RunCrawler
-from self_destruct import SelfDestruct
+from indeed_crawler import IndeedCrawler
+
+
+def center(window: Tk) -> None:
+    """
+    centers a tkinter window
+    :param window: the main window or Toplevel window to center
+    """
+    window.update_idletasks()
+    width = window.winfo_width()
+    frm_width = window.winfo_rootx() - window.winfo_x()
+    window_width = width + 2 * frm_width
+    height = window.winfo_height()
+    titlebar_height = window.winfo_rooty() - window.winfo_y()
+    window_height = height + titlebar_height + frm_width
+    x = window.winfo_screenwidth() // 2 - window_width // 2
+    y = window.winfo_screenheight() // 2 - window_height // 2
+    window.geometry('{}x{}+{}+{}'.format(width, height, x, y))
+    window.deiconify()
+    return None
+
+def expiration_window(title: str, message: str) -> None:
+    window = Tk()
+    window.geometry('250x100')
+    window.title(title)
+    window.iconbitmap('icon/cool_robot_emoji.ico')
+    center(window)
+    frame = Frame(window)
+    frame.pack(expand=True)
+    Label(frame, text=message, fg='red').pack()
+    Label(frame, text='This robot has become obsolete.').pack()
+    Button(frame, text='Request an updated copy', command=lambda *args: open_new('https://www.google.com')).pack()
+    window.mainloop()
+    return None
 
 
 class App:
     version = '3.0-Beta'
-    _debug = False
-    _save_file = 'saved_input.txt'
-    _save_file2 = 'saved_input2.txt'
+    _debug = True
+    _save_file = 'saved_input.bin'
+    _save_file2 = 'saved_input2.bin'
     _required_input = {
         'First Name', 'Last Name', 'Email Address', 'Phone Number',
         'City', 'State', 'Country', 'Highest Education',
@@ -31,6 +64,7 @@ class App:
         'Languages': {'Language': []}
     }
     def __init__(self, root_window_: Tk):
+        self._log_box: Text
         self._start = True
         self._default_input = {
             'Clearance': 'No Clearance',
@@ -82,16 +116,15 @@ class App:
             'Remote': {'Variable': IntVar(value=0), 'Entity': Checkbutton, 'Regex': ''}
         })
         with open('q_and_a.json') as f:
-            self._q_and_a = load(f)
+            self._q_and_a = load_json(f)
         if path.exists(self._save_file):
-            with open(self._save_file) as f:
-                for field, dict_ in load(f).items():
+            with open(self._save_file, 'rb') as byte_stream:
+                for field, dict_ in load_bin(byte_stream).items():
                     for label, entry_list in dict_.items():
                         self._widget_entries[field][label] = entry_list
-            with open(self._save_file2) as f:
-                for field, value in load(f).items():
+            with open(self._save_file2, 'rb') as byte_stream:
+                for field, value in load_bin(byte_stream).items():
                     self._user_input[field]['Variable'].set(value)
-        self.log_box: Text
         self._root_frame = Frame(root_window_)
         self._root_frame.pack(expand=True)
         self._start_button = Button(self._root_frame, command=self.start_crawling)
@@ -157,40 +190,37 @@ class App:
             command=on_select).grid(row=row, column=col, padx=padx, pady=pady, sticky='w')
         return None
 
-    def setup_log_box(self, row: int, col: int, padx: int, pady: int, width: str, colspan: int) -> None:
+    def _setup_log_box(self, row: int, col: int, padx: int, pady: int, width: str, colspan: int) -> None:
         add_frame = Frame(self._root_frame)
         add_frame.grid(row=row, column=col, columnspan=colspan, padx=padx, pady=pady, sticky='nsew')
-        self.log_box = Text(add_frame, height=10, width=colspan*width - padx)
+        self._log_box = Text(add_frame, height=10, width=colspan*width - padx)
         Label(add_frame, text='Crawler Log:').grid(row=0, column=0, sticky='w')
-        scroll_bar = Scrollbar(add_frame, command=self.log_box.yview)
-        self.log_box.config(yscrollcommand=scroll_bar.set)
+        scroll_bar = Scrollbar(add_frame, command=self._log_box.yview)
+        self._log_box.config(yscrollcommand=scroll_bar.set)
         scroll_bar.grid(row=1, column=0, sticky='nse')
-        self.log_box.grid(row=1, column=0, sticky='w')
-        self.log_box.insert('end', 'Please fill out the above information. Required input is highlighted.')
-        self.log_box.configure(state='disabled')
+        self._log_box.grid(row=1, column=0, sticky='w')
+        self._log_box.insert('end', 'Please fill out the above information. Required input is highlighted.')
+        self._log_box.configure(state='disabled')
         return None
 
     def start_crawling(self) -> None:
         recast_input = {}
         for field, dict_ in self._user_input.items():
             recast_input[field] = dict_['Variable'].get()
-        input_q_and_a = self._input_q_and_a().update(recast_input)
-        run_crawler = RunCrawler(
-            email=self._user_input['Indeed Login']['Variable'].get(),
-            password=self._user_input['Indeed Password']['Variable'].get(),
-            total_number_of_jobs=self._user_input['Number of Jobs']['Variable'].get(),
-            queries=[query.strip() for query in self._user_input['Search Job(s) (Comma Separated)']['Variable'].get().split(',')],
-            places=[(location.strip(), self._user_input['Search Country']['Variable'].get().lower())
-                    for location in self._user_input['Search State(s)/Region(s) (Comma Separated)']['Variable'].get().split(',')],
-            negate_jobs_list=[
-                word.strip() for word in self._user_input['Word(s) or Phrase(s) to Avoid (Comma Separated)']['Variable'].get().split(',')],
-            negate_companies_list=[
-                word.strip() for word in self._user_input['Companies to Avoid (Comma Separated)']['Variable'].get().split(',')],
-            min_salary=self._user_input['Desired Salary']['Variable'].get(),
-            q_and_a=input_q_and_a,
-            log_box=self.log_box,
-            debug=self._debug)
-        new_thread = Thread(target=run_crawler.start)
+        input_q_and_a = self._input_q_and_a()
+        input_q_and_a.update(recast_input)
+        queries = [query.strip() for query in self._user_input['Search Job(s) (Comma Separated)']['Variable'].get().split(',')]
+        regions = [(location.strip(), self._user_input['Search Country']['Variable'].get().lower())
+            for location in self._user_input['Search State(s)/Region(s) (Comma Separated)']['Variable'].get().split(',')]
+        jobs_negate_list = [
+            word.strip() for word in self._user_input['Word(s) or Phrase(s) to Avoid (Comma Separated)']['Variable'].get().split(',')
+            if word.strip()]
+        company_negate_list = [
+            word.strip() for word in self._user_input['Companies to Avoid (Comma Separated)']['Variable'].get().split(',')
+            if word.strip()]
+        total_number_of_jobs = self._user_input['Number of Jobs']['Variable'].get()
+        indeed_crawler = IndeedCrawler(total_number_of_jobs, self._debug, input_q_and_a, self._log_box)
+        new_thread = Thread(target=indeed_crawler.start_crawling, args=(company_negate_list, jobs_negate_list, queries, regions))
         new_thread.start()
         return None
 
@@ -225,7 +255,7 @@ class App:
                 .grid(row=row_i, column=col_i, sticky='w', padx=padx, pady=pady)
             elif type(self._user_input[field]['Entity']) is list:
                 self.option_menu(add_frame, field, row_i, col_i, padx, pady, sticky)
-        self.setup_log_box(row + 2, col, padx, 0, width, col_i + 1)
+        self._setup_log_box(row + 2, col, padx, 0, width, col_i + 1)
         image = ImageTk.PhotoImage(Image.open('icon/cool_glasses.png'))
         self._start_button.image = image
         self._start_button.configure(image=image)
@@ -354,10 +384,10 @@ class App:
             # All labels within a widget field must have a value.
             if len(label_dict) == i + 1:
                 save_input[field] = label_dict
-        with open(path.join(path.dirname(__file__), self._save_file), 'w') as f:
-            dump(save_input, f)
-        with open(path.join(path.dirname(__file__), self._save_file2), 'w') as f:
-            dump({field: dict_['Variable'].get() for field, dict_ in user_input.items()}, f)
+        with open(path.join(path.dirname(__file__), self._save_file), 'wb') as f:
+            dump_bin(save_input, f)
+        with open(path.join(path.dirname(__file__), self._save_file2), 'wb') as f:
+            dump_bin({field: dict_['Variable'].get() for field, dict_ in user_input.items()}, f)
         return None
 
     def _toggle_start_button(self, *args) -> None:
@@ -370,11 +400,8 @@ class App:
 
 
 if __name__ == '__main__':
-    current_date = date.today()
-    PROGRAM_EXPIRATION_DATE = date(2030, 1, 1)
-    if current_date >= PROGRAM_EXPIRATION_DATE:
-        self_destruct = SelfDestruct('Indeed Crawler')
-        self_destruct.open_window('EXPIRATION DATE EXCEEDED')
+    if date.today() >= date(2030, 1, 1):
+        expiration_window('Indeed Crawler', 'EXPIRATION DATE EXCEEDED')
     else:
         root_window = Tk()
         root_window.geometry('960x620')
