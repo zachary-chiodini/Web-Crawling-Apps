@@ -44,21 +44,36 @@ class IndeedCrawler:
                 for line in f:
                     self._cache.add(line.strip())
 
-    def _log(self, message: str, traceback: bool = False) -> None:
-        if len(message) > 255 and (not traceback):
-            message = f"{message[:251]} ..."
-        if self._log_box:
-            self._log_box.configure(state='normal')
-            self._log_box.insert('end', f'\n{message}')
-            self._log_box.configure(state='disabled')
-        else:
-            print(message)
-        return None
-
     def setup_browser(self) -> None:
         options = ChromeOptions()
         options.add_argument('--disable-popup-blocking')
         self._browser = Chrome(options)
+        return None
+
+    def start_crawling(self, company_negate_list: List[str], job_negate_list: List[str],
+            queries: List[str], regions: List[Tuple[str]]) -> None:
+        start_t = time()
+        self.setup_browser()
+        self.login('', '')
+        number_per_query = ceil(self._total_number_of_jobs // (len(queries) * len(regions)))
+        for location, country in regions:
+            for query in queries:
+                try:
+                    self._search_jobs(country, location, number_per_query, query,
+                        job_negate_list=job_negate_list, company_negate_list=company_negate_list)
+                except Exception:
+                    self._log(format_exc(), traceback=True)
+        df = DataFrame(data=self.results)
+        if not df.empty:
+            with ExcelWriter('submissions.xlsx', engine='openpyxl', mode='a') as writer:
+                df.to_excel(writer, sheet_name='jobs', index=False)
+        total_t = int(time() - start_t)
+        seconds = total_t % 60
+        minutes = (total_t % 3600) // 60
+        hours = (total_t % 86400) // 3600
+        days = total_t // 86400
+        self._log('Job search has terminated.')
+        self._log(f'Time elapsed: {days:02}:{hours:02}:{minutes:02}:{seconds:02}')
         return None
 
     def login(self, email: str, password: str) -> None:
@@ -66,79 +81,6 @@ class IndeedCrawler:
         # Automated login is no longer possible on indeed.com.
         self._log('You must manually sign in. After signing in, navigate to your profile page.')
         WebDriverWait(self._browser, 600).until(lambda driver: 'https://profile.indeed.com/' in driver.current_url)
-        return None
-
-    def _load_s2v_model(self) -> None:
-        self._log('Loading fasttext pretrained sentence/document embedding model. This may take a few minutes.')
-        model = load_model('fasttext-model/cc.en.300.bin')
-        self._sentence2vec = vectorize(model.get_sentence_vector, otypes=[float32], signature='()->(n)')
-        self._log('Model loaded successfully.')
-        return None
-
-    def _cosine_distance(self, v: NDArray[str_], s: str) -> NDArray[float32]:
-        return apply_along_axis(distance.cosine, 1, self._sentence2vec(v), self._sentence2vec(s))
-
-    def _select_continue(self) -> bool:
-        # The continue button is duplicated in the html source.
-        for element in self._browser.find_elements(By.XPATH, '//button//span[text()[contains(.,"Continue")]]'):
-            try:
-                element.click()
-                self._log('Selected continue.')
-                return True
-            except ElementNotInteractableException:
-                pass
-        self._log('Failed to continue.')
-        return False
-
-    def _select_answer(self, answer: str, selections: Set[str]) -> str:
-        select_array = array(list(selections), dtype='str')
-        select_array = char.replace(select_array, '\n', '')
-        self._log(f"Selections found: {selections}.")
-        answer = select_array[argmin(self._cosine_distance(select_array, answer))]
-        self._log(f"Answer selected: {answer}.")
-        return answer
-
-    def _input_answer(self, answer: str, tag: Tag) -> None:
-        selections = set()
-        input_0 = tag.find('input')
-        if input_0:
-            input_type = input_0.get('type')
-            if input_type == 'text' and (not input_0.get('value')):
-                input_id = input_0.get('id')
-                input_element = self._browser.find_element(By.XPATH, f'//input[@id="{input_id}"]')
-                input_element.clear()
-                input_element.send_keys(answer)
-            elif input_type == 'radio':
-                for input_i in tag.find_all('input'):
-                    text = input_i.find_next_sibling('span').get_text().strip()
-                    if text:
-                        selections.add(text)
-                answer = self._select_answer(answer, selections)
-                input_id = input_0.get('id')
-                self._browser.find_element(
-                    By.XPATH, f'//input[contains(@id, "{input_id}")]//span[text()[contains(.,"{answer}")]]').click()
-        elif tag.find('select'):
-            input_type = 'selection'
-            for option_i in tag.find_all('option'):
-                if option_i.get('value'):
-                    text = option_i.get_text()
-                    if text:
-                        selections.add(text)
-                answer = self._select_answer(answer, selections)
-                select_id = tag.find('select').get('id')
-                self._browser.find_element(
-                    By.XPATH, f'//select[contains(@id, "{select_id}")]//option[text()[contains(., "{answer}")]]').click()
-        elif tag.find('textarea'):
-            input_type = 'textarea'
-            text_tag = tag.find('textarea')
-            text_id = text_tag.get('id')
-            if not text_tag.get('value'):
-                text_element = self._browser.find_element(By.XPATH, f'//textarea[@id="{text_id}"]')
-                text_element.clear()
-                text_element.send_keys(answer)
-        else:
-            input_type = 'unknown'
-        self._log(f"Input type found: {input_type}")
         return None
 
     def _apply_to_job(self, job_url: str, wait=5) -> bool:
@@ -149,7 +91,7 @@ class IndeedCrawler:
         self._browser.switch_to.window(self._browser.window_handles[-1])
         self._browser.get(job_url)
         sleep(wait)
-        self._browser.find_element(By.ID, 'indeedApplyButton').click()
+        self._browser.find_element(By.XPATH, '//button//span[text()="Apply now"]').click()
         sleep(wait)
         prev_url = ''
         while prev_url != self._browser.current_url:
@@ -159,7 +101,7 @@ class IndeedCrawler:
                 matches = findall('".+?"', question)
                 if matches:
                     question = max(matches, key=len).strip('"')
-                self._log(f"Question found: {question}.")
+                self._log(f"Question found: {question}")
                 answer = self._df.loc[argmin(self._cosine_distance(self._df['Question'], question)), 'Answer']
                 self._log(f"Answer found: {answer}.")
                 self._input_answer(answer, tag)
@@ -177,10 +119,10 @@ class IndeedCrawler:
             self._browser.find_element(By.XPATH, '//button//span[text()[contains(.,"Submit")]]').click()
             return_val = True
             self._log(f"SUCCESS - applied to job {job_url}")
-            sleep(wait)
+            sleep(600)
         except NoSuchElementException:
             self._log(f"FAILURE - did not apply to {job_url}")
-        self._browser.quit()
+        self._browser.close()
         self._browser.switch_to.window(self._main_window)
         return return_val
 
@@ -190,6 +132,16 @@ class IndeedCrawler:
             file.write(f"{job_jk}\n")
         return None
 
+    def _cosine_distance(self, v: NDArray[str_], s: str) -> NDArray[float32]:
+        return apply_along_axis(distance.cosine, 1, self._sentence2vec(v), self._sentence2vec(s))
+
+    def _find_word_in_negate_list(self, string: str, negate_list: List[str]) -> bool:
+        for word in negate_list:
+            if word.lower() in string.lower():
+                self._log(f"Found {word} in {string}.")
+                return True
+        return False
+
     def _get_value(self, field: str, tag: Union[Tag, None]) -> str:
         if not tag:
             self._log(f"Failed to find {field}.")
@@ -198,37 +150,62 @@ class IndeedCrawler:
         self._log(f"{field}: {value}")
         return value
 
-    def _find_word_in_negate_list(self, string: str, negate_list: List[str]) -> bool:
-        for word in negate_list:
-            if word.lower() in string.lower():
-                self._log(f"Found {word} in {string}.")
-                return True
-        return False
-    
-    def start_crawling(self, company_negate_list: List[str], job_negate_list: List[str],
-            queries: List[str], regions: List[Tuple[str]]) -> None:
-        start_t = time()
-        self.setup_browser()
-        self.login('', '')
-        number_per_query = ceil(self._total_number_of_jobs // (len(queries) * len(regions)))
-        for location, country in regions:
-            for query in queries:
-                try:
-                    self._search_jobs(country, location, number_per_query, query,
-                        job_negate_list=job_negate_list, company_negate_list=company_negate_list)
-                except Exception:
-                    self._log(format_exc, traceback=True)
-        df = DataFrame(data=self.results)
-        if not df.empty:
-            with ExcelWriter('submissions.xlsx', engine='openpyxl', mode='a') as writer:
-                df.to_excel(writer, sheet_name='jobs', index=False)
-        total_t = int(time() - start_t)
-        seconds = total_t % 60
-        minutes = (total_t % 3600) // 60
-        hours = (total_t % 86400) // 3600
-        days = total_t // 86400
-        self._log('Job search has terminated.')
-        self._log(f'Time elapsed: {days:02}:{hours:02}:{minutes:02}:{seconds:02}')
+    def _input_answer(self, answer: str, tag: Tag) -> None:
+        selections = set()
+        input_0 = tag.find('input')
+        print()
+        print('tag =', tag)
+        print()
+        if input_0:
+            input_type = input_0.get('type')
+            self._log(f"Input type found: {input_type}.")
+            if input_type == 'text' and (not input_0.get('value')):
+                input_element = self._browser.find_element(By.XPATH, f'//input')
+                input_element.click()
+                input_element.send_keys(answer)
+            elif input_type == 'radio':
+                for input_i in tag.find_all('input'):
+                    text = input_i.find_next_sibling('span').get_text().strip()
+                    if text:
+                        selections.add(text)
+                answer = self._select_answer(answer, selections)
+                self._browser.find_element(
+                    By.XPATH, f'//span[text()="{answer}"]/preceding::input[1]').click()
+        elif tag.find('select'):
+            self._log(f"Input type found: selection.")
+            for option_i in tag.find_all('option'):
+                if option_i.get('value'):
+                    text = option_i.get_text()
+                    if text:
+                        selections.add(text)
+                answer = self._select_answer(answer, selections)
+                self._browser.find_element(By.XPATH, f'//select//option[text()="{answer}")]').click()
+        elif tag.find('textarea'):
+            self._log(f"Input type found: textarea.")
+            if not tag.find('textarea').get('value'):
+                text_element = self._browser.find_element(By.XPATH, f'//textarea')
+                text_element.click()
+                text_element.send_keys(answer)
+        else:
+            self._log(f"Input type found: unknown.")
+        return None
+
+    def _load_s2v_model(self) -> None:
+        self._log('Loading fasttext pretrained sentence/document embedding model. This may take a few minutes.')
+        model = load_model('fasttext-model/cc.en.300.bin')
+        self._sentence2vec = vectorize(model.get_sentence_vector, otypes=[float32], signature='()->(n)')
+        self._log('Model loaded successfully.')
+        return None
+
+    def _log(self, message: str, traceback: bool = False) -> None:
+        if len(message) > 255 and (not traceback):
+            message = f"{message[:251]} ..."
+        if self._log_box:
+            self._log_box.configure(state='normal')
+            self._log_box.insert('end', f'\n{message}')
+            self._log_box.configure(state='disabled')
+        else:
+            print(message)
         return None
 
     def _search_jobs(self, country: str, location: str, number_of_jobs: int, query: str, enforce_query: bool = False,
@@ -310,3 +287,23 @@ class IndeedCrawler:
             except NoSuchElementException:
                 break
         return None
+
+    def _select_answer(self, answer: str, selections: Set[str]) -> str:
+        select_array = array(list(selections), dtype='str')
+        select_array = char.replace(select_array, '\n', '')
+        self._log(f"Selections found: {selections}.")
+        answer = select_array[argmin(self._cosine_distance(select_array, answer))]
+        self._log(f"Answer selected: {answer}.")
+        return answer
+
+    def _select_continue(self) -> bool:
+        # The continue button is duplicated in the html source.
+        for element in self._browser.find_elements(By.XPATH, '//button//span[text()[contains(.,"Continue")]]'):
+            try:
+                element.click()
+                self._log('Selected continue.')
+                return True
+            except ElementNotInteractableException:
+                pass
+        self._log('Failed to continue.')
+        return False
