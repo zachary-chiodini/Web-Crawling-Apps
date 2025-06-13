@@ -210,11 +210,7 @@ class App:
                 if val:
                     clean_set.add(val)
             return clean_set
-        recast_input = {}
-        for field, dict_ in self._user_input.items():
-            recast_input[field] = dict_['Variable'].get()
         input_q_and_a = self._input_q_and_a()
-        input_q_and_a.update(recast_input)
         queries = get_clean_set_from(self._user_input['Search Job(s) (Comma Separated)']['Variable'].get())
         regions = set()
         for location in self._user_input['Search State(s)/Region(s) (Comma Separated)']['Variable'].get().split(','):
@@ -317,10 +313,11 @@ class App:
 
         for entry_list in self._widget_entries['Languages'].values():
             for question in self._q_and_a['Languages']:
-                if not entry_list:
-                    input_q_and_a[question.replace('[BLANK]', 'English')] = 'yes'
                 for entry in entry_list:
-                    input_q_and_a[question.replace('[BLANK]', entry.get())] = 'yes'
+                    text = entry.get()
+                    if search('Language [0-9]+', text):
+                        text = 'English'
+                    input_q_and_a[question.replace('[BLANK]', text)] = 'yes'
 
         for entry_list in self._widget_entries['Certs/Licenses'].values():
             for question in self._q_and_a['Certs/Licenses']:
@@ -348,15 +345,17 @@ class App:
             input_q_and_a[question] = answer
 
         for field in self._q_and_a:
-            if (field in input_q_and_a) or (field not in self._user_input):
+            if field not in self._user_input:
                 continue
             answer = self._user_input[field]['Variable'].get()
-            if (not answer) and (field in self._default_input):
-                answer = self._default_input[field]
-            else:
-                answer = 'Prefer not to say'
+            if not answer:
+                if field in self._default_input:
+                    answer = self._default_input[field]
+                else:
+                    answer = 'Prefer not to say'
             for question in self._q_and_a[field]:
-                input_q_and_a[question] = answer
+                if question not in input_q_and_a:
+                    input_q_and_a[question] = answer
         return input_q_and_a
 
     def _remove_entry(self, field: str) -> None:
