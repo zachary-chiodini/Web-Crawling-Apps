@@ -153,9 +153,6 @@ class IndeedCrawler:
     def _input_answer(self, answer: str, tag: Tag) -> None:
         selections = set()
         input_0 = tag.find('input')
-        print()
-        print('tag =', tag)
-        print()
         if input_0:
             input_type = input_0.get('type')
             self._log(f"Input type found: {input_type}.")
