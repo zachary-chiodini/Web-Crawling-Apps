@@ -284,12 +284,13 @@ class IndeedCrawler:
                     active_search = False
                     break
             try:
-                next_page_element = self._browser.find_element(By.XPATH, '//nav//a[@aria-label="Next"]')
+                next_page_element = self._browser.find_element(By.XPATH, '//nav//a[@aria-label="Next Page"]')
                 next_page_element.click()
             except ElementClickInterceptedException:
                 ActionChains(self._browser).move_to_element(next_page_element).click().perform()
                 next_page_element.click()
             except NoSuchElementException:
+                self._log('Failed to click next page')
                 break
         return None
 
