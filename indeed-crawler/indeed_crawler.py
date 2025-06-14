@@ -9,6 +9,7 @@ from typing import Callable, Dict, List, Optional, Set, Tuple, Union
 
 from bs4 import BeautifulSoup
 from bs4.element import Tag
+from fake_useragent import UserAgent
 from fasttext import load_model
 from numpy import apply_along_axis, argmin, array, char, float32, str_, vectorize
 from numpy.typing import NDArray
@@ -48,6 +49,8 @@ class IndeedCrawler:
     def setup_browser(self) -> None:
         options = ChromeOptions()
         options.add_argument('--disable-popup-blocking')
+        user_agent = UserAgent()
+        options.add_argument(f"user-agent={user_agent.random}")
         self._browser = Chrome(options)
         return None
 
