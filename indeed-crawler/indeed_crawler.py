@@ -222,14 +222,13 @@ class IndeedCrawler:
         return None
 
     def _log(self, message: str, traceback: bool = False) -> None:
-        if len(message) > 255 and (not traceback):
+        if traceback or (not self._log_box):
+            print(message)
+        elif len(message) > 255:
             message = f"{message[:251]} ..."
-        if self._log_box:
             self._log_box.configure(state='normal')
             self._log_box.insert('end', f'\n{message}')
             self._log_box.configure(state='disabled')
-        else:
-            print(message)
         return None
 
     def _search_jobs(self, country: str, location: str, number_of_jobs: int, query: str, enforce_query: bool = False,
