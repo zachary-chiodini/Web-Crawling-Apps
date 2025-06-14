@@ -66,10 +66,10 @@ class IndeedCrawler:
         df = DataFrame(data=self.results)
         if not df.empty:
             if path.exists(self._submissions_doc):
-                with ExcelWriter(self._submissions_doc, engine='openpyxl', mode='a') as writer:
+                with ExcelWriter(self._submissions_doc, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
                     df.to_excel(writer, sheet_name='jobs', index=False)
             else:
-                df.to_excel(self._submissions_doc, sheet_name='jobs', index=False)
+                df.to_excel(self._submissions_doc, sheet_name='jobs', startrow=writer.sheets['jobs'].max_row, index=False)
         total_t = int(time() - start_t)
         seconds = total_t % 60
         minutes = (total_t % 3600) // 60
