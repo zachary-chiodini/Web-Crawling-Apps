@@ -167,6 +167,7 @@
             "Can you provide the necessary documentation to prove that you are a citizen, permanent resident, or a foreign national with authorization to work in [BLANK]?": ""
       },
       "Private": {
+            "Do you have experience mentoring and training?": "Yes",
             "If you were referred, please share your referrer's name with us.": "No referral",
             "If you were referred to this position by a current employee of our company, please enter their name below.": "No referral",
             "On which website did you see this opening advertised?": "Indeed",
