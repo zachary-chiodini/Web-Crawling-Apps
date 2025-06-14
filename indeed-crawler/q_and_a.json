@@ -148,7 +148,8 @@
             "Do you currently require sponsorship to work in [BLANK]?": "",
             "Will you now or in the future require sponsorship for employment visa status in [BLANK]?": "",
             "Do you currently or will you in the future require visa sponsorship to work in [BLANK]?": "",
-            "Do you need sponsorship?": ""
+            "Do you need sponsorship?": "",
+            "Are you legally authorized to work in the United States without need for sponsorship now or in the future?": ""
       },
       "Eligible to Work": {
             "Are you legally eligible to work in [BLANK]?": "",
@@ -188,7 +189,7 @@
             "Do you have a non-compete, non-solicitation, confidentiality or similar agreement that could impact your ability to work for us?": "No",
             "Do you have a non-compete or similar agreement with your former employer(s) that would preclude you from working at our company?": "No",
             "Do you have relatives currently employed at our company": "No",
-            "If you have relatives currently employed at our company, please provide their name and title.": "No relatives",
+            "If you have relatives currently employed at our company, please provide their name and title.": "None",
             "Do any of your friends or relatives, other than spouse work for our company?": "No",
             "Do you consent to being contacted about this job via text/SMS?": "Yes",
             "I consent to the hiring team of this job contacting me via text message.": "Yes",
