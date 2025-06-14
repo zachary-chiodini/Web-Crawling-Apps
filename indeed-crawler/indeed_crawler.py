@@ -77,8 +77,8 @@ class IndeedCrawler:
         hours = (total_t % 86400) // 3600
         days = total_t // 86400
         self._log('Job search has terminated.')
-        self._log(f"Applied to {self.total_jobs_applied_to} jobs")
-        self._log(f'Time elapsed: {days:02}:{hours:02}:{minutes:02}:{seconds:02}')
+        self._log(f"Applied to {self.total_jobs_applied_to} jobs.")
+        self._log(f'Time elapsed: {days:02}:{hours:02}:{minutes:02}:{seconds:02}.')
         return None
 
     def login(self, email: str, password: str) -> None:
