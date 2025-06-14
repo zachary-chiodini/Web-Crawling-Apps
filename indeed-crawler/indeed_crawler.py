@@ -37,6 +37,7 @@ class IndeedCrawler:
         self._q_and_a: Dict[str, Set[str]] = q_and_a
         # Sentence to vector model must be loaded from fasttext binary.
         self._sentence2vec: Callable[[NDArray[str_]], NDArray[float32]] = None
+        self._submissions_doc = 'submissions.xlsx'
         self._total_number_of_jobs = total_number_of_jobs
         if path.exists(self._cache_file_name):
             with open(self._cache_file_name) as f:
@@ -64,8 +65,11 @@ class IndeedCrawler:
                     self._log(format_exc(), traceback=True)
         df = DataFrame(data=self.results)
         if not df.empty:
-            with ExcelWriter('submissions.xlsx', engine='openpyxl', mode='a') as writer:
-                df.to_excel(writer, sheet_name='jobs', index=False)
+            if path.exists(self._submissions_doc):
+                with ExcelWriter(self._submissions_doc, engine='openpyxl', mode='a') as writer:
+                    df.to_excel(writer, sheet_name='jobs', index=False)
+            else:
+                df.to_excel(self._submissions_doc, sheet_name='jobs', index=False)
         total_t = int(time() - start_t)
         seconds = total_t % 60
         minutes = (total_t % 3600) // 60
@@ -119,6 +123,11 @@ class IndeedCrawler:
             sleep(wait)
         except NoSuchElementException:
             self._log('Failed to submit application.')
+        try:
+            self._browser.find_element(By.XPATH, '//button//span[text()[contains(.,"Apply")]]').click()
+            sleep(wait)
+        except NoSuchElementException:
+            self._log('Failed to apply.')
         try:
             self._log('You may have encountered a captcha.')
             WebDriverWait(self._browser, 120).until(lambda driver: driver.current_url.endswith('post-apply'))
