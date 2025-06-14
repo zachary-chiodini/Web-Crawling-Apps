@@ -137,7 +137,7 @@ class IndeedCrawler:
         except NoSuchElementException:
             self._log('Failed to submit application.')
         try:
-            self._log('Waiting 60 seconds for post-apply page.')
+            self._log('Waiting up to 60 seconds for post-apply page.')
             WebDriverWait(self._browser, 60).until(lambda driver: driver.current_url.endswith('post-apply'))
             return_val = True
             self._log(f"SUCCESS - applied to job {job_url}")
