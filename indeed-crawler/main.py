@@ -51,7 +51,7 @@ class App:
     _required_input = {
         'First Name', 'Last Name', 'Email Address', 'Phone Number',
         'City', 'State', 'Country', 'Highest Education', 'Postal Code',
-        'Current Job Title', 'Current Company', 'LinkedIn',
+        'Current Job Title', 'Current Company', 'LinkedIn', 'Desired Salary',
         'Indeed Login', 'Indeed Password', 'Search Job(s) (CSV)',
         'Search Country', 'Number of Jobs', 'Skill 1', 'Experience 1'
     }
@@ -101,7 +101,7 @@ class App:
             'Indeed Password': {'Variable': StringVar(), 'Entity': Entry, 'Regex': ''},
             'LinkedIn': {'Variable': StringVar(), 'Entity': Entry, 'Regex': ''},
             'Desired Salary': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^[0-9]+$'},
-            'Salary Type': {'Variable': StringVar(value='Annual'), 'Entity': ['Annual', 'Hourly'], 'Regex': ''},
+            'Salary Type': {'Variable': StringVar(value='Annually'), 'Entity': ['Annually', 'Hourly'], 'Regex': ''},
             'Currency': {'Variable': StringVar(value='USD'), 'Entity': ['USD'], 'Regex': ''},
             'Number of Jobs': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^[0-9]+$'},
             'Search Job(s) (CSV)': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^.*?(,.*?)*$'},
