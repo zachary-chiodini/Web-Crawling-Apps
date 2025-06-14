@@ -228,6 +228,7 @@ class IndeedCrawler:
         self._browser.get(f"https://{self._map_country[country]}indeed.com/jobs?q={query}"
             f"{'&fromage=14' * past_14_days}{'&jt='*bool(job_type) + job_type}{'&explvl='*bool(exp_lvl) + exp_lvl}"
             f"{'&l='*bool(location) + location}{'&radius='*bool(radius) + radius}")
+        WebDriverWait(self._browser, 600).until(lambda driver: f"jobs?q={query.replace(' ', '+')}" in driver.current_url)
         batch_jobs_applied_to = 0
         active_search = True
         while active_search:
