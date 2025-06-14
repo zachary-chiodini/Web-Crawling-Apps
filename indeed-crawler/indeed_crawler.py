@@ -23,13 +23,12 @@ from undetected_chromedriver import Chrome, ChromeOptions
 
 class IndeedCrawler:
 
-    def __init__(self, total_number_of_jobs=0, debug=False, q_and_a={}, log_box: Optional[Text] = None) -> None:
+    def __init__(self, total_number_of_jobs=0, q_and_a={}, log_box: Optional[Text] = None) -> None:
         self.results = {'Title': [], 'Company': [], 'Location': [], 'Salary': [], 'URL': []}
         self.total_jobs_applied_to = 0
         self._browser: Chrome
         self._cache = set()
         self._cache_file_name = 'cache.txt'
-        self._debug = debug
         self._df = DataFrame()
         self._log_box = log_box
         self._main_window = ''
