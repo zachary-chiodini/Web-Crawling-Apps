@@ -17,8 +17,9 @@ from pandas import DataFrame, ExcelWriter
 from scipy.spatial import distance
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import (ElementClickInterceptedException,
+from selenium.common.exceptions import (
     ElementNotInteractableException, NoSuchElementException, TimeoutException)
 from undetected_chromedriver import Chrome, ChromeOptions
 
@@ -179,9 +180,9 @@ class IndeedCrawler:
             self._log(f"Input type found: {input_type}.")
             if input_type == 'text' and (not input_0.get('value')):
                 identifier = input_0.get('name')
-                input_element = self._browser.find_element(By.XPATH, f'//input[@name="{identifier}"]')
-                input_element.click()
-                input_element.send_keys(answer)
+                web_element = self._browser.find_element(By.XPATH, f'//input[@name="{identifier}"]')
+                self._move_mouse_to_and_click(web_element)
+                web_element.send_keys(answer)
             elif input_type == 'radio':
                 for input_i in tag.find_all('input'):
                     text = input_i.find_next_sibling('span').get_text().strip()
@@ -189,8 +190,9 @@ class IndeedCrawler:
                         selections.add(text)
                 answer = self._select_answer(answer, selections)
                 identifier = input_0.get('name')
-                self._browser.find_element(
-                    By.XPATH, f'//span[contains(text(), "{answer}")]/preceding::input[@name="{identifier}"][1]').click()
+                web_element = self._browser.find_element(
+                    By.XPATH, f'//span[contains(text(), "{answer}")]/preceding::input[@name="{identifier}"][1]')
+                self._move_mouse_to_and_click(web_element)
         elif tag.find('select'):
             self._log(f"Input type found: selection.")
             for option_i in tag.find_all('option'):
@@ -200,16 +202,17 @@ class IndeedCrawler:
                         selections.add(text)
             answer = self._select_answer(answer, selections)
             identifier = tag.find('select').get('name')
-            self._browser.find_element(
-                By.XPATH, f'//select[@name="{identifier}"]//option[contains(text(), "{answer}")]').click()
+            web_element = self._browser.find_element(
+                By.XPATH, f'//select[@name="{identifier}"]//option[contains(text(), "{answer}")]')
+            self._move_mouse_to_and_click(web_element)
         elif tag.find('textarea'):
             self._log(f"Input type found: textarea.")
             textarea = tag.find('textarea')
             if not textarea.get('value'):
                 identifier = textarea.get('name')
-                text_element = self._browser.find_element(By.XPATH, f'//textarea[@name="{identifier}"]')
-                text_element.click()
-                text_element.send_keys(answer)
+                web_element = self._browser.find_element(By.XPATH, f'//textarea[@name="{identifier}"]')
+                self._move_mouse_to_and_click(web_element)
+                web_element.send_keys(answer)
         else:
             self._log(f"Input type found: unknown.")
         return None
@@ -230,6 +233,11 @@ class IndeedCrawler:
             self._log_box.configure(state='normal')
             self._log_box.insert('end', f'\n{message}')
             self._log_box.configure(state='disabled')
+        return None
+
+    def _move_mouse_to_and_click(self, web_element: WebElement) -> None:
+        ActionChains(self._browser).move_to_element(web_element).click().perform()
+        web_element.click()
         return None
 
     def _search_jobs(self, country: str, location: str, number_of_jobs: int, query: str, enforce_query: bool = False,
@@ -296,10 +304,7 @@ class IndeedCrawler:
                     break
             try:
                 next_page_element = self._browser.find_element(By.XPATH, '//nav//a[@aria-label="Next Page"]')
-                next_page_element.click()
-            except ElementClickInterceptedException:
-                ActionChains(self._browser).move_to_element(next_page_element).click().perform()
-                next_page_element.click()
+                self._move_mouse_to_and_click(next_page_element)
             except NoSuchElementException:
                 self._log('Failed to click next page')
                 break
