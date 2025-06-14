@@ -1,5 +1,6 @@
 from math import ceil
 from os import path
+from random import uniform
 from re import compile as compile_regex, findall
 from time import sleep, time
 from tkinter import Text
@@ -76,6 +77,7 @@ class IndeedCrawler:
         hours = (total_t % 86400) // 3600
         days = total_t // 86400
         self._log('Job search has terminated.')
+        self._log(f"Applied to {self.total_jobs_applied_to} jobs")
         self._log(f'Time elapsed: {days:02}:{hours:02}:{minutes:02}:{seconds:02}')
         return None
 
@@ -90,12 +92,11 @@ class IndeedCrawler:
         return_val = False
         self._log(f"Applying to job at {job_url}.")
         self._browser.execute_script("window.open('');")
-        sleep(wait)
         self._browser.switch_to.window(self._browser.window_handles[-1])
         self._browser.get(job_url)
-        sleep(wait)
+        self._sleep(wait)
         self._browser.find_element(By.XPATH, '//button//span[contains(text(), "Apply")]').click()
-        sleep(wait)
+        self._sleep(wait)
         prev_url = ''
         while prev_url != self._browser.current_url:
             for tag in BeautifulSoup(self._browser.page_source, 'lxml').find_all(class_=compile_regex('Questions-item')):
@@ -113,22 +114,23 @@ class IndeedCrawler:
                 answer = self._df.loc[argmin(self._cosine_distance(self._df['Question'], question)), 'Answer']
                 self._log(f"Answer found: {answer}.")
                 self._input_answer(answer, tag)
+                self._sleep(0)
             prev_url = self._browser.current_url
             if BeautifulSoup(self._browser.page_source, 'lxml').find('span', string=compile_regex('Apply anyway')):
                 # Applies to job even if not qualified.
                 self._browser.find_element(By.XPATH, '//button//span[contains(text(), "Apply anyway")]').click()
             elif not self._select_continue():
                 break
-            sleep(wait)
+            self._sleep(wait)
         try:
             self._browser.find_element(By.XPATH, '//button//span[contains(text(), "Review")]').click()
             self._log('Reviewing application.')
-            sleep(wait)
+            self._sleep(wait)
         except NoSuchElementException:
             self._log('Failed to review application.')
         try:
             self._browser.find_element(By.XPATH, '//button//span[contains(text(), "Submit")]').click()
-            sleep(wait)
+            self._sleep(wait)
         except NoSuchElementException:
             self._log('Failed to submit application.')
         try:
@@ -297,7 +299,7 @@ class IndeedCrawler:
             except NoSuchElementException:
                 self._log('Failed to click next page')
                 break
-            sleep(wait)  # Wait for page to load.
+            self._sleep(wait)  # Wait for page to load.
         return None
 
     def _select_answer(self, answer: str, selections: Set[str]) -> str:
@@ -320,3 +322,7 @@ class IndeedCrawler:
                 pass
         self._log('Failed to continue.')
         return False
+
+    def _sleep(self, wait: int) -> None:
+        sleep(wait + uniform(0, 3))
+        return None
