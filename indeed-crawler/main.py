@@ -69,7 +69,7 @@ class App:
             'Hours per Week': '40',
             'Website': 'No Website',
             'Start Date': date.today().strftime('%m/%d/%y'),
-            'Interview Date & Time': 'Anytime',
+            'Interview Date & Time': 'Anytime'
         }
         self._log_box: Text
         self._start = True
