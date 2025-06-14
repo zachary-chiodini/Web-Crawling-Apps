@@ -264,8 +264,8 @@ class IndeedCrawler:
                     pass
                 location = self._get_value('Location', tag.find('div', {'data-testid': 'text-location'}))
                 job_url = f"https://www.indeed.com/viewjob?jk={job_jk}"
-                self._cache_job(job_jk)
                 if self._apply_to_job(job_url, wait):
+                    self._cache_job(job_jk)
                     self.results['Title'].append(title)
                     self.results['Company'].append(company)
                     self.results['Location'].append(location)
