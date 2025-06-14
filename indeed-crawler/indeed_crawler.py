@@ -244,7 +244,6 @@ class IndeedCrawler:
         batch_jobs_applied_to = 0
         active_search = True
         while active_search:
-            sleep(wait)  # Waiting for page to load.
             self._main_window = self._browser.current_window_handle  # Jobs are applied to in a separate tab.
             for tag in BeautifulSoup(self._browser.page_source, 'lxml').find_all('div', {'class': 'job_seen_beacon'}):
                 # Automation is limited to "Easy apply".
@@ -299,6 +298,7 @@ class IndeedCrawler:
             except NoSuchElementException:
                 self._log('Failed to click next page')
                 break
+            sleep(wait)  # Wait for page to load.
         return None
 
     def _select_answer(self, answer: str, selections: Set[str]) -> str:
