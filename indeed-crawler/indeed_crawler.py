@@ -94,9 +94,9 @@ class IndeedCrawler:
     def _apply_to_job(self, job_url: str, wait: int) -> bool:
         return_val = False
         self._log(f"Applying to job at {job_url}.")
-        self._browser.execute_script("window.open('');")
+        self._browser.execute_script(f"window.open('{job_url}', '_blank');")
+        self._sleep(wait)
         self._browser.switch_to.window(self._browser.window_handles[-1])
-        self._browser.get(job_url)
         self._sleep(wait)
         self._browser.find_element(By.XPATH, '//button//span[contains(text(), "Apply")]').click()
         self._sleep(wait)
