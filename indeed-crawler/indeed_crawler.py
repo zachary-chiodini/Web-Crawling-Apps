@@ -94,7 +94,7 @@ class IndeedCrawler:
         self._browser.switch_to.window(self._browser.window_handles[-1])
         self._browser.get(job_url)
         sleep(wait)
-        self._browser.find_element(By.XPATH, '//button//span[text()="Apply now"]').click()
+        self._browser.find_element(By.XPATH, '//button//span[contains(text(), "Apply")]').click()
         sleep(wait)
         prev_url = ''
         while prev_url != self._browser.current_url:
@@ -118,21 +118,16 @@ class IndeedCrawler:
                 break
             sleep(wait)
         try:
-            self._browser.find_element(By.XPATH, '//button//span[text()="Review"]').click()
+            self._browser.find_element(By.XPATH, '//button//span[contains(text(), "Review")]').click()
             self._log('Reviewing application.')
             sleep(wait)
         except NoSuchElementException:
             self._log('Failed to review application.')
         try:
-            self._browser.find_element(By.XPATH, '//button//span[text()[contains(.,"Submit")]]').click()
+            self._browser.find_element(By.XPATH, '//button//span[contains(text(), "Submit")]').click()
             sleep(wait)
         except NoSuchElementException:
             self._log('Failed to submit application.')
-        try:
-            self._browser.find_element(By.XPATH, '//button//span[text()[contains(.,"Apply")]]').click()
-            sleep(wait)
-        except NoSuchElementException:
-            self._log('Failed to apply.')
         try:
             self._log('You may have encountered a captcha.')
             WebDriverWait(self._browser, 120).until(lambda driver: driver.current_url.endswith('post-apply'))
@@ -187,7 +182,7 @@ class IndeedCrawler:
                 answer = self._select_answer(answer, selections)
                 identifier = input_0.get('name')
                 self._browser.find_element(
-                    By.XPATH, f'//span[text()="{answer}"]/preceding::input[@name="{identifier}"][1]').click()
+                    By.XPATH, f'//span[contains(text(), "{answer}")]/preceding::input[@name="{identifier}"][1]').click()
         elif tag.find('select'):
             self._log(f"Input type found: selection.")
             for option_i in tag.find_all('option'):
@@ -198,7 +193,7 @@ class IndeedCrawler:
             answer = self._select_answer(answer, selections)
             identifier = tag.find('select').get('name')
             self._browser.find_element(
-                By.XPATH, f'//select[@name="{identifier}"]//option[text()="{answer}")]').click()
+                By.XPATH, f'//select[@name="{identifier}"]//option[contains(text(), "{answer}")]').click()
         elif tag.find('textarea'):
             self._log(f"Input type found: textarea.")
             textarea = tag.find('textarea')
@@ -313,7 +308,8 @@ class IndeedCrawler:
 
     def _select_continue(self) -> bool:
         # The continue button is duplicated in the html source.
-        for element in self._browser.find_elements(By.XPATH, '//button//span[text()[contains(.,"Continue")]]'):
+        for element in self._browser.find_elements(
+                By.XPATH, '//button//span[contains(text(), "Continue") or contains(text(), "continue")]'):
             try:
                 element.click()
                 self._log('Selected continue.')
