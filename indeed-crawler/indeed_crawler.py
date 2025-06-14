@@ -116,7 +116,7 @@ class IndeedCrawler:
             prev_url = self._browser.current_url
             if BeautifulSoup(self._browser.page_source, 'lxml').find('span', string=compile_regex('Apply anyway')):
                 # Applies to job even if not qualified.
-                self._browser.find_element(By.XPATH, '//button//span[contains(text(), "Apply")]').click()
+                self._browser.find_element(By.XPATH, '//button//span[contains(text(), "Apply anyway")]').click()
             elif not self._select_continue():
                 break
             sleep(wait)
