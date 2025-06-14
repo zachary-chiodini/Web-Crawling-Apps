@@ -224,8 +224,9 @@ class IndeedCrawler:
     def _log(self, message: str, traceback: bool = False) -> None:
         if traceback or (not self._log_box):
             print(message)
-        elif len(message) > 255:
-            message = f"{message[:251]} ..."
+        else:
+            if len(message) > 255:
+                message = f"{message[:251]} ..."
             self._log_box.configure(state='normal')
             self._log_box.insert('end', f'\n{message}')
             self._log_box.configure(state='disabled')
