@@ -48,22 +48,20 @@ def expiration_window(title: str, message: str) -> None:
 
 
 class App:
-    _save_file = 'saved_input.bin'
-    _save_file2 = 'saved_input2.bin'
     _required_input = {
         'First Name', 'Last Name', 'Email Address', 'Phone Number',
         'City', 'State', 'Country', 'Highest Education', 'Postal Code',
         'Indeed Login', 'Indeed Password', 'Search Job(s) (Comma Separated)',
         'Search Country', 'Number of Jobs', 'Skill 1', 'Experience 1'
     }
+    _save_file = 'saved_input.bin'
+    _save_file2 = 'saved_input2.bin'
     _widget_entries = {
         'Skills/Experience': {'Skill': [], 'Experience': []},
         'Certs/Licenses': {'Cert/License': []},
         'Languages': {'Language': []}
     }
     def __init__(self, root_window_: Tk):
-        self._log_box: Text
-        self._start = True
         self._default_input = {
             'Clearance': 'No Clearance',
             'Country Code': '1',
@@ -73,6 +71,8 @@ class App:
             'Start Date': date.today().strftime('%m/%d/%y'),
             'Interview Date & Time': 'Anytime',
         }
+        self._log_box: Text
+        self._start = True
         self._user_input = OrderedDict({
             'First Name': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^[A-Za-z]*$'},
             'Email Address': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^[a-z0-9/.]+@[a-z]+\.[a-z]+$'},
