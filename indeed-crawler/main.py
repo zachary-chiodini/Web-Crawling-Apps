@@ -52,7 +52,7 @@ class App:
         'First Name', 'Last Name', 'Email Address', 'Phone Number',
         'City', 'State', 'Country', 'Highest Education', 'Postal Code',
         'Current Job Title', 'Current Company', 'LinkedIn',
-        'Indeed Login', 'Indeed Password', 'Search Job(s) (Comma Separated)',
+        'Indeed Login', 'Indeed Password', 'Search Job(s) (CSV)',
         'Search Country', 'Number of Jobs', 'Skill 1', 'Experience 1'
     }
     _save_file = 'saved_input.bin'
@@ -94,9 +94,9 @@ class App:
             'Website': {'Variable': StringVar(), 'Entity': Entry, 'Regex': ''},
             'Employment Type': {'Variable': StringVar(value='Fulltime'), 'Entity': ['Fulltime', 'Parttime'], 'Regex': ''},
             'Hours per Week': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^[0-9]+$'},
-            'Search State(s)/Region(s) (Comma Separated)': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^.*?(,.*?)*$'},
-            'Word(s) or Phrase(s) to Avoid (Comma Separated)': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^.*?(,.*?)*$'},
-            'Companies to Avoid (Comma Separated)': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^.*?(,.*?)*$'},
+            'Search State(s)/Region(s) (CSV)': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^.*?(,.*?)*$'},
+            'Word(s) to Avoid (CSV)': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^.*?(,.*?)*$'},
+            'Companies to Avoid (CSV)': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^.*?(,.*?)*$'},
             'Certs/Licenses': {'Variable': StringVar(), 'Entity': Button, 'Regex': ['']},
             'Indeed Password': {'Variable': StringVar(), 'Entity': Entry, 'Regex': ''},
             'LinkedIn': {'Variable': StringVar(), 'Entity': Entry, 'Regex': ''},
@@ -104,7 +104,7 @@ class App:
             'Salary Type': {'Variable': StringVar(value='Annual'), 'Entity': ['Annual', 'Hourly'], 'Regex': ''},
             'Currency': {'Variable': StringVar(value='USD'), 'Entity': ['USD'], 'Regex': ''},
             'Number of Jobs': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^[0-9]+$'},
-            'Search Job(s) (Comma Separated)': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^.*?(,.*?)*$'},
+            'Search Job(s) (CSV)': {'Variable': StringVar(), 'Entity': Entry, 'Regex': '^.*?(,.*?)*$'},
             'Skills/Experience': {'Variable': StringVar(), 'Entity': Button, 'Regex': ['', '^[0-9]+$']},
             'Start Date': {'Variable': StringVar(), 'Entity': Entry, 'Regex': ''},
             'Interview Date & Time': {'Variable': StringVar(), 'Entity': Entry, 'Regex': ''},
@@ -209,14 +209,14 @@ class App:
                     clean_set.add(val)
             return clean_set
         input_q_and_a = self._input_q_and_a()
-        queries = get_clean_set_from(self._user_input['Search Job(s) (Comma Separated)']['Variable'].get())
+        queries = get_clean_set_from(self._user_input['Search Job(s) (CSV)']['Variable'].get())
         regions = set()
-        for location in self._user_input['Search State(s)/Region(s) (Comma Separated)']['Variable'].get().split(','):
+        for location in self._user_input['Search State(s)/Region(s) (CSV)']['Variable'].get().split(','):
             regions.add((location.strip(), self._user_input['Search Country']['Variable'].get().lower()))
         jobs_negate_set = get_clean_set_from(
-            self._user_input['Word(s) or Phrase(s) to Avoid (Comma Separated)']['Variable'].get())
+            self._user_input['Word(s) to Avoid (CSV)']['Variable'].get())
         company_negate_set = get_clean_set_from(
-            self._user_input['Companies to Avoid (Comma Separated)']['Variable'].get())
+            self._user_input['Companies to Avoid (CSV)']['Variable'].get())
         total_number_of_jobs = int(self._user_input['Number of Jobs']['Variable'].get())
         indeed_crawler = IndeedCrawler(total_number_of_jobs, input_q_and_a, self._log_box)
         new_thread = Thread(target=indeed_crawler.start_crawling, args=(list(company_negate_set), list(jobs_negate_set), queries, regions))
