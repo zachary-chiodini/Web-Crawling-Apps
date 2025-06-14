@@ -110,8 +110,7 @@ class App:
             'Interview Date & Time': {'Variable': StringVar(), 'Entity': Entry, 'Regex': ''},
             '18 Years or Older': {'Variable': IntVar(value=1), 'Entity': Checkbutton, 'Regex': ''},
             'Req. Sponsorship': {'Variable': IntVar(value=0), 'Entity': Checkbutton, 'Regex': ''},
-            'Eligible to Work': {'Variable': IntVar(value=1), 'Entity': Checkbutton, 'Regex': ''},
-            'Remote': {'Variable': IntVar(value=0), 'Entity': Checkbutton, 'Regex': ''}
+            'Eligible to Work': {'Variable': IntVar(value=1), 'Entity': Checkbutton, 'Regex': ''}
         })
         with open('q_and_a.json') as f:
             self._q_and_a = load_json(f)
