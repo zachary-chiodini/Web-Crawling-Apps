@@ -217,22 +217,16 @@ class IndeedCrawler:
     def _search_jobs(self, country: str, location: str, number_of_jobs: int, query: str, enforce_query: bool = False,
             job_negate_list: List[str] = [], company_negate_list: List[str] = [], past_14_days: bool = False,
             job_type: str = '', min_salary: str = '', enforce_salary: bool = False, exp_lvl: str = '',
-            remote: bool = False, radius: str = '', wait: int = 5) -> None:
+            radius: str = '', wait: int = 5) -> None:
         if not number_of_jobs:
             self._log('Number of jobs is zero.')
             return None
         if not self._sentence2vec:
             self._df = DataFrame(self._q_and_a.items(), columns=['Question', 'Answer'])
             self._load_s2v_model()
-        if remote:
-            # This block needs rewriting.
-            remote_id = ''
-        else:
-            remote_id = ''
         self._browser.get(f"https://{self._map_country[country]}indeed.com/jobs?q={query}"
             f"{'&fromage=14' * past_14_days}{'&jt='*bool(job_type) + job_type}{'&explvl='*bool(exp_lvl) + exp_lvl}"
-            f"{bool(remote)*('&remotejob=' + remote_id)}{'&l='*bool(location) + location}"
-            f"{'&radius='*bool(radius) + radius}")
+            f"{'&l='*bool(location) + location}{'&radius='*bool(radius) + radius}")
         batch_jobs_applied_to = 0
         active_search = True
         while active_search:
