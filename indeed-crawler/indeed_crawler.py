@@ -120,7 +120,8 @@ class IndeedCrawler:
         except NoSuchElementException:
             self._log('Failed to submit application.')
         try:
-            WebDriverWait(self._browser, wait).until(lambda driver: driver.current_url.endswith('post-apply'))
+            self._log('You may have encountered a captcha.')
+            WebDriverWait(self._browser, 120).until(lambda driver: driver.current_url.endswith('post-apply'))
             return_val = True
             self._log(f"SUCCESS - applied to job {job_url}")
         except TimeoutException:
