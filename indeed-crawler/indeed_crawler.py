@@ -99,7 +99,12 @@ class IndeedCrawler:
         prev_url = ''
         while prev_url != self._browser.current_url:
             for tag in BeautifulSoup(self._browser.page_source, 'lxml').find_all(class_=compile_regex('Questions-item')):
-                question = tag.find('span', {'data-testid': 'rich-text'}).get_text()
+                question = tag.find('span', {'data-testid': 'rich-text'})
+                if question:
+                    question = question.get_text()
+                else:
+                    self._log(f"Question not found.")
+                    continue
                 # Some questions are wrapped in double quotes.
                 matches = findall('".+?"', question)
                 if matches:
