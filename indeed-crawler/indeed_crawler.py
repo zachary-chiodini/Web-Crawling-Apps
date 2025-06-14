@@ -114,7 +114,9 @@ class IndeedCrawler:
                 self._log(f"Answer found: {answer}.")
                 self._input_answer(answer, tag)
             prev_url = self._browser.current_url
-            if not self._select_continue():
+            if BeautifulSoup(self._browser.page_source, 'lxml').find('span', string=compile_regex('Apply anyway')):
+                self._browser.find_element(By.XPATH, '//button//span[text()[contains(.,"Apply")]]').click()
+            elif not self._select_continue():
                 break
             sleep(wait)
         try:
