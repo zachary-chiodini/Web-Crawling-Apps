@@ -53,7 +53,7 @@ class App:
     _save_file2 = 'saved_input2.bin'
     _required_input = {
         'First Name', 'Last Name', 'Email Address', 'Phone Number',
-        'City', 'State', 'Country', 'Highest Education',
+        'City', 'State', 'Country', 'Highest Education', 'Postal Code',
         'Indeed Login', 'Indeed Password', 'Search Job(s) (Comma Separated)',
         'Search Country', 'Number of Jobs', 'Skill 1', 'Experience 1'
     }
@@ -348,7 +348,12 @@ class App:
             if field not in self._user_input:
                 continue
             answer = self._user_input[field]['Variable'].get()
-            if not answer:
+            if isinstance(answer, int):
+                if answer:
+                    answer = 'Yes'
+                else:
+                    answer = 'No'
+            elif not answer:
                 if field in self._default_input:
                     answer = self._default_input[field]
                 else:
