@@ -51,6 +51,7 @@ class App:
     _required_input = {
         'First Name', 'Last Name', 'Email Address', 'Phone Number',
         'City', 'State', 'Country', 'Highest Education', 'Postal Code',
+        'Current Job Title', 'Current Company', 'LinkedIn',
         'Indeed Login', 'Indeed Password', 'Search Job(s) (Comma Separated)',
         'Search Country', 'Number of Jobs', 'Skill 1', 'Experience 1'
     }
@@ -66,7 +67,6 @@ class App:
             'Clearance': 'No Clearance',
             'Country Code': '1',
             'Hours per Week': '40',
-            'LinkedIn': 'No Website',
             'Website': 'No Website',
             'Start Date': date.today().strftime('%m/%d/%y'),
             'Interview Date & Time': 'Anytime',
