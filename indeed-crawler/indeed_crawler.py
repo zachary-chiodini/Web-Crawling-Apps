@@ -9,15 +9,15 @@ from typing import Callable, Dict, List, Optional, Set, Tuple, Union
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 from fasttext import load_model
-from numpy import append, apply_along_axis, argmin, array, char, float32, str_, vectorize
+from numpy import apply_along_axis, argmin, array, char, float32, str_, vectorize
 from numpy.typing import NDArray
 from pandas import DataFrame, ExcelWriter
 from scipy.spatial import distance
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import (
-    ElementClickInterceptedException, ElementNotInteractableException, NoSuchElementException)
+from selenium.common.exceptions import (ElementClickInterceptedException,
+    ElementNotInteractableException, NoSuchElementException, TimeoutException)
 from undetected_chromedriver import Chrome, ChromeOptions
 
 
@@ -83,7 +83,7 @@ class IndeedCrawler:
         WebDriverWait(self._browser, 600).until(lambda driver: 'https://profile.indeed.com/' in driver.current_url)
         return None
 
-    def _apply_to_job(self, job_url: str, wait=5) -> bool:
+    def _apply_to_job(self, job_url: str, wait: int) -> bool:
         return_val = False
         self._log(f"Applying to job at {job_url}.")
         self._browser.execute_script("window.open('');")
@@ -117,11 +117,15 @@ class IndeedCrawler:
             self._log('Failed to review application.')
         try:
             self._browser.find_element(By.XPATH, '//button//span[text()[contains(.,"Submit")]]').click()
+            sleep(wait)
+        except NoSuchElementException:
+            self._log('Failed to submit application.')
+        try:
+            WebDriverWait(self._browser, wait).until(lambda driver: driver.current_url.endswith('post-apply'))
             return_val = True
             self._log(f"SUCCESS - applied to job {job_url}")
-            sleep(600)
-        except NoSuchElementException:
-            self._log(f"FAILURE - did not apply to {job_url}")
+        except TimeoutException:
+            self._log(f"FAILURE - did not apply to job {job_url}")
         self._browser.close()
         self._browser.switch_to.window(self._main_window)
         return return_val
@@ -157,7 +161,8 @@ class IndeedCrawler:
             input_type = input_0.get('type')
             self._log(f"Input type found: {input_type}.")
             if input_type == 'text' and (not input_0.get('value')):
-                input_element = self._browser.find_element(By.XPATH, f'//input')
+                identifier = input_0.get('name')
+                input_element = self._browser.find_element(By.XPATH, f'//input[@name="{identifier}"]')
                 input_element.click()
                 input_element.send_keys(answer)
             elif input_type == 'radio':
@@ -166,8 +171,9 @@ class IndeedCrawler:
                     if text:
                         selections.add(text)
                 answer = self._select_answer(answer, selections)
+                identifier = input_0.get('name')
                 self._browser.find_element(
-                    By.XPATH, f'//span[text()="{answer}"]/preceding::input[1]').click()
+                    By.XPATH, f'//span[text()="{answer}"]/preceding::input[@name="{identifier}"][1]').click()
         elif tag.find('select'):
             self._log(f"Input type found: selection.")
             for option_i in tag.find_all('option'):
@@ -175,12 +181,16 @@ class IndeedCrawler:
                     text = option_i.get_text()
                     if text:
                         selections.add(text)
-                answer = self._select_answer(answer, selections)
-                self._browser.find_element(By.XPATH, f'//select//option[text()="{answer}")]').click()
+            answer = self._select_answer(answer, selections)
+            identifier = tag.find('select').get('name')
+            self._browser.find_element(
+                By.XPATH, f'//select[@name="{identifier}"]//option[text()="{answer}")]').click()
         elif tag.find('textarea'):
             self._log(f"Input type found: textarea.")
-            if not tag.find('textarea').get('value'):
-                text_element = self._browser.find_element(By.XPATH, f'//textarea')
+            textarea = tag.find('textarea')
+            if not textarea.get('value'):
+                identifier = textarea.get('name')
+                text_element = self._browser.find_element(By.XPATH, f'//textarea[@name="{identifier}"]')
                 text_element.click()
                 text_element.send_keys(answer)
         else:
@@ -208,7 +218,7 @@ class IndeedCrawler:
     def _search_jobs(self, country: str, location: str, number_of_jobs: int, query: str, enforce_query: bool = False,
             job_negate_list: List[str] = [], company_negate_list: List[str] = [], past_14_days: bool = False,
             job_type: str = '', min_salary: str = '', enforce_salary: bool = False, exp_lvl: str = '',
-            remote: bool = False, radius: str = '') -> None:
+            remote: bool = False, radius: str = '', wait: int = 5) -> None:
         if not number_of_jobs:
             self._log('Number of jobs is zero.')
             return None
@@ -227,7 +237,7 @@ class IndeedCrawler:
         batch_jobs_applied_to = 0
         active_search = True
         while active_search:
-            sleep(5)  # Waiting for page to load.
+            sleep(wait)  # Waiting for page to load.
             self._main_window = self._browser.current_window_handle  # Jobs are applied to in a separate tab.
             for tag in BeautifulSoup(self._browser.page_source, 'lxml').find_all('div', {'class': 'job_seen_beacon'}):
                 # Automation is limited to "Easy apply".
@@ -261,7 +271,7 @@ class IndeedCrawler:
                 location = self._get_value('Location', tag.find('div', {'data-testid': 'text-location'}))
                 job_url = f"https://www.indeed.com/viewjob?jk={job_jk}"
                 self._cache_job(job_jk)
-                if self._apply_to_job(job_url):
+                if self._apply_to_job(job_url, wait):
                     self.results['Title'].append(title)
                     self.results['Company'].append(company)
                     self.results['Location'].append(location)
@@ -274,12 +284,10 @@ class IndeedCrawler:
                     active_search = False
                     break
             try:
-                next_page_element = self._browser.find_element(
-                    By.XPATH, '//nav//a[@aria-label="Next"]')
+                next_page_element = self._browser.find_element(By.XPATH, '//nav//a[@aria-label="Next"]')
                 next_page_element.click()
             except ElementClickInterceptedException:
-                ActionChains(self._browser).move_to_element(next_page_element)\
-                    .click().perform()
+                ActionChains(self._browser).move_to_element(next_page_element).click().perform()
                 next_page_element.click()
             except NoSuchElementException:
                 break
