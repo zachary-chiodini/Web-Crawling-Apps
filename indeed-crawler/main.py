@@ -42,7 +42,8 @@ def expiration_window(title: str, message: str) -> None:
     frame.pack(expand=True)
     Label(frame, text=message, fg='red').pack()
     Label(frame, text='This robot has become obsolete.').pack()
-    Button(frame, text='Request an updated copy', command=lambda *args: open_new('https://www.google.com')).pack()
+    Button(frame, text='Request an updated copy',
+           command=lambda *args: open_new('https://www.google.com')).pack()
     window.mainloop()
     return None
 
@@ -127,9 +128,9 @@ class App:
         self._start_button = Button(self._root_frame, command=self.start_crawling)
         self.user_form(0, 0, 13, 7, 25, 'nesw')
 
-    def entry_box(
-            self, root_frame: Frame, default_text: str, width: int, row: int, col: int,
-            padx: int, pady: int, sticky: str, colspan=1, regex = '', secure=False, value='') -> Entry:
+    def entry_box(self, root_frame: Frame, default_text: str, width: int,
+                  row: int, col: int, padx: int, pady: int, sticky: str,
+                  colspan=1, regex = '', secure=False, value='') -> Entry:
         def bind_clear_default(*args) -> None:
             if (entry.get() == default_text) or (entry.get() == 'INVALID'):
                 entry.config(textvariable=var)
@@ -187,16 +188,18 @@ class App:
             command=on_select).grid(row=row, column=col, padx=padx, pady=pady, sticky='w')
         return None
 
-    def _setup_log_box(self, row: int, col: int, padx: int, pady: int, width: str, colspan: int) -> None:
+    def _setup_log_box(self, row: int, col: int, padx: int, pady: int,
+                       width: str, colspan: int) -> None:
         add_frame = Frame(self._root_frame)
-        add_frame.grid(row=row, column=col, columnspan=colspan, padx=padx, pady=pady, sticky='nsew')
+        add_frame.grid(row=row, column=col, columnspan=colspan,padx=padx, pady=pady, sticky='nsew')
         self._log_box = Text(add_frame, height=10, width=colspan*width - padx)
         Label(add_frame, text='Crawler Log:').grid(row=0, column=0, sticky='w')
         scroll_bar = Scrollbar(add_frame, command=self._log_box.yview)
         self._log_box.config(yscrollcommand=scroll_bar.set)
         scroll_bar.grid(row=1, column=0, sticky='nse')
         self._log_box.grid(row=1, column=0, sticky='w')
-        self._log_box.insert('end', 'Please fill out the above information. Required input is highlighted.')
+        self._log_box.insert(
+            'end', 'Please fill out the above information. Required input is highlighted.')
         self._log_box.configure(state='disabled')
         return None
 
@@ -219,12 +222,13 @@ class App:
             self._user_input['Companies to Avoid (CSV)']['Variable'].get())
         total_number_of_jobs = int(self._user_input['Number of Jobs']['Variable'].get())
         indeed_crawler = IndeedCrawler(total_number_of_jobs, input_q_and_a, self._log_box)
-        new_thread = Thread(target=indeed_crawler.start_crawling, args=(list(company_negate_set), list(jobs_negate_set), queries, regions))
+        new_thread = Thread(target=indeed_crawler.start_crawling,
+                            args=(list(company_negate_set), list(jobs_negate_set), queries, regions))
         new_thread.start()
         return None
 
-    def widget(self, root_frame: Frame, field: str, width: int,
-            row: int, col: int, padx: int, pady: int, sticky: str, regex: List[str]) -> None:
+    def widget(self, root_frame: Frame, field: str, width: int, row: int, col: int,
+               padx: int, pady: int, sticky: str, regex: List[str]) -> None:
         add_frame = Frame(root_frame)
         add_frame.grid(row=row, column=col, padx=padx, pady=pady, sticky=sticky)
         Label(add_frame, text=field).grid(row=0, column=0, sticky='w')
@@ -250,8 +254,8 @@ class App:
                 self.widget(add_frame, field, width, row_i, col_i, padx, pady, sticky,
                     regex=self._user_input[field]['Regex'])
             elif self._user_input[field]['Entity'] is Checkbutton:
-                Checkbutton(add_frame, text=field, variable=self._user_input[field]['Variable'])\
-                .grid(row=row_i, column=col_i, sticky='w', padx=padx, pady=pady)
+                Checkbutton(add_frame, text=field, variable=self._user_input[field]['Variable']).grid(
+                    row=row_i, column=col_i, sticky='w', padx=padx, pady=pady)
             elif type(self._user_input[field]['Entity']) is list:
                 self.option_menu(add_frame, field, row_i, col_i, padx, pady, sticky)
         self._setup_log_box(row + 2, col, padx, 0, width, col_i + 1)
@@ -324,14 +328,14 @@ class App:
                 for entry in entry_list:
                     input_q_and_a[question.replace('[BLANK]', entry.get())] = 'yes'
 
+        country = self._user_input['Search Country']['Variable'].get()
         for field in ['Req. Sponsorship', 'Eligible to Work', '18 Years or Older']:
             if self._user_input[field]['Variable'].get():
                 answer = 'yes'
             else:
                 answer = 'no'
             for question in self._q_and_a[field]:
-                input_q_and_a[
-                    question.replace('[BLANK]', self._user_input['Search Country']['Variable'].get())] = answer
+                input_q_and_a[question.replace('[BLANK]', country)] = answer
 
         for label, tuple_ in {'Full Name': ('First Name', 'Last Name'), 'Full Address': ('City', 'State')}.items():
             answer = ' '.join(
@@ -398,8 +402,8 @@ class App:
         return None
 
     def _toggle_start_button(self, *args) -> None:
-        if all(self._user_input[field]['Variable'].get() for field in self._required_input if field in self._user_input)\
-            & all(entry_list[0].get() for entry_list in self._widget_entries['Skills/Experience'].values()):
+        if (all(self._user_input[field]['Variable'].get() for field in self._required_input if field in self._user_input)
+                & all(entry_list[0].get() for entry_list in self._widget_entries['Skills/Experience'].values())):
             self._start_button.configure(state='normal')
         else:
             self._start_button.configure(state='disable')
