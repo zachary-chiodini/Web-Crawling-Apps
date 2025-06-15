@@ -60,11 +60,11 @@ class IndeedCrawler:
         start_t = time()
         self.setup_browser()
         self.login('', '')
-        number_per_query = ceil(self._total_number_of_jobs // (len(queries) * len(regions)))
+        jobs_per_query = ceil(self._total_number_of_jobs // (len(queries) * len(regions)))
         for location, country in regions:
             for query in queries:
                 try:
-                    self._search_jobs(country, location, number_per_query, query,
+                    self._search_jobs(country, location, jobs_per_query, query,
                         job_negate_list=job_negate_list, company_negate_list=company_negate_list)
                 except Exception:
                     self._log(format_exc(), traceback=True)
