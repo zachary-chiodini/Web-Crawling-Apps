@@ -102,9 +102,8 @@ class IndeedCrawler:
         self._sleep(wait)
         self._browser.switch_to.window(self._browser.window_handles[-1])
         self._sleep(1)
-        apply_button = self._browser.find_element(
-            By.XPATH, '//button//span[contains(text(), "Apply")]')
-        self._move_to_and_click(apply_button)
+        self._move_to_and_click(
+            self._browser.find_element(By.XPATH, '//button//span[contains(text(), "Apply")]'))
         self._sleep(wait)
         prev_url = ''
         while prev_url != self._browser.current_url:
@@ -130,16 +129,15 @@ class IndeedCrawler:
             if BeautifulSoup(self._browser.page_source, 'lxml').find(
                     'span', string=compile_regex('Apply anyway')):
                 # Applies to job even if not qualified.
-                apply_anyway_button = self._browser.find_element(
-                    By.XPATH, '//button//span[contains(text(), "Apply anyway")]')
-                self._move_to_and_click(apply_anyway_button)
+                self._move_to_and_click(
+                    self._browser.find_element(
+                        By.XPATH, '//button//span[contains(text(), "Apply anyway")]'))
             elif not self._select_continue():
                 break
             self._sleep(wait)
         try:
-            review_button = self._browser.find_element(
-                By.XPATH, '//button//span[contains(text(), "Review")]')
-            self._move_to_and_click(review_button)
+            self._move_to_and_click(
+                self._browser.find_element(By.XPATH, '//button//span[contains(text(), "Review")]'))
             self._log('Reviewing application.')
             self._sleep(wait)
         except NoSuchElementException:
@@ -194,8 +192,7 @@ class IndeedCrawler:
             self._log(f"Input type found: {input_type}.")
             if input_type == 'text' and (not input_0.get('value')):
                 identifier = input_0.get('name')
-                web_element = self._browser.find_element(
-                    By.XPATH, f'//input[@name="{identifier}"]')
+                web_element = self._browser.find_element(By.XPATH, f'//input[@name="{identifier}"]')
                 self._move_to_and_click(web_element)
                 web_element.send_keys(answer)
             elif input_type == 'radio':
@@ -205,9 +202,9 @@ class IndeedCrawler:
                         selections.add(text)
                 answer = self._select_answer(answer, selections)
                 identifier = input_0.get('name')
-                web_element = self._browser.find_element(
-                    By.XPATH, f'//span[contains(text(), "{answer}")]/preceding::input[@name="{identifier}"][1]')
-                self._move_to_and_click(web_element)
+                self._move_to_and_click(
+                    self._browser.find_element(
+                        By.XPATH, f'//span[contains(text(), "{answer}")]/preceding::input[@name="{identifier}"][1]'))
         elif tag.find('select'):
             self._log(f"Input type found: selection.")
             for option_i in tag.find_all('option'):
@@ -217,16 +214,15 @@ class IndeedCrawler:
                         selections.add(text)
             answer = self._select_answer(answer, selections)
             identifier = tag.find('select').get('name')
-            web_element = self._browser.find_element(
-                By.XPATH, f'//select[@name="{identifier}"]//option[contains(text(), "{answer}")]')
-            self._move_to_and_click(web_element)
+            self._move_to_and_click(
+                self._browser.find_element(
+                    By.XPATH, f'//select[@name="{identifier}"]//option[contains(text(), "{answer}")]'))
         elif tag.find('textarea'):
             self._log(f"Input type found: textarea.")
             textarea = tag.find('textarea')
             if not textarea.get('value'):
                 identifier = textarea.get('name')
-                web_element = self._browser.find_element(
-                    By.XPATH, f'//textarea[@name="{identifier}"]')
+                web_element = self._browser.find_element(By.XPATH, f'//textarea[@name="{identifier}"]')
                 self._move_to_and_click(web_element)
                 web_element.send_keys(answer)
         else:
@@ -237,7 +233,8 @@ class IndeedCrawler:
         self._log('Loading fasttext pretrained sentence/document embedding model. '
                   'This may take a few minutes.')
         model = load_model('fasttext-model/cc.en.300.bin')
-        self._sentence2vec = vectorize(model.get_sentence_vector, otypes=[float32], signature='()->(n)')
+        self._sentence2vec = vectorize(
+            model.get_sentence_vector, otypes=[float32], signature='()->(n)')
         self._log('Model loaded successfully.')
         return None
 
@@ -333,9 +330,8 @@ class IndeedCrawler:
                     active_search = False
                     break
             try:
-                next_page_element = self._browser.find_element(
-                    By.XPATH, '//nav//a[@aria-label="Next Page"]')
-                self._move_to_and_click(next_page_element)
+                self._move_to_and_click(
+                    self._browser.find_element(By.XPATH, '//nav//a[@aria-label="Next Page"]'))
             except NoSuchElementException:
                 self._log('Failed to click next page')
                 break
