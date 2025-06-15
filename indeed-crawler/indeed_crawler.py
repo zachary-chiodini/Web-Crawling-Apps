@@ -299,7 +299,7 @@ class IndeedCrawler:
                 title = self._get_value(
                     'Job Title', tag.find('span', {'id': f"jobTitle-{job_jk}"}))
                 if enforce_query and ((query.lower() not in title.lower())
-                                      or (title.lower() not in query.lower())):
+                        or (title.lower() not in query.lower())):
                     self._log(f"Title {title} does not match query {query}")
                     continue
                 if self._find_word_in_negate_list(title, job_negate_list):
