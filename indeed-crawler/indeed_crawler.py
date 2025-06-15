@@ -68,13 +68,15 @@ class IndeedCrawler:
                         job_negate_list=job_negate_list, company_negate_list=company_negate_list)
                 except Exception:
                     self._log(format_exc(), traceback=True)
-        df = DataFrame(data=self.results)
-        if not df.empty:
+        if self.results:
+            df = DataFrame(data=self.results)
             if path.exists(self._submissions_doc):
-                with ExcelWriter(self._submissions_doc, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+                with ExcelWriter(self._submissions_doc, engine='openpyxl',mode='a',
+                                 if_sheet_exists='overlay') as writer:
                     df.to_excel(writer, sheet_name='jobs', index=False)
             else:
-                df.to_excel(self._submissions_doc, sheet_name='jobs', startrow=writer.sheets['jobs'].max_row, index=False)
+                df.to_excel(self._submissions_doc, sheet_name='jobs',
+                            startrow=writer.sheets['jobs'].max_row, index=False)
         total_t = int(time() - start_t)
         seconds = total_t % 60
         minutes = (total_t % 3600) // 60
@@ -89,7 +91,8 @@ class IndeedCrawler:
         self._browser.get('https://secure.indeed.com/account/login')
         # Automated login is no longer possible on indeed.com.
         self._log('You must manually sign in. After signing in, navigate to your profile page.')
-        WebDriverWait(self._browser, 600).until(lambda driver: 'https://profile.indeed.com/' in driver.current_url)
+        WebDriverWait(self._browser, 600).until(
+            lambda driver: 'https://profile.indeed.com/' in driver.current_url)
         return None
 
     def _apply_to_job(self, job_url: str, wait: int) -> bool:
@@ -105,7 +108,8 @@ class IndeedCrawler:
         self._sleep(wait)
         prev_url = ''
         while prev_url != self._browser.current_url:
-            for tag in BeautifulSoup(self._browser.page_source, 'lxml').find_all(class_=compile_regex('Questions-item')):
+            for tag in BeautifulSoup(self._browser.page_source, 'lxml').find_all(
+                    class_=compile_regex('Questions-item')):
                 question = tag.find('span', {'data-testid': 'rich-text'})
                 if question:
                     question = question.get_text()
@@ -117,12 +121,14 @@ class IndeedCrawler:
                 if matches:
                     question = max(matches, key=len).strip('"')
                 self._log(f"Question found: {question}")
-                answer = self._df.loc[argmin(self._cosine_distance(self._df['Question'], question)), 'Answer']
+                answer = self._df.loc[
+                    argmin(self._cosine_distance(self._df['Question'], question)), 'Answer']
                 self._log(f"Answer found: {answer}.")
                 self._input_answer(answer, tag)
                 self._sleep(0)
             prev_url = self._browser.current_url
-            if BeautifulSoup(self._browser.page_source, 'lxml').find('span', string=compile_regex('Apply anyway')):
+            if BeautifulSoup(self._browser.page_source, 'lxml').find(
+                    'span', string=compile_regex('Apply anyway')):
                 # Applies to job even if not qualified.
                 apply_anyway_button = self._browser.find_element(
                     By.XPATH, '//button//span[contains(text(), "Apply anyway")]')
@@ -139,14 +145,15 @@ class IndeedCrawler:
         except NoSuchElementException:
             self._log('Failed to review application.')
         try:
-            submit_buttom = self._browser.find_element(By.XPATH, '//button//span[contains(text(), "Submit")]')
-            self._move_to_and_click(submit_buttom)
+            self._move_to_and_click(
+                self._browser.find_element(By.XPATH, '//button//span[contains(text(), "Submit")]'))
             self._sleep(wait)
         except NoSuchElementException:
             self._log('Failed to submit application.')
         try:
             self._log('Waiting up to 60 seconds for post-apply page.')
-            WebDriverWait(self._browser, 60).until(lambda driver: driver.current_url.endswith('post-apply'))
+            WebDriverWait(self._browser, 60).until(
+                lambda driver: driver.current_url.endswith('post-apply'))
             return_val = True
             self._log(f"SUCCESS - applied to job {job_url}")
         except TimeoutException:
@@ -187,7 +194,8 @@ class IndeedCrawler:
             self._log(f"Input type found: {input_type}.")
             if input_type == 'text' and (not input_0.get('value')):
                 identifier = input_0.get('name')
-                web_element = self._browser.find_element(By.XPATH, f'//input[@name="{identifier}"]')
+                web_element = self._browser.find_element(
+                    By.XPATH, f'//input[@name="{identifier}"]')
                 self._move_to_and_click(web_element)
                 web_element.send_keys(answer)
             elif input_type == 'radio':
@@ -217,7 +225,8 @@ class IndeedCrawler:
             textarea = tag.find('textarea')
             if not textarea.get('value'):
                 identifier = textarea.get('name')
-                web_element = self._browser.find_element(By.XPATH, f'//textarea[@name="{identifier}"]')
+                web_element = self._browser.find_element(
+                    By.XPATH, f'//textarea[@name="{identifier}"]')
                 self._move_to_and_click(web_element)
                 web_element.send_keys(answer)
         else:
@@ -225,7 +234,8 @@ class IndeedCrawler:
         return None
 
     def _load_s2v_model(self) -> None:
-        self._log('Loading fasttext pretrained sentence/document embedding model. This may take a few minutes.')
+        self._log('Loading fasttext pretrained sentence/document embedding model. '
+                  'This may take a few minutes.')
         model = load_model('fasttext-model/cc.en.300.bin')
         self._sentence2vec = vectorize(model.get_sentence_vector, otypes=[float32], signature='()->(n)')
         self._log('Model loaded successfully.')
@@ -243,7 +253,8 @@ class IndeedCrawler:
         return None
 
     def _move_to_and_click(self, web_element: WebElement) -> None:
-        self._browser.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", web_element)
+        self._browser.execute_script(
+            "arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", web_element)
         self._sleep(1)
         ActionChains(self._browser).move_to_element(web_element).perform()
         self._sleep(1)
@@ -262,14 +273,17 @@ class IndeedCrawler:
             self._df = DataFrame(self._q_and_a.items(), columns=['Question', 'Answer'])
             self._load_s2v_model()
         self._browser.get(f"https://{self._map_country[country]}indeed.com/jobs?q={query}"
-            f"{'&fromage=14' * past_14_days}{'&jt='*bool(job_type) + job_type}{'&explvl='*bool(exp_lvl) + exp_lvl}"
-            f"{'&l='*bool(location) + location}{'&radius='*bool(radius) + radius}")
+            f"{'&fromage=14' * past_14_days}{'&jt='*bool(job_type) + job_type}"
+            f"{'&explvl='*bool(exp_lvl) + exp_lvl}{'&l='*bool(location) + location}"
+            f"{'&radius='*bool(radius) + radius}")
         WebDriverWait(self._browser, 600).until(lambda driver: '&vjk=' in driver.current_url)
         batch_jobs_applied_to = 0
         active_search = True
         while active_search:
-            self._main_window = self._browser.current_window_handle  # Jobs are applied to in a separate tab.
-            for tag in BeautifulSoup(self._browser.page_source, 'lxml').find_all('div', {'class': 'job_seen_beacon'}):
+            # Jobs are applied to in a separate tab.
+            self._main_window = self._browser.current_window_handle
+            for tag in BeautifulSoup(self._browser.page_source, 'lxml').find_all(
+                    'div', {'class': 'job_seen_beacon'}):
                 # Automation is limited to "Easy apply".
                 if not tag.find('span', string=compile_regex('Easily apply')):
                     continue
@@ -282,23 +296,28 @@ class IndeedCrawler:
                 if job_jk in self._cache:
                     self._log(f"Already applied to job: {job_jk}.")
                     continue
-                title = self._get_value('Job Title', tag.find('span', {'id': f"jobTitle-{job_jk}"}))
-                if enforce_query and ((query.lower() not in title.lower()) or (title.lower() not in query.lower())):
+                title = self._get_value(
+                    'Job Title', tag.find('span', {'id': f"jobTitle-{job_jk}"}))
+                if enforce_query and ((query.lower() not in title.lower())
+                                      or (title.lower() not in query.lower())):
                     self._log(f"Title {title} does not match query {query}")
                     continue
                 if self._find_word_in_negate_list(title, job_negate_list):
                     continue
-                company = self._get_value('Company Name', tag.find('span', {'data-testid': 'company-name'}))
+                company = self._get_value(
+                    'Company Name', tag.find('span', {'data-testid': 'company-name'}))
                 if self._find_word_in_negate_list(company, company_negate_list):
                     continue
-                salary = self._get_value('Salary', tag.find(string=compile_regex('^\$?[0-9]{1,3},?[0-9]{0,3}.?[0-9]{0,2}')))
+                salary = self._get_value(
+                    'Salary', tag.find(string=compile_regex('^\$?[0-9]{1,3},?[0-9]{0,3}.?[0-9]{0,2}')))
                 if enforce_salary and (not salary):
                     self._log(f"Salary is enforced. Skipping job {job_jk}.")
                     continue
                 if min_salary and salary:
                     # Needs rewriting.
                     pass
-                location = self._get_value('Location', tag.find('div', {'data-testid': 'text-location'}))
+                location = self._get_value(
+                    'Location', tag.find('div', {'data-testid': 'text-location'}))
                 job_url = f"https://www.indeed.com/viewjob?jk={job_jk}"
                 if self._apply_to_job(job_url, wait):
                     self._cache_job(job_jk)
@@ -314,7 +333,8 @@ class IndeedCrawler:
                     active_search = False
                     break
             try:
-                next_page_element = self._browser.find_element(By.XPATH, '//nav//a[@aria-label="Next Page"]')
+                next_page_element = self._browser.find_element(
+                    By.XPATH, '//nav//a[@aria-label="Next Page"]')
                 self._move_to_and_click(next_page_element)
             except NoSuchElementException:
                 self._log('Failed to click next page')
