@@ -176,8 +176,8 @@ class App:
             entry.config({'background': 'yellow'})
         return entry
 
-    def option_menu(self, root_frame: Frame, field: str,
-            row: int, col: int, padx: int, pady: int, sticky: str) -> None:
+    def option_menu(self, root_frame: Frame, field: str, row: int, col: int,
+                    padx: int, pady: int, sticky: str) -> None:
         def on_select(value: str) -> None:
             selected_var.set(value)
             display_var.set(field)
@@ -185,11 +185,10 @@ class App:
         display_var = StringVar(value=field)
         selected_var = self._user_input[field]['Variable']
         OptionMenu(root_frame, display_var, *self._user_input[field]['Entity'],
-            command=on_select).grid(row=row, column=col, padx=padx, pady=pady, sticky='w')
+            command=on_select).grid(row=row, column=col, padx=padx, pady=pady, sticky=sticky)
         return None
 
-    def _setup_log_box(self, row: int, col: int, padx: int, pady: int,
-                       width: str, colspan: int) -> None:
+    def _setup_log_box(self, row: int, col: int, padx: int, pady: int, width: str, colspan: int) -> None:
         add_frame = Frame(self._root_frame)
         add_frame.grid(row=row, column=col, columnspan=colspan,padx=padx, pady=pady, sticky='nsew')
         self._log_box = Text(add_frame, height=10, width=colspan*width - padx)
@@ -216,10 +215,8 @@ class App:
         regions = set()
         for location in self._user_input['Search State(s)/Region(s) (CSV)']['Variable'].get().split(','):
             regions.add((location.strip(), self._user_input['Search Country']['Variable'].get().lower()))
-        jobs_negate_set = get_clean_set_from(
-            self._user_input['Word(s) to Avoid (CSV)']['Variable'].get())
-        company_negate_set = get_clean_set_from(
-            self._user_input['Companies to Avoid (CSV)']['Variable'].get())
+        jobs_negate_set = get_clean_set_from(self._user_input['Word(s) to Avoid (CSV)']['Variable'].get())
+        company_negate_set = get_clean_set_from(self._user_input['Companies to Avoid (CSV)']['Variable'].get())
         total_number_of_jobs = int(self._user_input['Number of Jobs']['Variable'].get())
         indeed_crawler = IndeedCrawler(total_number_of_jobs, input_q_and_a, self._log_box)
         new_thread = Thread(target=indeed_crawler.start_crawling,
@@ -271,8 +268,8 @@ class App:
         self._toggle_start_button()
         return None
 
-    def _add_entry(self, root_frame: Frame, field: str, width: int,
-            row: int, col: int, padx: int, pady: int, sticky: str, regex: List[str]) -> None:
+    def _add_entry(self, root_frame: Frame, field: str, width: int, row: int, col: int,
+                   padx: int, pady: int, sticky: str, regex: List[str]) -> None:
         # Detects and processes saved user input.
         if self._start and any(self._widget_entries[field].values()):
             for i, (label, entry_list) in enumerate(self._widget_entries[field].items()):
