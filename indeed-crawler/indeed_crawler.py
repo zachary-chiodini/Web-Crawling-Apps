@@ -26,7 +26,7 @@ from undetected_chromedriver import Chrome, ChromeOptions
 
 class IndeedCrawler:
 
-    def __init__(self, total_number_of_jobs=0, q_and_a={}, log_box: Optional[Text] = None) -> None:
+    def __init__(self, total_number_of_jobs=0, q_and_a={}, log_box: Optional[Text] = None):
         self.results = {'Title': [], 'Company': [], 'Location': [], 'Salary': [], 'URL': []}
         self.total_jobs_applied_to = 0
         self._browser: Chrome
@@ -250,9 +250,10 @@ class IndeedCrawler:
         web_element.click()
         return None
 
-    def _search_jobs(self, country: str, location: str, number_of_jobs: int, query: str, enforce_query: bool = False,
-            job_negate_list: List[str] = [], company_negate_list: List[str] = [], past_14_days: bool = False,
-            job_type: str = '', min_salary: str = '', enforce_salary: bool = False, exp_lvl: str = '',
+    def _search_jobs(self, country: str, location: str, number_of_jobs: int, query: str,
+            company_negate_list: List[str] = [], enforce_salary: bool = False,
+            enforce_query: bool = False, exp_lvl: str = '', job_negate_list: List[str] = [],
+            job_type: str = '', min_salary: str = '', past_14_days: bool = False,
             radius: str = '', wait: int = 5) -> None:
         if not number_of_jobs:
             self._log('Number of jobs is zero.')
