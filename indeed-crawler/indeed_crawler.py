@@ -99,7 +99,6 @@ class IndeedCrawler:
         return None
 
     def _apply_to_job(self, job_url: str) -> bool:
-        bool_val = False
         self._log(f"Applying to job at {job_url}.")
         prev_url = self._browser.current_url
         self._browser.execute_script(f"window.open('{job_url}', '_blank');")
@@ -109,6 +108,8 @@ class IndeedCrawler:
             self._browser.current_url, '//button//span[contains(text(), "Apply")]')
         if self._browser.current_url == job_url:
             self._log(f"Cannot apply to job: no apply button.")
+            self._browser.close()
+            self._browser.switch_to.window(self._main_window)
             return False
         retries = 0
         while True:
@@ -132,6 +133,7 @@ class IndeedCrawler:
                 retries += 1
                 if retries == 2:
                     break
+        bool_val = False
         self._click_button(self._browser.current_url, '//button//span[contains(text(), "Review")]')
         if self._move_to_and_click('//button//span[contains(text(), "Submit")]'):
             self._log('Waiting up to 60 seconds for post-apply page.')
