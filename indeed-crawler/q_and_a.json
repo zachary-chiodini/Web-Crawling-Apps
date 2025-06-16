@@ -9,12 +9,13 @@
       },
       "Full Name": {
             "Name": "",
+            "Your Name": "",
             "Full Name": "",
             "Candidate Name": "",
             "What is your name?": "",
             "Please type your full name": "",
             "How may we pronounce your name?": "",
-            "Please confirm your legal first and last name": ""            
+            "Please confirm your legal first and last name": ""
       },
       "Email Address": {
             "Email": "",
