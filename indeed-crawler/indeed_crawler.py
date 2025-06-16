@@ -48,7 +48,7 @@ class IndeedCrawler:
         if path.exists(self._cache_file_name):
             with open(self._cache_file_name) as f:
                 for line in f:
-                    self._cache.add(line.strip())
+                    self._cache.add(line)
 
     def setup_browser(self) -> None:
         options = ChromeOptions()
@@ -301,7 +301,7 @@ class IndeedCrawler:
             for key_ in keys:
                 self._sleep(0, 0.25)  # Typing speed
                 self._browser.find_element(By.XPATH, xpath).send_keys(key_)
-        self._sleep(*self.fidget_time)
+            self._sleep(*self.fidget_time)
         return None
 
     def _search_jobs(self, country: str, location: str, number_of_jobs: int, query: str,
