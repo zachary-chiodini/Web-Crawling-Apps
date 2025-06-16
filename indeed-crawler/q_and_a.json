@@ -169,6 +169,7 @@
             "Are you legally eligible to be employed in [BLANK]?": "",
             "Are you able to provide proof that you are eligible to legally work in [BLANK]?": "",
             "Can you provide legal documents establishing your eligibility to work in [BLANK]?": "",
+            "Are you a US Citizen and can obtain a Federal Security Clearance?": "",
             "Can you provide the necessary documentation to prove that you are a citizen, permanent resident, or a foreign national with authorization to work in [BLANK]?": ""
       },
       "Private": {
