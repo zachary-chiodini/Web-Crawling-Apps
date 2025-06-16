@@ -98,7 +98,8 @@
       "Skills Other": {
             "Do you have at least one year of experience in [BLANK]?": "",
             "Do you have experience working with [BLANK]?": "",
-            "Do you have [BLANK] experience or are you in a [BLANK] degree?": ""
+            "Do you have [BLANK] experience or are you in a [BLANK] degree?": "",
+            "What do you have experience with [BLANK]?": ""
       },
       "Highest Education": {
             "What is the highest level of education you have completed?": "",
@@ -191,6 +192,7 @@
             "Can you provide the necessary documentation to prove that you are a citizen, permanent resident, or a foreign national with authorization to work in [BLANK]?": ""
       },
       "Private": {
+            "What are your pronouns?": "Prefer not to say",
             "Do you have access to a remote work environment that will allow me to work effectively during my working hours.": "Yes",
             "Do you have consistent internet access?": "Yes",            
             "Do you currently live in the United States of America?": "Yes",
