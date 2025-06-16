@@ -68,9 +68,10 @@ class App:
             'Clearance': 'No Clearance',
             'Country Code': '1',
             'Hours per Week': '40',
-            'Website': 'No Website',
+            'Interview Date & Time': 'Anytime',
             'Start Date': date.today().strftime('%m/%d/%y'),
-            'Interview Date & Time': 'Anytime'
+            "Today's Date": date.today().strftime('%m/%d/%y'),
+            'Website': 'No Website'
         }
         self._log_box: Text
         self._start = True
@@ -210,7 +211,7 @@ class App:
                 if val:
                     clean_set.add(val)
             return clean_set
-        input_q_and_a = self._input_q_and_a()
+        input_q_and_a = self._get_input_q_and_a()
         queries = get_clean_set_from(self._user_input['Search Job(s) (CSV)']['Variable'].get())
         regions = set()
         for location in self._user_input['Search State(s)/Region(s) (CSV)']['Variable'].get().split(','):
@@ -301,8 +302,9 @@ class App:
                 self._user_input[f"{label} {n}"]['Variable'].set('')
         return None
 
-    def _input_q_and_a(self) -> Dict:
+    def _get_input_q_and_a(self) -> Dict:
         input_q_and_a = {}
+        
         for skill, experience in zip(self._widget_entries['Skills/Experience']['Skill'],
                 self._widget_entries['Skills/Experience']['Experience']):
             for question in self._q_and_a['Skills']:
@@ -344,9 +346,12 @@ class App:
             input_q_and_a[question] = answer
 
         for field in self._q_and_a:
-            if field not in self._user_input:
+            if field == 'Private':
                 continue
-            answer = self._user_input[field]['Variable'].get()
+            if field in self._user_input:
+                answer = self._user_input[field]['Variable'].get()
+            else:
+                answer = ''
             if isinstance(answer, int):
                 if answer:
                     answer = 'Yes'
