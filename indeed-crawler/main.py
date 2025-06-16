@@ -49,6 +49,15 @@ def expiration_window(title: str, message: str) -> None:
 
 
 class App:
+    _default_input = {
+        'Clearance': 'No Clearance',
+        'Country Code': '1',
+        'Hours per Week': '40',
+        'Interview Date & Time': 'Anytime',
+        'Start Date': date.today().strftime('%m/%d/%Y'),
+        "Today's Date": date.today().strftime('%m/%d/%Y'),
+        'Website': 'No Website'
+    }
     _required_input = {
         'First Name', 'Last Name', 'Email Address', 'Phone Number',
         'City', 'State', 'Country', 'Highest Education', 'Postal Code',
@@ -64,15 +73,6 @@ class App:
         'Languages': {'Language': []}
     }
     def __init__(self, root_window_: Tk):
-        self._default_input = {
-            'Clearance': 'No Clearance',
-            'Country Code': '1',
-            'Hours per Week': '40',
-            'Interview Date & Time': 'Anytime',
-            'Start Date': date.today().strftime('%m/%d/%Y'),
-            "Today's Date": date.today().strftime('%m/%d/%Y'),
-            'Website': 'No Website'
-        }
         self._log_box: Text
         self._start = True
         self._user_input = OrderedDict({
