@@ -419,7 +419,7 @@ class IndeedCrawler:
                 break
         return False
 
-    def _sleep(self, seconds: int, rand_lim = 3) -> None:
+    def _sleep(self, seconds: int, rand_lim: int) -> None:
         sleep(seconds + uniform(0, rand_lim))
         return None
 
