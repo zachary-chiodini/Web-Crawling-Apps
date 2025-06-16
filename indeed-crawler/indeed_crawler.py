@@ -405,19 +405,18 @@ class IndeedCrawler:
             self._move_to(xpath)
         except NoSuchElementException:
             return False
-        else:
-            prev_url = self._browser.current_url
-            # The continue button is duplicated in the html source.
-            for web_element in self._browser.find_elements(By.XPATH, xpath):
-                try:
-                    web_element.click()
-                    self._log('Selected continue.')
-                    self._wait_for_new_page(prev_url)
-                    return True
-                except ElementNotInteractableException:
-                    pass
-                except TimeoutException:
-                    return False
+        prev_url = self._browser.current_url
+        # The continue button is duplicated in the html source.
+        for web_element in self._browser.find_elements(By.XPATH, xpath):
+            try:
+                web_element.click()
+                self._log('Selected continue.')
+                self._wait_for_new_page(prev_url)
+                return True
+            except ElementNotInteractableException:
+                pass
+            except TimeoutException:
+                break
         return False
 
     def _sleep(self, seconds: int, rand_lim = 3) -> None:
