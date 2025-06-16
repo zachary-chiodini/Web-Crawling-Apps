@@ -146,11 +146,10 @@ class IndeedCrawler:
                 lambda driver: driver.current_url.endswith('post-apply'))
             return_val = True
             self._log(f"SUCCESS - applied to job {job_url}")
-            self._sleep(wait)
+            self._sleep(1, 2)
         except TimeoutException:
             self._log(f"FAILURE - did not apply to job {job_url}")
         self._browser.close()
-        self._sleep(0)
         self._browser.switch_to.window(self._main_window)
         self._sleep(wait)
         return return_val
@@ -216,7 +215,6 @@ class IndeedCrawler:
                 self._move_to_and_send_keys(f'//textarea[@name="{identifier}"]', answer)
         else:
             self._log(f"Input type found: unknown.")
-        self._sleep(0)
         return None
 
     def _load_s2v_model(self) -> None:
@@ -260,6 +258,7 @@ class IndeedCrawler:
             # Sometimes element is clickable but not interactable.
             pass
         self._browser.find_element(By.XPATH, xpath).click()
+        self._sleep(0)
         return None
 
     def _move_to_and_send_keys(self, xpath: str, keys: str) -> None:
@@ -267,7 +266,7 @@ class IndeedCrawler:
         #  to avoid "StaleElementReferenceException".
         self._move_to_and_click(xpath)
         for key_ in keys:
-            self._sleep(0)
+            self._sleep(0, 1)
             self._browser.find_element(By.XPATH, xpath).send_keys(key_)
         return None
 
@@ -371,6 +370,6 @@ class IndeedCrawler:
         self._log('Failed to continue.')
         return False
 
-    def _sleep(self, wait: int) -> None:
-        sleep(wait + uniform(0, 3))
+    def _sleep(self, wait: int, rand_lim = 3) -> None:
+        sleep(wait + uniform(0, rand_lim))
         return None
