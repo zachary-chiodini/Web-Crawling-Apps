@@ -26,6 +26,7 @@ from undetected_chromedriver import Chrome, ChromeOptions
 class IndeedCrawler:
 
     def __init__(self, total_number_of_jobs=0, q_and_a={}, log_box: Optional[Text] = None):
+        self.debug = False
         self.fidget_time = (0.5, 1.5)
         self.page_load_time = (4, 2)
         self.results = {'Title': [], 'Company': [], 'Location': [], 'Salary': [], 'URL': []}
@@ -98,7 +99,7 @@ class IndeedCrawler:
         return None
 
     def _apply_to_job(self, job_url: str) -> bool:
-        return_val = False
+        bool_val = False
         self._log(f"Applying to job at {job_url}.")
         prev_url = self._browser.current_url
         self._browser.execute_script(f"window.open('{job_url}', '_blank');")
@@ -128,27 +129,21 @@ class IndeedCrawler:
                 retries += 1
                 if retries == 2:
                     break
-        try:
-            self._click_button(
-                self._browser.current_url, '//button//span[contains(text(), "Review")]')
-        except NoSuchElementException:
-            self._log('Failed to review application.')
-        try:
-            self._move_to_and_click('//button//span[contains(text(), "Submit")]')
-        except NoSuchElementException:
-            self._log('Failed to submit application.')
-        try:
+        self._click_button(self._browser.current_url, '//button//span[contains(text(), "Review")]')
+        if self._move_to_and_click('//button//span[contains(text(), "Submit")]'):
             self._log('Waiting up to 60 seconds for post-apply page.')
-            WebDriverWait(self._browser, 60).until(
-                lambda driver: driver.current_url.endswith('post-apply'))
-            self._sleep(*self.page_load_time)
-            return_val = True
-            self._log(f"SUCCESS - applied to job {job_url}")
-        except TimeoutException:
-            self._log(f"FAILURE - did not apply to job {job_url}")
+            try:
+                WebDriverWait(self._browser, 60).until(
+                    lambda driver: driver.current_url.endswith('post-apply'))
+            except TimeoutException:
+                pass
+            else:
+                self._sleep(*self.page_load_time)
+                bool_val = True
+                self._log(f"SUCCESS - applied to job {job_url}")
         self._browser.close()
         self._browser.switch_to.window(self._main_window)
-        return return_val
+        return bool_val
 
     def _cache_job(self, job_jk: str) -> None:
         self._cache.add(job_jk)
@@ -157,8 +152,8 @@ class IndeedCrawler:
         return None
 
     def _click_button(self, current_url: str, xpath: str) -> None:
-        self._move_to_and_click(xpath)
-        self._wait_for_new_page(current_url)
+        if self._move_to_and_click(xpath):
+            self._wait_for_new_page(current_url)
         return None
 
     def _cosine_distance(self, v: NDArray[str_], s: str) -> NDArray[float32]:
@@ -202,7 +197,7 @@ class IndeedCrawler:
         if input_0:
             input_type = input_0.get('type')
             self._log(f"Input type found: {input_type}.")
-            if input_type == 'text' and (not input_0.get('value')):
+            if ((not input_type) or (input_type == 'text')) and (not input_0.get('value')):
                 identifier = input_0.get('name')
                 self._move_to_and_send_keys(f'//input[@name="{identifier}"]', answer)
             elif (input_type == 'radio') or (input_type == 'checkbox'):
@@ -279,24 +274,28 @@ class IndeedCrawler:
                 self._browser.find_element(By.XPATH, xpath)).perform()
             self._sleep(*self.fidget_time)
         except ElementNotInteractableException:
-            self._log(f"Web element not interactable: {xpath}")
+            pass
         return None
 
-    def _move_to_and_click(self, xpath: str) -> None:
+    def _move_to_and_click(self, xpath: str) -> bool:
         #  Finding the element before every action is
         #  to avoid "StaleElementReferenceException".
-        self._move_to(xpath)
+        try:
+            self._move_to(xpath)
+        except NoSuchElementException:
+            self._log('Failed to click: NoSuchElementException')
+            return False
         self._browser.find_element(By.XPATH, xpath).click()
         self._sleep(*self.fidget_time)
-        return None
+        return True
 
     def _move_to_and_send_keys(self, xpath: str, keys: str) -> None:
         #  Finding the element before every action is
         #  to avoid "StaleElementReferenceException".
-        self._move_to_and_click(xpath)
-        for key_ in keys:
-            self._sleep(0, 0.25)  # Typing speed
-            self._browser.find_element(By.XPATH, xpath).send_keys(key_)
+        if self._move_to_and_click(xpath):
+            for key_ in keys:
+                self._sleep(0, 0.25)  # Typing speed
+                self._browser.find_element(By.XPATH, xpath).send_keys(key_)
         self._sleep(*self.fidget_time)
         return None
 
@@ -370,6 +369,12 @@ class IndeedCrawler:
                     batch_jobs_applied_to += 1
                     self.total_jobs_applied_to += 1
                     self._log(f"You've applied to {self.total_jobs_applied_to} job(s).")
+                else:
+                    self._log(f"FAILURE - did not apply to job {job_url}")
+                    if self.debug:
+                        error_msg = f"{self.__class__.__name__}.debug is set to {self.debug}"
+                        self._log(error_msg)
+                        raise ValueError(error_msg)
                 if batch_jobs_applied_to == number_of_jobs:
                     active_search = False
                     break
@@ -406,6 +411,8 @@ class IndeedCrawler:
                     return True
                 except ElementNotInteractableException:
                     pass
+                except TimeoutException:
+                    return False
         return False
 
     def _sleep(self, seconds: int, rand_lim = 3) -> None:
