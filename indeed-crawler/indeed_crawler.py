@@ -352,8 +352,6 @@ class IndeedCrawler:
 
     def _select_continue(self) -> bool:
         xpath = '//button//span[contains(text(), "Continue") or contains(text(), "continue")]'
-        self._move_to(xpath)
-        self._sleep(1)
         # The continue button is duplicated in the html source.
         for web_element in self._browser.find_elements(By.XPATH, xpath):
             try:
@@ -362,6 +360,7 @@ class IndeedCrawler:
                 return True
             except ElementNotInteractableException:
                 pass
+            self._sleep(1)
         self._log('Failed to continue.')
         return False
 
