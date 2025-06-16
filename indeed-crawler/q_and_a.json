@@ -13,7 +13,8 @@
             "Candidate Name": "",
             "What is your name?": "",
             "Please type your full name": "",
-            "How may we pronounce your name?": ""
+            "How may we pronounce your name?": "",
+            "Please confirm your legal first and last name": ""            
       },
       "Email Address": {
             "Email": "",
@@ -35,7 +36,8 @@
             "Current Company": ""
       },
       "Current Job Title": {
-            "Current Job Title": ""
+            "Current Job Title": "",
+            "What type of position are you looking for?": ""
       },
       "Street Address": {
             "Address 1": "",
@@ -149,7 +151,8 @@
             "Will you now or in the future require sponsorship for employment visa status in [BLANK]?": "",
             "Do you currently or will you in the future require visa sponsorship to work in [BLANK]?": "",
             "Do you need sponsorship?": "",
-            "Are you legally authorized to work in the United States without need for sponsorship now or in the future?": ""
+            "Are you legally authorized to work in the United States without need for sponsorship now or in the future?": "",
+            "Will you now or in the future require the company to commence an immigration case in order to employ you? This is sometimes called “sponsorship” for an employment-based visa status.": ""
       },
       "Eligible to Work": {
             "Are you legally authorized to work in the United States for any employer without the need for current or future sponsorship for an employment visa?": "",
@@ -169,6 +172,9 @@
             "Can you provide the necessary documentation to prove that you are a citizen, permanent resident, or a foreign national with authorization to work in [BLANK]?": ""
       },
       "Private": {
+            "Have you ever worked in this industry before?": "Yes",
+            "Do you wish to proceed with your application?": "Yes",
+            "This is a full-time, W2 position - do you wish to proceed with your application?": "Yes",
             "Do you have experience mentoring and training?": "Yes",
             "If you were referred, please share your referrer's name with us.": "No referral",
             "If you were referred to this position by a current employee of our company, please enter their name below.": "No referral",
