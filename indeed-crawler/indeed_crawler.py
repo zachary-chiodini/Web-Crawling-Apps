@@ -26,7 +26,10 @@ from undetected_chromedriver import Chrome, ChromeOptions
 class IndeedCrawler:
 
     def __init__(self, total_number_of_jobs=0, q_and_a={}, log_box: Optional[Text] = None):
+        self.fidget_time = (0.5, 1.5)
+        self.page_load_time = (4, 2)
         self.results = {'Title': [], 'Company': [], 'Location': [], 'Salary': [], 'URL': []}
+        self.timeout_time = 10
         self.total_jobs_applied_to = 0
         self._browser: Chrome
         self._cache = set()
@@ -83,7 +86,7 @@ class IndeedCrawler:
         days = total_t // 86400
         self._log('Job search has terminated.')
         self._log(f"Applied to {self.total_jobs_applied_to} jobs.")
-        self._log(f'Time elapsed: {days:02}:{hours:02}:{minutes:02}:{seconds:02}.')
+        self._log(f"Time elapsed: {days:02}:{hours:02}:{minutes:02}:{seconds:02}.")
         return None
 
     def login(self, email: str, password: str) -> None:
@@ -94,64 +97,57 @@ class IndeedCrawler:
             lambda driver: 'https://profile.indeed.com/' in driver.current_url)
         return None
 
-    def _apply_to_job(self, job_url: str, wait: int) -> bool:
+    def _apply_to_job(self, job_url: str) -> bool:
         return_val = False
         self._log(f"Applying to job at {job_url}.")
+        prev_url = self._browser.current_url
         self._browser.execute_script(f"window.open('{job_url}', '_blank');")
-        self._sleep(wait)
         self._browser.switch_to.window(self._browser.window_handles[-1])
-        self._sleep(0, 2)
-        self._move_to_and_click('//button//span[contains(text(), "Apply")]')
-        self._sleep(wait)
-        prev_url = ''
-        while prev_url != self._browser.current_url:
+        self._wait_for_new_page(prev_url)
+        self._click_button(
+            self._browser.current_url, '//button//span[contains(text(), "Apply")]')
+        retries = 0
+        while True:
             for tag in BeautifulSoup(self._browser.page_source, 'lxml').find_all(
                     class_=compile_regex('Questions-item')):
-                question = tag.find('span', {'data-testid': 'rich-text'})
-                if question:
-                    question = question.get_text()
-                else:
-                    self._log(f"Question not found.")
+                question = self._find_question(tag)
+                if not question:
                     continue
-                # Some questions are wrapped in double quotes.
-                matches = findall('".+?"', question)
-                if matches:
-                    question = max(matches, key=len).strip('"')
-                self._log(f"Question found: {question}")
                 answer = self._df.loc[
                     argmin(self._cosine_distance(self._df['Question'], question)), 'Answer']
                 self._log(f"Answer found: {answer}.")
                 self._input_answer(answer, tag)
-            prev_url = self._browser.current_url
             if BeautifulSoup(self._browser.page_source, 'lxml').find(
                     'span', string=compile_regex('Apply anyway')):
                 # Applies to job even if not qualified.
-                self._move_to_and_click('//button//span[contains(text(), "Apply anyway")]')
+                self._click_button(
+                    self._browser.current_url, '//button//span[contains(text(), "Apply anyway")]')
             elif not self._select_continue():
-                break
-            self._sleep(wait)
+                self._log('Failed to continue.')
+                #  Try one more time.
+                retries += 1
+                if retries == 2:
+                    break
         try:
-            self._move_to_and_click('//button//span[contains(text(), "Review")]')
-            self._sleep(wait)
+            self._click_button(
+                self._browser.current_url, '//button//span[contains(text(), "Review")]')
         except NoSuchElementException:
             self._log('Failed to review application.')
         try:
             self._move_to_and_click('//button//span[contains(text(), "Submit")]')
-            self._sleep(wait)
         except NoSuchElementException:
             self._log('Failed to submit application.')
         try:
             self._log('Waiting up to 60 seconds for post-apply page.')
             WebDriverWait(self._browser, 60).until(
                 lambda driver: driver.current_url.endswith('post-apply'))
+            self._sleep(*self.page_load_time)
             return_val = True
             self._log(f"SUCCESS - applied to job {job_url}")
-            self._sleep(1, 2)
         except TimeoutException:
             self._log(f"FAILURE - did not apply to job {job_url}")
         self._browser.close()
         self._browser.switch_to.window(self._main_window)
-        self._sleep(wait)
         return return_val
 
     def _cache_job(self, job_jk: str) -> None:
@@ -160,8 +156,31 @@ class IndeedCrawler:
             file.write(f"{job_jk}\n")
         return None
 
+    def _click_button(self, current_url: str, xpath: str) -> None:
+        self._move_to_and_click(xpath)
+        self._wait_for_new_page(current_url)
+        return None
+
     def _cosine_distance(self, v: NDArray[str_], s: str) -> NDArray[float32]:
         return apply_along_axis(distance.cosine, 1, self._sentence2vec(v), self._sentence2vec(s))
+
+    def _find_question(self, tag: Tag) -> str:
+        question = tag.find('span', {'data-testid': 'rich-text'})
+        if question:
+            question = question.get_text()
+        elif tag.find('legend'):
+            question = tag.find('legend').get_text()
+        elif tag.find('label'):
+            question = tag.find('label').get_text()
+        else:
+            self._log(f"Question not found.")
+            return ''
+        # Some questions are wrapped in double quotes.
+        matches = findall('".+?"', question)
+        if matches:
+            question = max(matches, key=len).strip('"')
+        self._log(f"Question found: {question}")
+        return question
 
     def _find_word_in_negate_list(self, string: str, negate_list: List[str]) -> bool:
         for word in negate_list:
@@ -179,7 +198,6 @@ class IndeedCrawler:
         return value
 
     def _input_answer(self, answer: str, tag: Tag) -> None:
-        selections = set()
         input_0 = tag.find('input')
         if input_0:
             input_type = input_0.get('type')
@@ -187,38 +205,46 @@ class IndeedCrawler:
             if input_type == 'text' and (not input_0.get('value')):
                 identifier = input_0.get('name')
                 self._move_to_and_send_keys(f'//input[@name="{identifier}"]', answer)
-                self._sleep(0, 2)
-            elif input_type == 'radio':
-                for input_i in tag.find_all('input'):
-                    text = input_i.find_next_sibling('span').get_text().strip()
-                    if text:
-                        selections.add(text)
-                answer = self._select_answer(answer, selections)
-                identifier = input_0.get('name')
-                self._move_to_and_click(
-                    f'//span[contains(text(), "{answer}")]/preceding::input[@name="{identifier}"][1]')
-                self._sleep(0, 2)
+            elif (input_type == 'radio') or (input_type == 'checkbox'):
+                self._input_radio(answer, tag)
         elif tag.find('select'):
             self._log(f"Input type found: selection.")
-            for option_i in tag.find_all('option'):
-                if option_i.get('value'):
-                    text = option_i.get_text()
-                    if text:
-                        selections.add(text)
-            answer = self._select_answer(answer, selections)
-            identifier = tag.find('select').get('name')
-            self._move_to_and_click(
-                f'//select[@name="{identifier}"]//option[contains(text(), "{answer}")]')
-            self._sleep(0, 2)
+            self._input_selection(answer, tag)
         elif tag.find('textarea'):
             self._log(f"Input type found: textarea.")
             textarea = tag.find('textarea')
             if not textarea.get('value'):
                 identifier = textarea.get('name')
                 self._move_to_and_send_keys(f'//textarea[@name="{identifier}"]', answer)
-                self._sleep(0, 2)
         else:
             self._log(f"Input type found: unknown.")
+        return None
+
+    def _input_radio(self, answer: str, tag: Tag) -> None:
+        selections = set()
+        for input_i in tag.find_all('input'):
+            text = input_i.find_next_sibling('span').get_text()
+            if text:
+                selections.add(text)
+        answer = self._select_answer(answer, selections)
+        identifier = input_i.get('name')
+        xpath = f'//span[contains(text(), "{answer}")]/preceding::input[@name="{identifier}"][1]'
+        if not self._browser.find_element(By.XPATH, xpath).is_selected():
+            self._move_to_and_click(xpath)
+        return None
+
+    def _input_selection(self, answer: str, tag: Tag) -> None:
+        selections = set()
+        for option_i in tag.find_all('option'):
+            if option_i.get('value'):
+                text = option_i.get_text()
+                if text:
+                    selections.add(text)
+        answer = self._select_answer(answer, selections)
+        identifier = tag.find('select').get('name')
+        xpath = f'//select[@name="{identifier}"]//option[contains(text(), "{answer}")]'
+        if not self._browser.find_element(By.XPATH, xpath).is_selected():
+            self._move_to_and_click(xpath)
         return None
 
     def _load_s2v_model(self) -> None:
@@ -247,21 +273,21 @@ class IndeedCrawler:
         self._browser.execute_script(
             "arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});",
             self._browser.find_element(By.XPATH, xpath))
-        self._sleep(0, 2)
-        ActionChains(self._browser).move_to_element(
-            self._browser.find_element(By.XPATH, xpath)).perform()
+        self._sleep(*self.fidget_time)
+        try:
+            ActionChains(self._browser).move_to_element(
+                self._browser.find_element(By.XPATH, xpath)).perform()
+            self._sleep(*self.fidget_time)
+        except ElementNotInteractableException:
+            self._log(f"Web element not interactable: {xpath}")
         return None
 
     def _move_to_and_click(self, xpath: str) -> None:
         #  Finding the element before every action is
         #  to avoid "StaleElementReferenceException".
-        try:
-            self._move_to(xpath)
-            self._sleep(0, 2)
-        except ElementNotInteractableException:
-            # Sometimes element is clickable but not interactable.
-            pass
+        self._move_to(xpath)
         self._browser.find_element(By.XPATH, xpath).click()
+        self._sleep(*self.fidget_time)
         return None
 
     def _move_to_and_send_keys(self, xpath: str, keys: str) -> None:
@@ -269,15 +295,16 @@ class IndeedCrawler:
         #  to avoid "StaleElementReferenceException".
         self._move_to_and_click(xpath)
         for key_ in keys:
-            self._sleep(0, 0.5)
+            self._sleep(0, 0.25)  # Typing speed
             self._browser.find_element(By.XPATH, xpath).send_keys(key_)
+        self._sleep(*self.fidget_time)
         return None
 
     def _search_jobs(self, country: str, location: str, number_of_jobs: int, query: str,
             company_negate_list: List[str] = [], enforce_salary: bool = False,
             enforce_query: bool = False, exp_lvl: str = '', job_negate_list: List[str] = [],
             job_type: str = '', min_salary: str = '', past_14_days: bool = False,
-            radius: str = '', wait: int = 5) -> None:
+            radius: str = '') -> None:
         if not number_of_jobs:
             self._log('Number of jobs is zero.')
             return None
@@ -288,7 +315,9 @@ class IndeedCrawler:
             f"{'&fromage=14' * past_14_days}{'&jt='*bool(job_type) + job_type}"
             f"{'&explvl='*bool(exp_lvl) + exp_lvl}{'&l='*bool(location) + location}"
             f"{'&radius='*bool(radius) + radius}")
-        WebDriverWait(self._browser, 600).until(lambda driver: '&vjk=' in driver.current_url)
+        self._log(f"Waiting for job search page. If there is a captcha, fill it out now.")
+        WebDriverWait(self._browser, 60).until(lambda driver: '&vjk=' in driver.current_url)
+        self._sleep(*self.page_load_time)
         batch_jobs_applied_to = 0
         active_search = True
         while active_search:
@@ -331,7 +360,7 @@ class IndeedCrawler:
                 location = self._get_value(
                     'Location', tag.find('div', {'data-testid': 'text-location'}))
                 job_url = f"https://www.indeed.com/viewjob?jk={job_jk}"
-                if self._apply_to_job(job_url, wait):
+                if self._apply_to_job(job_url):
                     self._cache_job(job_jk)
                     self.results['Title'].append(title)
                     self.results['Company'].append(company)
@@ -345,11 +374,11 @@ class IndeedCrawler:
                     active_search = False
                     break
             try:
-                self._move_to_and_click('//nav//a[@aria-label="Next Page"]')
+                self._click_button(
+                    self._browser.current_url, '//nav//a[@aria-label="Next Page"]')
             except NoSuchElementException:
                 self._log('Failed to click next page')
                 break
-            self._sleep(wait)  # Wait for page to load.
         return None
 
     def _select_answer(self, answer: str, selections: Set[str]) -> str:
@@ -362,17 +391,28 @@ class IndeedCrawler:
 
     def _select_continue(self) -> bool:
         xpath = '//button//span[contains(text(), "Continue") or contains(text(), "continue")]'
-        # The continue button is duplicated in the html source.
-        for web_element in self._browser.find_elements(By.XPATH, xpath):
-            try:
-                web_element.click()
-                self._log('Selected continue.')
-                return True
-            except ElementNotInteractableException:
-                pass
-        self._log('Failed to continue.')
+        try:
+            self._move_to(xpath)
+        except NoSuchElementException:
+            return False
+        else:
+            prev_url = self._browser.current_url
+            # The continue button is duplicated in the html source.
+            for web_element in self._browser.find_elements(By.XPATH, xpath):
+                try:
+                    web_element.click()
+                    self._log('Selected continue.')
+                    self._wait_for_new_page(prev_url)
+                    return True
+                except ElementNotInteractableException:
+                    pass
         return False
 
-    def _sleep(self, wait: int, rand_lim = 3) -> None:
-        sleep(wait + uniform(0, rand_lim))
+    def _sleep(self, seconds: int, rand_lim = 3) -> None:
+        sleep(seconds + uniform(0, rand_lim))
+        return None
+
+    def _wait_for_new_page(self, prev_url: str) -> None:
+        WebDriverWait(self._browser, self.timeout_time).until(lambda driver: prev_url != driver.current_url)
+        self._sleep(*self.page_load_time)
         return None
