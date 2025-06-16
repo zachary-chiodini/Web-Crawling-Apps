@@ -69,8 +69,8 @@ class App:
             'Country Code': '1',
             'Hours per Week': '40',
             'Interview Date & Time': 'Anytime',
-            'Start Date': date.today().strftime('%m/%d/%y'),
-            "Today's Date": date.today().strftime('%m/%d/%y'),
+            'Start Date': date.today().strftime('%m/%d/%Y'),
+            "Today's Date": date.today().strftime('%m/%d/%Y'),
             'Website': 'No Website'
         }
         self._log_box: Text
