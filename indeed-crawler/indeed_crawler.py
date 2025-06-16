@@ -100,7 +100,7 @@ class IndeedCrawler:
         self._browser.execute_script(f"window.open('{job_url}', '_blank');")
         self._sleep(wait)
         self._browser.switch_to.window(self._browser.window_handles[-1])
-        self._sleep(0)
+        self._sleep(0, 2)
         self._move_to_and_click('//button//span[contains(text(), "Apply")]')
         self._sleep(wait)
         prev_url = ''
@@ -187,6 +187,7 @@ class IndeedCrawler:
             if input_type == 'text' and (not input_0.get('value')):
                 identifier = input_0.get('name')
                 self._move_to_and_send_keys(f'//input[@name="{identifier}"]', answer)
+                self._sleep(0, 2)
             elif input_type == 'radio':
                 for input_i in tag.find_all('input'):
                     text = input_i.find_next_sibling('span').get_text().strip()
@@ -196,6 +197,7 @@ class IndeedCrawler:
                 identifier = input_0.get('name')
                 self._move_to_and_click(
                     f'//span[contains(text(), "{answer}")]/preceding::input[@name="{identifier}"][1]')
+                self._sleep(0, 2)
         elif tag.find('select'):
             self._log(f"Input type found: selection.")
             for option_i in tag.find_all('option'):
@@ -207,12 +209,14 @@ class IndeedCrawler:
             identifier = tag.find('select').get('name')
             self._move_to_and_click(
                 f'//select[@name="{identifier}"]//option[contains(text(), "{answer}")]')
+            self._sleep(0, 2)
         elif tag.find('textarea'):
             self._log(f"Input type found: textarea.")
             textarea = tag.find('textarea')
             if not textarea.get('value'):
                 identifier = textarea.get('name')
                 self._move_to_and_send_keys(f'//textarea[@name="{identifier}"]', answer)
+                self._sleep(0, 2)
         else:
             self._log(f"Input type found: unknown.")
         return None
@@ -258,7 +262,6 @@ class IndeedCrawler:
             # Sometimes element is clickable but not interactable.
             pass
         self._browser.find_element(By.XPATH, xpath).click()
-        self._sleep(0, 2)
         return None
 
     def _move_to_and_send_keys(self, xpath: str, keys: str) -> None:
