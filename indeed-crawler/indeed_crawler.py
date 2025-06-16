@@ -107,6 +107,9 @@ class IndeedCrawler:
         self._wait_for_new_page(prev_url)
         self._click_button(
             self._browser.current_url, '//button//span[contains(text(), "Apply")]')
+        if self._browser.current_url == job_url:
+            self._log(f"Cannot apply to job: no apply button.")
+            return False
         retries = 0
         while True:
             for tag in BeautifulSoup(self._browser.page_source, 'lxml').find_all(
