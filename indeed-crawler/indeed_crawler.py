@@ -243,7 +243,7 @@ class IndeedCrawler:
         self._browser.execute_script(
             "arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});",
             self._browser.find_element(By.XPATH, xpath))
-        self._sleep(0)
+        self._sleep(0, 2)
         ActionChains(self._browser).move_to_element(
             self._browser.find_element(By.XPATH, xpath)).perform()
         return None
@@ -253,12 +253,12 @@ class IndeedCrawler:
         #  to avoid "StaleElementReferenceException".
         try:
             self._move_to(xpath)
-            self._sleep(0)
+            self._sleep(0, 2)
         except ElementNotInteractableException:
             # Sometimes element is clickable but not interactable.
             pass
         self._browser.find_element(By.XPATH, xpath).click()
-        self._sleep(0)
+        self._sleep(0, 2)
         return None
 
     def _move_to_and_send_keys(self, xpath: str, keys: str) -> None:
@@ -266,7 +266,7 @@ class IndeedCrawler:
         #  to avoid "StaleElementReferenceException".
         self._move_to_and_click(xpath)
         for key_ in keys:
-            self._sleep(0, 1)
+            self._sleep(0, 0.5)
             self._browser.find_element(By.XPATH, xpath).send_keys(key_)
         return None
 
