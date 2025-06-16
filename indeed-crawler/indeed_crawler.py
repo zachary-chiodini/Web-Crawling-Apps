@@ -72,7 +72,7 @@ class IndeedCrawler:
             if path.exists(self._submissions_doc):
                 with ExcelWriter(self._submissions_doc, engine='openpyxl',mode='a',
                                  if_sheet_exists='overlay') as writer:
-                    df.to_excel(writer, sheet_name='jobs', index=False,
+                    df.to_excel(writer, sheet_name='jobs', header=False, index=False,
                                 startrow=writer.sheets['jobs'].max_row)
             else:
                 df.to_excel(self._submissions_doc, sheet_name='jobs', index=False)
@@ -100,7 +100,7 @@ class IndeedCrawler:
         self._browser.execute_script(f"window.open('{job_url}', '_blank');")
         self._sleep(wait)
         self._browser.switch_to.window(self._browser.window_handles[-1])
-        self._sleep(1)
+        self._sleep(0)
         self._move_to_and_click('//button//span[contains(text(), "Apply")]')
         self._sleep(wait)
         prev_url = ''
@@ -146,10 +146,13 @@ class IndeedCrawler:
                 lambda driver: driver.current_url.endswith('post-apply'))
             return_val = True
             self._log(f"SUCCESS - applied to job {job_url}")
+            self._sleep(wait)
         except TimeoutException:
             self._log(f"FAILURE - did not apply to job {job_url}")
         self._browser.close()
+        self._sleep(0)
         self._browser.switch_to.window(self._main_window)
+        self._sleep(wait)
         return return_val
 
     def _cache_job(self, job_jk: str) -> None:
@@ -213,7 +216,7 @@ class IndeedCrawler:
                 self._move_to_and_send_keys(f'//textarea[@name="{identifier}"]', answer)
         else:
             self._log(f"Input type found: unknown.")
-        self._sleep(1)
+        self._sleep(0)
         return None
 
     def _load_s2v_model(self) -> None:
@@ -242,7 +245,7 @@ class IndeedCrawler:
         self._browser.execute_script(
             "arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});",
             self._browser.find_element(By.XPATH, xpath))
-        self._sleep(1)
+        self._sleep(0)
         ActionChains(self._browser).move_to_element(
             self._browser.find_element(By.XPATH, xpath)).perform()
         return None
@@ -250,8 +253,12 @@ class IndeedCrawler:
     def _move_to_and_click(self, xpath: str) -> None:
         #  Finding the element before every action is
         #  to avoid "StaleElementReferenceException".
-        self._move_to(xpath)
-        self._sleep(1)
+        try:
+            self._move_to(xpath)
+            self._sleep(0)
+        except ElementNotInteractableException:
+            # Sometimes element is clickable but not interactable.
+            pass
         self._browser.find_element(By.XPATH, xpath).click()
         return None
 
@@ -259,8 +266,9 @@ class IndeedCrawler:
         #  Finding the element before every action is
         #  to avoid "StaleElementReferenceException".
         self._move_to_and_click(xpath)
-        self._sleep(1)
-        self._browser.find_element(By.XPATH, xpath).send_keys(keys)
+        for key_ in keys:
+            self._sleep(0)
+            self._browser.find_element(By.XPATH, xpath).send_keys(key_)
         return None
 
     def _search_jobs(self, country: str, location: str, number_of_jobs: int, query: str,
@@ -360,7 +368,6 @@ class IndeedCrawler:
                 return True
             except ElementNotInteractableException:
                 pass
-            self._sleep(1)
         self._log('Failed to continue.')
         return False
 
