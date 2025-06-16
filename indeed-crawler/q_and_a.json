@@ -33,7 +33,8 @@
             "Phone number format must be between 6 and 15 digits, and can only contain numbers": ""
       },
       "Current Company": {
-            "Current Company": ""
+            "Current Company": "",
+            "Current or last company you worked for": ""
       },
       "Current Job Title": {
             "What is your most recent job title?": "",
@@ -57,7 +58,11 @@
       },
       "Full Address": {
             "Where are you currently located?": "",
-            "What is your current location?": ""
+            "What is your current location?": "",
+            "Current Location": "",
+            "Address (Please specify City & State)": "",
+            "Address": "",
+            "Location": ""
       },
       "Postal Code": {
             "Postal/ZIP": "",
@@ -91,7 +96,8 @@
       },
       "Skills Other": {
             "Do you have at least one year of experience in [BLANK]?": "",
-            "Do you have experience working with [BLANK]?": ""
+            "Do you have experience working with [BLANK]?": "",
+            "Do you have [BLANK] experience or are you in a [BLANK] degree?": ""
       },
       "Highest Education": {
             "What is the highest level of education you have completed?": "",
@@ -114,7 +120,8 @@
             "What are your salary expectations?": "",
             "What is your desired salary?": "",
             "Please enter the amount": "",
-            "What are your compensation expectations for this position?": ""
+            "What are your compensation expectations for this position?": "",
+            "Salary Expectation": ""
       },
       "Salary Type": {
             "Desired Pay": ""
@@ -159,6 +166,9 @@
             "Will you now or in the future require the company to commence an immigration case in order to employ you? This is sometimes called 'sponsorship' for an employment-based visa status.": ""
       },
       "Eligible to Work": {
+            "Are you legally eligible to work in the location listed within the job description?": "",
+            "Are you legally eligible to work in the location listed within the job description? Select 'Yes' if you do NOT need visa sponsorship of any kind.": "",
+            "Do you currently have indefinite authorization to work in [BLANK]?": "",
             "Are you able to work in the US without sponsorship (now or in the future)?": "",                        
             "Are you currently authorized to work in the [BLANK] without the need for current or future visa sponsorship?": "",
             "Are you legally authorized to work in the [BLANK] for any employer without the need for current or future sponsorship for an employment visa?": "",
@@ -167,6 +177,7 @@
             "Are you legally authorized to work in [BLANK]": "",
             "Are you authorized to work in the job's location?": "",
             "Are you authorised to work in [BLANK]?": "",
+            "Are you authorized to work in the [BLANK] WITHOUT sponsorship or an employment pass?": "",
             "Are you currently legally eligible to work in [BLANK]?": "",
             "Are you currently authorized to work in [BLANK]?": "",
             "Are you authorized to work in the following country: [BLANK]?": "",
@@ -179,6 +190,12 @@
             "Can you provide the necessary documentation to prove that you are a citizen, permanent resident, or a foreign national with authorization to work in [BLANK]?": ""
       },
       "Private": {
+            "Do you have access to a remote work environment that will allow me to work effectively during my working hours.": "Yes",
+            "Do you have consistent internet access?": "Yes",            
+            "Do you currently live in the United States of America?": "Yes",
+            "Have you ever been employed by us? If yes, list your dates of employment in the additional commends field below.": "No",
+            "Do you have any family members that work for us? If yes, please list their full name and relationship in the additional comments field below.": "No referral",
+            "If extended an offer of employment, how long of a notice period do you require?": "One week",
             "Which languages and dialects do you speak fluently?": "English",
             "Have you ever worked in this industry before?": "Yes",
             "Do you wish to proceed with your application?": "Yes",
