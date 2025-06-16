@@ -1,7 +1,7 @@
 __pycache__
 build
 cache.txt
-dist/job-crawler-*
+dist
 fasttext-model/cc.en.100.bin
 fasttext-model/cc.en.300.bin
 questionnaire.xlsx
