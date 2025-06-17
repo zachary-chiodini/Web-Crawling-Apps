@@ -424,6 +424,7 @@ class IndeedCrawler:
         return None
 
     def _wait_for_new_page(self, prev_url: str) -> None:
-        WebDriverWait(self._browser, self.timeout_time).until(lambda driver: prev_url != driver.current_url)
+        WebDriverWait(self._browser, self.timeout_time).until(
+            lambda driver: prev_url != driver.current_url)
         self._sleep(*self.page_load_time)
         return None
